@@ -754,6 +754,7 @@ namespace AtmoData
 	  {
 
 	    /*** Low clouds ***/
+
 	    cloud_max = 0;
 	    // The first level is excluded.
 	    for (k = 1; k < Nz && Pressure(h, k, j, i) > P_0; k++)
@@ -776,12 +777,12 @@ namespace AtmoData
 	    k_max = k - 1;
 	    // Goes up to P_0.
 	    if (k_base > k_top)
-	      k_top = k_max;
+	      k_top = k_max + 1;
 	    LowIndices(h, j, i, 0) = k_base;
 	    LowIndices(h, j, i, 1) = k_top;
 	    k = k_base;
 	    // k_top == 0 means no cloud.
-	    while (k <= k_top && k_top != 0)
+	    while (k < k_top && k_top != 0)
 	      {
 		LowCloudiness(h, j, i) += CloudFraction(h, k, j, i)
 		  * (GridZ_interf.Value(h, k + 1, j, i)
@@ -790,7 +791,7 @@ namespace AtmoData
 	      }
 	    if (k_top != 0)
 	      LowCloudiness(h, j, i) /=
-		GridZ_interf.Value(h, k_top + 1, j, i)
+		GridZ_interf.Value(h, k_top, j, i)
 		- GridZ_interf.Value(h, k_base, j, i);
 
 	    /*** Medium clouds ***/
@@ -818,7 +819,7 @@ namespace AtmoData
 	    k_max = k - 1;
 	    // Goes up to P_1.
 	    if (k_base > k_top)
-	      k_top = k_max;
+	      k_top = k_max + 1;
 	    MediumIndices(h, j, i, 0) = k_base;
 	    MediumIndices(h, j, i, 1) = k_top;
 	    k = k_base;
@@ -832,7 +833,7 @@ namespace AtmoData
 	      }
 	    if (k_top != 0)
 	      MediumCloudiness(h, j, i) /=
-		GridZ_interf.Value(h, k_top + 1, j, i)
+		GridZ_interf.Value(h, k_top, j, i)
 		- GridZ_interf.Value(h, k_base, j, i);
 
 	    /*** High clouds ***/
@@ -856,7 +857,7 @@ namespace AtmoData
 	    k_max = k - 1;
 	    // Goes up to the top.
 	    if (k_base > k_top)
-	      k_top = k_max;
+	      k_top = k_max + 1;
 	    HighIndices(h, j, i, 0) = k_base;
 	    HighIndices(h, j, i, 1) = k_top;
 	    k = k_base;
@@ -870,7 +871,7 @@ namespace AtmoData
 	      }
 	    if (k_top != 0)
 	      HighCloudiness(h, j, i) /=
-		GridZ_interf.Value(h, k_top + 1, j, i)
+		GridZ_interf.Value(h, k_top, j, i)
 		- GridZ_interf.Value(h, k_base, j, i);
 	  }
   }

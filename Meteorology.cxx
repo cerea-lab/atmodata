@@ -129,34 +129,34 @@ namespace AtmoData
 
     if ( (ZonalWind.GetLength(3) == Nx + 1) && (MeridionalWind.GetLength(2) == Ny + 1) )
       for (h=0; h<Nt; h++)
-	  for (j=0; j<Ny; j++)
-	    for (i=0; i<Nx; i++)
-	      {
+	for (j=0; j<Ny; j++)
+	  for (i=0; i<Nx; i++)
+	    {
 		
-		u = 0.5 * (ZonalWind(h, 0, j, i+1) + ZonalWind(h, 0, j, i));
-		v = 0.5 * (MeridionalWind(h, 0, j+1, i) + MeridionalWind(h, 0, j, i));
-		wind = max(sqrt(u*u + v*v), wind_threshold);
-		SurfaceRichardson(h, j, i) = g * (PotentialTemperature(h, 1, j, i)
-						  - PotentialTemperature(h, 0, j, i))
-		  * (Levels.Value(h, 1, j, i) - Levels.Value(h, 0, j, i))
-		  / (wind*wind * PotentialTemperature(h, 0, j, i));
+	      u = 0.5 * (ZonalWind(h, 0, j, i+1) + ZonalWind(h, 0, j, i));
+	      v = 0.5 * (MeridionalWind(h, 0, j+1, i) + MeridionalWind(h, 0, j, i));
+	      wind = max(sqrt(u*u + v*v), wind_threshold);
+	      SurfaceRichardson(h, j, i) = g * (PotentialTemperature(h, 1, j, i)
+						- PotentialTemperature(h, 0, j, i))
+		* (Levels.Value(h, 1, j, i) - Levels.Value(h, 0, j, i))
+		/ (wind*wind * PotentialTemperature(h, 0, j, i));
 
-	      }
+	    }
     else
       for (h=0; h<Nt; h++)
-	  for (j=0; j<Ny; j++)
-	    for (i=0; i<Nx; i++)
-	      {
+	for (j=0; j<Ny; j++)
+	  for (i=0; i<Nx; i++)
+	    {
 		
-		u = ZonalWind(h, 0, j, i);
-		v = MeridionalWind(h, 0, j, i);
-		wind = max(sqrt(u*u + v*v), wind_threshold);
-		SurfaceRichardson(h, j, i) = g * (PotentialTemperature(h, 1, j, i)
-						  - PotentialTemperature(h, 0, j, i))
-		  * (Levels.Value(h, 1, j, i) - Levels.Value(h, 0, j, i))
-		  / (wind*wind * PotentialTemperature(h, 0, j, i));
+	      u = ZonalWind(h, 0, j, i);
+	      v = MeridionalWind(h, 0, j, i);
+	      wind = max(sqrt(u*u + v*v), wind_threshold);
+	      SurfaceRichardson(h, j, i) = g * (PotentialTemperature(h, 1, j, i)
+						- PotentialTemperature(h, 0, j, i))
+		* (Levels.Value(h, 1, j, i) - Levels.Value(h, 0, j, i))
+		/ (wind*wind * PotentialTemperature(h, 0, j, i));
 
-	      }
+	    }
 
   }
 

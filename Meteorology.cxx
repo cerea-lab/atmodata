@@ -57,6 +57,8 @@ namespace AtmoData
     int Nt = Richardson.GetLength(0);
 
     Grid<TG>& Levels = Richardson[1];
+    Grid<TG>& MeridionalWindLevels = MeridionalWind[1];
+    Grid<TG>& ZonalWindLevels = ZonalWind[1];
 
     const T g(9.81);
     T dudz, dvdz, dwinddz;
@@ -75,21 +77,21 @@ namespace AtmoData
 		dudz = 0.5
 		  * ( (ZonalWind(h, level, j, i+1)
 		       - ZonalWind(h, level-1, j, i+1))
-		      / (ZonalWindLevels(h, level, j, i+1)
-			 - ZonalWindLevels(h, level-1, j, i+1))
+		      / (ZonalWindLevels.Value(h, level, j, i+1)
+			 - ZonalWindLevels.Value(h, level-1, j, i+1))
 		      + (ZonalWind(h, level, j, i)
 			 - ZonalWind(h, level-1, j, i))
-		      / (ZonalWindLevels(h, level, j, i)
-			 - ZonalWindLevels(h, level-1, j, i)) );
+		      / (ZonalWindLevels.Value(h, level, j, i)
+			 - ZonalWindLevels.Value(h, level-1, j, i)) );
 		dvdz = 0.5
 		  * ( (MeridionalWind(h, level, j+1, i)
 		       - MeridionalWind(h, level-1, j+1, i))
-		      / (MeridionalWindLevels(h, level, j+1, i)
-			 - MeridionalWindLevels(h, level-1, j+1, i))
+		      / (MeridionalWindLevels.Value(h, level, j+1, i)
+			 - MeridionalWindLevels.Value(h, level-1, j+1, i))
 		      + (MeridionalWind(h, level, j, i)
 			 - MeridionalWind(h, level-1, j, i))
-		      / (MeridionalWindLevels(h, level, j, i)
-			 - MeridionalWindLevels(h, level-1, j, i)) );
+		      / (MeridionalWindLevels.Value(h, level, j, i)
+			 - MeridionalWindLevels.Value(h, level-1, j, i)) );
 		dwinddz = max(sqrt(dudz*dudz + dvdz*dvdz), wind_threshold);
 		Richardson(h, k, j, i) =
 		  g * (PotentialTemperature(h, level, j, i)
@@ -111,12 +113,12 @@ namespace AtmoData
 		
 		dudz = (ZonalWind(h, level, j, i)
 			- ZonalWind(h, level-1, j, i))
-		  / (ZonalWindLevels(h, level, j, i)
-		     - ZonalWindLevels(h, level-1, j, i));
+		  / (ZonalWindLevels.Value(h, level, j, i)
+		     - ZonalWindLevels.Value(h, level-1, j, i));
 		dvdz = (MeridionalWind(h, level, j, i)
 			- MeridionalWind(h, level-1, j, i))
-		      / (MeridionalWindLevels(h, level, j, i)
-			 - MeridionalWindLevels(h, level-1, j, i));
+		      / (MeridionalWindLevels.Value(h, level, j, i)
+			 - MeridionalWindLevels.Value(h, level-1, j, i));
 		dwinddz = max(sqrt(dudz*dudz + dvdz*dvdz), wind_threshold);
 		Richardson(h, k, j, i) =
 		  g * (PotentialTemperature(h, level, j, i)

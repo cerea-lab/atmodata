@@ -338,7 +338,7 @@ namespace AtmoData
 	throw IOError("FormatBinary<T>::Read(ifstream& FileStream, Array<T, N>& A)",
 		    "Unable to read " + to_str(data_size) + " byte(s)." +
 		      " The input stream is only "
-		      + to_str(file_size/(rec_length+12)*rec_length) + " byte(s) long.");
+		      + to_str((file_size/(rec_length+12)+i)*rec_length) + " byte(s) long.");
       }
     FileStream.seekg(position);
 

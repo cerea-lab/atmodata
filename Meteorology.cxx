@@ -294,6 +294,66 @@ namespace AtmoData
   }
 
 
+  template <class TT, class TP, class TH,
+	    class T, class TG>
+  void ComputeCloudHeight(Data<TT, 4, TG>& Temperature, Data<TP, 4, TG>& Pressure,
+			  Data<TH, 4, TG>& Humidity,
+			  T (CriticalRelativeHumidity)(const T&, const T&, const T&),
+			  Data<T, 3, TG>& CloudHeight)
+  {
+
+    int h, k, j, i;
+    int Nt(CloudHeight.GetLength(0));
+    int Nz(Pressure.GetLength(1));
+    int Ny(CloudHeight.GetLength(1));
+    int Nx(CloudHeight.GetLength(2));    
+
+    // Index "0" and "1" refer to two contiguous levels.
+    T rh0, rh1, rhc, dz, delta_z, s;
+
+    T max_height = 2. * Pressure[1].Value(0, Nz-1, 0, 0);
+    CloudHeight.Fill(max_height);
+
+    for (h=0; h<Nt; h++)
+      for (j=0; j<Ny; j++)
+	for (i=0; i<Nx; i++)
+	  {
+
+	    // Specific humidity to relative humidity.
+	    s = 611. * pow(10., 7.5 * (Temperature(h, Nz-1, j, i) - 273.15)
+			   / (Temperature(h, Nz-1, j, i) - 35.85));
+	    rh0 = Pressure(h, Nz-1, j, i) * Humidity(h, Nz-1, j, i)
+	      / (0.62197 + Humidity(h, Nz-1, j, i)) / s;
+	    
+	    k = 0;
+	    while ( (k<Nz) && (CloudHeight(h, j, i) == max_height) )
+	      {
+
+		// Specific humidity to relative humidity.
+		s = 611. * pow(10., 7.5 * (Temperature(h, k, j, i) - 273.15)
+			       / (Temperature(h, k, j, i) - 35.85));
+		rh1 = Pressure(h, k, j, i) * Humidity(h, k, j, i)
+		  / (0.62197 + Humidity(h, k, j, i)) / s;
+
+		// Critical relative humidity.
+		rhc = CriticalRelativeHumidity(Pressure[1].Value(h, k, j, i),
+					       Pressure(h, k, j, i),
+					       Pressure(h, 0, j, i));
+
+		if (rh1 >= rhc)  // Above a cloud.
+		  CloudHeight(h, j, i) = Pressure[1].Value(h, k, j, i);
+
+		// For the next level.
+		rh0 = rh1;
+
+		k++;
+
+	      }
+
+	  }
+  }
+
+
 }  // namespace AtmoData.
 
 #define ATMODATA_FILE_METEOROLOGY_CXX

@@ -49,6 +49,12 @@ namespace AtmoData
   void ComputeModule(Data<TU, 4, TG>& U, Data<TV, 4, TG>& V,
 		     Data<T, 3, TG>& Module);
 
+  template <class TT, class TP, class TH,
+	    class T, class TG>
+  void ComputeCloudHeight(Data<TT, 4, TG>& Temperature, Data<TP, 4, TG>& Pressure,
+			  Data<TH, 4, TG>& Humidity,
+			  T (CriticalRelativeHumidity)(const T&, const T&, const T&),
+			  Data<T, 3, TG>& CloudHeight);
 
 }  // namespace AtmoData.
 

@@ -3,6 +3,24 @@ o------------------o
 o------------------o
 
 
+Version 0.3 (2003-08-04)
+-----------
+
+** Improvements:
+
+- Added function 'ZenithAngle' to compute the zenith angle.
+- Removed functions 'to_num' because they are now defined in SeldonData.
+- Added functions to compute errors between data sets:
+   + NGE_interpolation
+   + NGE
+   + Bias_interpolation
+   + Bias
+   + RMS_interpolation
+   + RMS
+
+** Bug fixes:
+
+
 Version 0.2 (2003-06-10)
 -----------
 

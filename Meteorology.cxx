@@ -931,6 +931,42 @@ namespace AtmoData
   }
 
 
+  //! Computes the height of cloud basis.
+  /*!
+    \param LowIndices vertical indices of base and top of low clouds.
+    \param MediumIndices vertical indices of base and top of medium clouds.
+    \param HighIndices vertical indices of base and top of high clouds.
+    \param CloudHeight (output) altitudes of cloud basis.
+  */
+  template <class T, class TG>
+  void ComputeCloudHeight(Data<int, 4>& LowIndices,
+			  Data<int, 4>& MediumIndices,
+			  Data<int, 4>& HighIndices,
+			  Grid<TG>& GridZ_interf,
+			  Data<T, 3, TG>& CloudHeight)
+  {
+    int h, j, i;
+    int Nt(CloudHeight.GetLength(0));
+    int Ny(CloudHeight.GetLength(1));
+    int Nx(CloudHeight.GetLength(2));
+
+    CloudHeight.SetZero();
+
+    for (h = 0; h < Nt; h++)
+      for (j = 0; j < Ny; j++)
+	for (i = 0; i < Nx; i++)
+	  if (LowIndices(h, j, i, 0) != 0)
+	    CloudHeight(h, j, i) =
+	      GridZ_interf.Value(h, LowIndices(h, j, i, 0), j, i);
+	  else if (MediumIndices(h, j, i, 0) != 0)
+	    CloudHeight(h, j, i) =
+	      GridZ_interf.Value(h, MediumIndices(h, j, i, 0), j, i);
+	  else if (HighIndices(h, j, i, 0) != 0)
+	    CloudHeight(h, j, i) =
+	      GridZ_interf.Value(h, HighIndices(h, j, i, 0), j, i);
+  }
+
+
   //! Computes the pressure from the surface pressure.
   /*!
     Formula: Pressure_k = alpha_k * P0 + beta_k * SurfacePressure,

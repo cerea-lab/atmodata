@@ -130,6 +130,13 @@ namespace AtmoData
 			  Data<TCRH, 4, TG>& CriticalRelativeHumidity,
 			  Data<T, 3, TG>& CloudHeight);
 
+  template <class T, class TG>
+  void ComputeCloudHeight(Data<int, 4>& LowIndices,
+			  Data<int, 4>& MediumIndices,
+			  Data<int, 4>& HighIndices,
+			  Grid<TG>& GridZ_interf,
+			  Data<T, 3, TG>& CloudHeight);
+
   template <class Ta, class Tb, class TSP,
 	    class T, class TG>
   void ComputePressure(Data<Ta, 1, TG>& alpha, Data<Tb, 1, TG>& beta,

@@ -176,6 +176,79 @@ namespace AtmoData
 
   //! Default constructor.
   template <class T>
+  LonlatToMM5LccInd<T>::LonlatToMM5LccInd(int jmx, int imx, double jx, double ix, double phic, double lambdac,
+					  double phi1, double phi2, double ds0, int ratio)  throw():
+    jmx_(jmx), imx_(imx), jx_(jx), ix_(ix), phic_(phic), lambdac_(lambdac),
+    phi1_(phi1), phi2_(phi2), ds0_(ds0), ratio_(ratio),
+    pi_(3.14159265358979323846264),
+    Earth_radius_(6370997.)
+  {
+    
+  }
+
+
+  //! Convertion operator.
+  /*!
+    \param lon longitude.
+    \param lat latitude.
+    \param j index of the MM5 grid along the East-West direction.
+    \param i index of the MM5 grid along the North-South direction.
+    \warning Indices order (in MM5) is confusing: j and i are swapped with respect to
+    the natural order.
+  */
+  template <class T>
+  void LonlatToMM5LccInd<T>::operator() (const T lon, const T lat,
+					 T& j, T& i)
+  {
+
+    double ic0, jc0;
+    double ic, jc;
+    double conv;
+    double aux1, aux2, kappa;
+    double auxsig;
+    double psi1;
+    double auxc, yc;
+    double x, y, R;
+    double auxl;
+    double lambdaprima;
+    double aux, Rs;
+    double auxij;
+    double auxtan;
+
+    ic0 = (imx_ + 1.0) / 2.0;
+    jc0 = (jmx_ + 1.0) / 2.0;
+
+    ic = (ic0 - ix_) * ratio_ + 0.5;
+    jc = (jc0 - jx_) * ratio_ + 0.5;
+
+    conv = 360.0 / (2.0 * pi_);
+
+    aux1 = (45.0 - abs(phi1_) / 2.0) / conv;
+    aux2 = (45.0 - abs(phi2_) / 2.0) / conv;
+    kappa = ( log10(cos(phi1_/conv)) - log10(cos(phi2_/conv)) )
+      / ( log10(tan(aux1)) - log10(tan(aux2)) );
+
+    auxsig = phic_>0 ? 1.0 : -1.0;
+    
+    psi1 = auxsig * ( pi_ / 2.0 - abs(phi1_) / conv );
+
+    auxc = (auxsig * 90.0 - phic_) / conv / 2.0;
+    yc = - (Earth_radius_ / kappa) * sin(psi1)
+      * pow(tan(auxc) / tan(psi1/2.0), kappa);
+
+    aux = (auxsig * 90.0 - lat) / (2.0 * conv);
+    Rs = (Earth_radius_ / kappa) * sin(psi1) * pow(tan(aux) / tan(psi1/2.0), kappa);
+
+    auxij = kappa * (lon - lambdac_) / conv;
+    i = ( ic0 - ( yc/ds0_ + Rs*cos(auxij)/ds0_ ) - ix_ ) * ratio_ - 0.5;
+
+    j = ( jc0 + auxsig * Rs * sin(auxij)/ds0_ - jx_ ) * ratio_ - 0.5;
+
+  }
+
+
+  //! Default constructor.
+  template <class T>
   MM5MercIndToLonlat<T>::MM5MercIndToLonlat(int jmx, int imx, double jx, double ix, double phic,
 					    double lambdac, double phi1, double ds, int ratio)  throw():
     jmx_(jmx), imx_(imx), jx_(jx), ix_(ix), phic_(phic), lambdac_(lambdac),

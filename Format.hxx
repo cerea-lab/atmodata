@@ -3,7 +3,7 @@
 namespace AtmoData
 {
 
-  //! Input/ouput class to read files in CSV format.
+  //! Input/ouput class to read files in CSV format (Airparif).
   class FormatCSV: public Format
   {
 

@@ -28,13 +28,13 @@ namespace AtmoData
 
   /*!
     Computes biogenic emission rates according to Simpson et al. (1999).
-    \param LUC Land use coverage.
-    \param EF_isoprene isoprene emission factors.
-    \param EF_terpenes terpenes emission factors.
-    \param EF_NO NO emission factors.
-    \param Isoprene isoprene emission rates.
-    \param Terpenes terpenes emission rates.
-    \param NO NO emission rates.
+    \param LUC Land use coverage ([0, 1]).
+    \param EF_isoprene isoprene emission factors (\mu g . m^{-2} . s^{-1}).
+    \param EF_terpenes terpenes emission factors (\mu g . m^{-2} . s^{-1}).
+    \param EF_NO NO emission factors (\mu g . m^{-2} . s^{-1}).
+    \param Isoprene isoprene emission rates (\mu g . m^{-2} . s^{-1}).
+    \param Terpenes terpenes emission rates (\mu g . m^{-2} . s^{-1}).
+    \param NO NO emission rates (\mu g . m^{-2} . s^{-1}).
   */
   template <class TL, class TD, class TEFI, class TEFT,
 	    class TEFN, class TI, class TT, class TN, class TG>
@@ -62,7 +62,7 @@ namespace AtmoData
 	  {
 	    Isoprene(j, i) += Density(k) * EF_isoprene(k) * LUC(k, j, i);
 	    Terpenes(j, i) += Density(k) * EF_terpenes(k) * LUC(k, j, i);
-	    NO(j, i) += Density(k) * EF_NO(k) * 1.e-3 * LUC(k, j, i);
+	    NO(j, i) += Density(k) * EF_NO(k) * LUC(k, j, i);
 	  }
 
   }
@@ -74,12 +74,12 @@ namespace AtmoData
     \param Temperature soil or leaf temperature.
     \param PAR Photosynthetically active radiation.
     \param LUC Land use coverage.
-    \param EF_isoprene isoprene emission factors.
-    \param EF_terpenes terpenes emission factors.
-    \param EF_NO NO emission factors.
-    \param Isoprene isoprene emissions.
-    \param Terpenes terpenes emissions.
-    \param NO NO emissions.
+    \param EF_isoprene isoprene emission factors (\mu g . m^{-2} . s^{-1}).
+    \param EF_terpenes terpenes emission factors (\mu g . m^{-2} . s^{-1}).
+    \param EF_NO NO emission factors (\mu g . m^{-2} . s^{-1}).
+    \param Isoprene isoprene emissions (\mu g . m^{-2} . s^{-1}).
+    \param Terpenes terpenes emissions (\mu g . m^{-2} . s^{-1}).
+    \param NO NO emissions (\mu g . m^{-2} . s^{-1}).
   */
   template <class TTemp, class TP, class TL, class TD, class TEFI, class TEFT,
 	    class TEFN, class TI, class TT, class TN, class TG>
@@ -145,7 +145,7 @@ namespace AtmoData
 		Ts_NO = 35;
 	      if (Ts_NO<15)
 		Ts_NO = 15;
-	      NO(h, j, i) += 1.e-3 * EF_NO(k) * LUC(k, j, i) * exp(0.071*(Ts_NO));
+	      NO(h, j, i) += EF_NO(k) * LUC(k, j, i) * exp(0.071*(Ts_NO));
 	    }
 
   }

@@ -60,6 +60,13 @@ namespace AtmoData
 				       Data<T, 4, TG>& CriticalRelativeHumidity,
 				       T coeff0 = 2., T coeff1 = sqrt(3.));
 
+  template<class TS, class TP, class T, class TG>
+  void ComputeCriticalRelativeHumidity_extended(Data<TS, 3, TG>& SurfacePressure,
+						Data<TP, 4, TG>& Pressure,
+						Data<T, 4, TG>& CriticalRelativeHumidity,
+						T coeff0 = 1.1, T coeff1 = sqrt(1.3),
+						T a0 = 0., T a1 = 1.1);
+
   template<class TB, class TS, class TP, class T, class TG>
   void ComputeCriticalRelativeHumidity(Data<TB, 3, TG>& BoundaryLayerHeight,
 				       Data<TS, 3, TG>& SurfacePressure,

@@ -305,6 +305,44 @@ namespace AtmoData
   }
 
 
+  //! Computes the critival relative humidity.
+  /*!
+    Extended formula: CriticalRelativeHumidity = 1.0 - coeff0 * sig^a0
+    * (1.0 - sig)^a1 * (1.0 + (sig - 0.5) * coeff1) where
+    sig = Pressure / SurfacePressure.
+    \param SurfacePressure surface pressure (Pa).
+    \param Pressure pressure (Pa).
+    \param CriticalRelativeHumidity (output) critical relative humidity.
+    \param coeff0 coefficient (see the formula). Default: 1.1.
+    \param coeff1 coefficient (see the formula). Default: sqrt(1.3).
+    \param a0 exponent (see the formula). Default: 0.0.
+    \param a1 exponent (see the formula). Default: 1.1.
+  */
+  template<class TS, class TP, class T, class TG>
+  void ComputeCriticalRelativeHumidity_extended(Data<TS, 3, TG>& SurfacePressure,
+						Data<TP, 4, TG>& Pressure,
+						Data<T, 4, TG>& CriticalRelativeHumidity,
+						T coeff0, T coeff1, T a0, T a1)
+  {
+    int h, k, j, i;
+    int Nt(CriticalRelativeHumidity.GetLength(0));
+    int Nz(CriticalRelativeHumidity.GetLength(1));
+    int Ny(CriticalRelativeHumidity.GetLength(2));
+    int Nx(CriticalRelativeHumidity.GetLength(3));
+
+    T sig;
+    for (h = 0; h < Nt; h++)
+      for (k = 0; k < Nz; k++)
+	for (j = 0; j < Ny; j++)
+	  for (i = 0; i < Nx; i++)
+	    {
+	      sig = Pressure(h, k, j, i) / SurfacePressure(h, j, i);
+	      CriticalRelativeHumidity(h, k, j, i) = 1.0 - coeff0 * pow(sig, a0)
+		* pow(T(1.) - sig, a1) * (1.0 + (sig - 0.5) * coeff1);
+	    }
+  }
+
+
   //! Computes the critical relative humidity.
   /*!
     Formula: inside the boundary layer,

@@ -44,5 +44,7 @@ T to_num(std::string s)
 
 #include "Format.cxx"
 
+#include "Errors.cxx"
+
 #define ATMODATA_FILE_ATMODATA_HXX
 #endif

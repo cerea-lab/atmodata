@@ -5,9 +5,9 @@
 namespace AtmoData
 {
 
-  ///////////////////
-  // FORMATCHIMERE //
-  ///////////////////
+  ///////////////
+  // FORMATCVS //
+  ///////////////
 
   //! Default constructor.
   FormatCSV::FormatCSV()  throw()

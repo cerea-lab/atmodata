@@ -3,7 +3,7 @@
 namespace AtmoData
 {
 
-  //! Input/ouput class to read files in Chimere format.
+  //! Input/ouput class to read files in CSV format.
   class FormatCSV: public Format
   {
 

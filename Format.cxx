@@ -173,19 +173,22 @@ namespace AtmoData
   /////////////////
 
   //! Default constructor.
-  FormatECMWF::FormatECMWF()  throw()
+  template <class T>
+  FormatECMWF<T>::FormatECMWF()  throw()
   {
     date_ = -1;
   }
 
   //! Constructor.
-  FormatECMWF::FormatECMWF(int date)  throw()
+  template <class T>
+  FormatECMWF<T>::FormatECMWF(int date)  throw()
   {
     date_ = date;
   }
 
   //! Destructor.
-  FormatECMWF::~FormatECMWF()  throw()
+  template <class T>
+  FormatECMWF<T>::~FormatECMWF()  throw()
   {
   }
 
@@ -193,7 +196,8 @@ namespace AtmoData
   /*!
     \param date date.
   */
-  void FormatECMWF::SetDate(int date)
+  template <class T>
+  void FormatECMWF<T>::SetDate(int date)
   {
     date_ = date;
   }
@@ -202,7 +206,8 @@ namespace AtmoData
   /*!
     \return The date.
   */
-  int FormatECMWF::GetDate() const
+  template <class T>
+  int FormatECMWF<T>::GetDate() const
   {
     return date_;
   }
@@ -212,8 +217,9 @@ namespace AtmoData
   /********/
  
   //! Reads a file in "ECMWF" format.
+  template <class T>
   template<class TD, int N, class TG>
-  void FormatECMWF::Read(string FileName, Data<TD, N, TG>& D) const
+  void FormatECMWF<T>::Read(string FileName, Data<TD, N, TG>& D) const
   {
 
     this->Read(FileName, D.GetArray());
@@ -221,8 +227,9 @@ namespace AtmoData
   }
 
   //! Reads a file in "ECMWF" format.
+  template <class T>
   template<class TD, int N, class TG>
-  void FormatECMWF::Read(ifstream& FileStream, Data<TD, N, TG>& D) const
+  void FormatECMWF<T>::Read(ifstream& FileStream, Data<TD, N, TG>& D) const
   {
 
     this->Read(FileStream, D.GetArray());
@@ -234,8 +241,9 @@ namespace AtmoData
   /*********/
 
   //! Reads a file in "ECMWF" format.
-  template<class T, int N>
-  void FormatECMWF::Read(string FileName, Array<T, N>& A) const
+  template <class T>
+  template<int N>
+  void FormatECMWF<T>::Read(string FileName, Array<T, N>& A) const
   {
 
     ifstream FileStream;
@@ -256,8 +264,9 @@ namespace AtmoData
   }
 
   //! Reads a file in "ECMWF" format.
-  template<class T, int N>
-  void FormatECMWF::Read(ifstream& FileStream, Array<T, N>& A) const
+  template <class T>
+  template<int N>
+  void FormatECMWF<T>::Read(ifstream& FileStream, Array<T, N>& A) const
   {
 
     int nb_elements = A.numElements();

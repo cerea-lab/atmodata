@@ -38,6 +38,7 @@ namespace AtmoData
   };  
 
   //! Input/ouput class to read files in binary format at ECMWF.
+  template<class T>
   class FormatECMWF: public Format
   {
 
@@ -61,10 +62,10 @@ namespace AtmoData
 
     // Array.
 
-    template<class TA, int N>
-    void Read(string FileName, Array<TA, N>& A) const;
-    template<class TA, int N>
-    void Read(ifstream& FileStream, Array<TA, N>& A) const;
+    template<int N>
+    void Read(string FileName, Array<T, N>& A) const;
+    template<int N>
+    void Read(ifstream& FileStream, Array<T, N>& A) const;
 
   };  
 

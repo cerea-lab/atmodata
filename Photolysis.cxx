@@ -48,12 +48,13 @@ namespace AtmoData
   T ZenithAngle(T lon, T lat, int idate, T ut)
   {
 
-    T azim, zen;
+    T zen;
+    T azim, caz, raz;
 
     T lbut,lzut;
     T rlt;
     T d, tz, rdecl, eqr, eqh, zpt;
-    T csz, zr, caz, raz ;
+    T csz, zr;
     T sintz, costz, sin2tz, cos2tz, sin3tz, cos3tz;
 
     int iiiiyear, imth, iday, ijd;
@@ -177,7 +178,7 @@ namespace AtmoData
 
     // Index "0" and "1" refer to two contiguous levels.
     T rh0, rh1, rhc, dz, delta_z,
-      lwc0, lwc1, lw, w, tau, opt_depth, s, tr;
+      lwc0, lwc1, lw, w, tau, s, tr;
 
     for (h=0; h<Nt; h++)
       for (j=0; j<Ny; j++)

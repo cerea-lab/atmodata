@@ -264,7 +264,7 @@ namespace AtmoData
 		     Data<T, 3, TG>& Module)
   {
 
-    int h, i, j, k;
+    int h, i, j;
 
     int Nx = Module.GetLength(2);
     int Ny = Module.GetLength(1);

@@ -856,6 +856,8 @@ namespace AtmoData
     this->name = SH.name;
     this->unit = SH.unit;
     this->description = SH.description;
+
+    return *this;
   }
 
 

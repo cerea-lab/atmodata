@@ -722,6 +722,12 @@ namespace AtmoData
     \param HighCloudiness high cloudiness.
     \param P_0 first pressure limit. Default: 80 000 Pa.
     \param P_1 second pressure limit. Default: 45 000 Pa.
+    \note Dimensions of LowIndices, MediumIndices and HighIndices are
+    Nt x Ny x Nx x 2. Along the last dimension, those arrays store the index
+    of the cloud base and the index of the cloud top (in this order). Those
+    indices are indices of interfaces. E.g., if LowIndices(t, y, x, 0) equals
+    2 and  LowIndices(t, y, x, 1) equals 4, then a cloud lies in layers 2
+    and 3.
   */
   template<class TC, class TP, class T, class TG>
   void ComputeCloudiness(Data<TC, 4, TG>& CloudFraction,
@@ -1000,6 +1006,12 @@ namespace AtmoData
     \param MediumIndices vertical indices of base and top of medium clouds.
     \param HighIndices vertical indices of base and top of high clouds.
     \param CloudHeight (output) altitudes of cloud basis.
+    \note Dimensions of LowIndices, MediumIndices and HighIndices are
+    Nt x Ny x Nx x 2. Along the last dimension, those arrays store the index
+    of the cloud base and the index of the cloud top (in this order). Those
+    indices are indices of interfaces. E.g., if LowIndices(t, y, x, 0) equals
+    2 and  LowIndices(t, y, x, 1) equals 4, then a cloud lies in layers 2
+    and 3.
   */
   template <class T, class TG>
   void ComputeCloudHeight(Data<int, 4>& LowIndices,

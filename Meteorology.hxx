@@ -35,6 +35,12 @@ namespace AtmoData
 			 Data<T, 3, TG>& SurfaceRichardson,
 			 T wind_threshold = 0.1);
 
+  template<class TT, class TP, class T, class TG>
+  void ComputePotentialTemperature(Data<TT, 4, TG>& Temperature,
+				   Data<TP, 4, TG>& Pressure,
+				   Data<T, 4, TG>& PotentialTemperature,
+				   T P0 = 101325., T cp = 1005.,T r = 287.0);
+
 }  // namespace AtmoData.
 
 #define ATMODATA_FILE_METEOROLOGY_HXX

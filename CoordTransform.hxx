@@ -86,8 +86,10 @@ namespace AtmoData
     const double pi_;
 
   public:
-    MM5LccIndToLonlat(int jmx, int imx, double jx, double ix, double phic, double lambdac,
-		      double phi1, double phi2, double ds, int ratio)  throw();
+    MM5LccIndToLonlat(int jmx, int imx, double jx, double ix,
+		      double phic, double lambdac,
+		      double phi1, double phi2, double ds,
+		      int ratio)  throw();
     void operator() (const T j, const T i,
 		     T& lon, T& lat);
   };
@@ -125,8 +127,10 @@ namespace AtmoData
     const double pi_;
 
   public:
-    LonlatToMM5LccInd(int jmx, int imx, double jx, double ix, double phic, double lambdac,
-		      double phi1, double phi2, double ds0, int ratio)  throw();
+    LonlatToMM5LccInd(int jmx, int imx, double jx, double ix,
+		      double phic, double lambdac,
+		      double phi1, double phi2, double ds0,
+		      int ratio)  throw();
     void operator() (const T lon, const T lat,
 		     T& j, T& i);
   };
@@ -162,7 +166,8 @@ namespace AtmoData
     const double pi_;
 
   public:
-    MM5MercIndToLonlat(int jmx, int imx, double jx, double ix, double phic, double lambdac,
+    MM5MercIndToLonlat(int jmx, int imx, double jx, double ix,
+		       double phic, double lambdac,
 		       double phi1, double ds, int ratio)  throw();
     void operator() (const T j, const T i,
 		     T& lon, T& lat);
@@ -199,7 +204,8 @@ namespace AtmoData
     const double pi_;
 
   public:
-    LonlatToMM5MercInd(int jmx, int imx, double jx, double ix, double phic, double lambdac,
+    LonlatToMM5MercInd(int jmx, int imx, double jx, double ix,
+		       double phic, double lambdac,
 		       double phi1, double ds0, int ratio)  throw();
     void operator() (const T lon, const T lat,
 		     T& j, T& i);
@@ -236,7 +242,8 @@ namespace AtmoData
     const double pi_;
 
   public:
-    MM5StereIndToLonlat(int jmx, int imx, double jx, double ix, double phic, double lambdac,
+    MM5StereIndToLonlat(int jmx, int imx, double jx, double ix,
+			double phic, double lambdac,
 			double phi1, double ds, int ratio)  throw();
     void operator() (const T j, const T i,
 		     T& lon, T& lat);
@@ -273,7 +280,8 @@ namespace AtmoData
     const double pi_;
 
   public:
-    LonlatToMM5StereInd(int jmx, int imx, double jx, double ix, double phic, double lambdac,
+    LonlatToMM5StereInd(int jmx, int imx, double jx, double ix,
+			double phic, double lambdac,
 			double phi1, double ds0, int ratio)  throw();
     void operator() (const T lon, const T lat,
 		     T& j, T& i);

@@ -46,7 +46,8 @@ namespace AtmoData
 			    Data<TEFI, 1, TG>& EF_isoprene,
 			    Data<TEFT, 1, TG>& EF_terpenes,
 			    Data<TEFN, 1, TG>& EF_NO,
-			    Data<TI, 2, TG>& Isoprene, Data<TT, 2, TG>& Terpenes, 
+			    Data<TI, 2, TG>& Isoprene,
+			    Data<TT, 2, TG>& Terpenes, 
 			    Data<TN, 2, TG>& NO)
   {
 
@@ -87,12 +88,15 @@ namespace AtmoData
   */
   template <class TTemp, class TP, class TL, class TD, class TEFI, class TEFT,
 	    class TEFN, class TI, class TT, class TN, class TG>
-  void ComputeBiogenicEmissions(Data<TTemp, 3, TG>& Temperature, Data<TP, 3, TG>& PAR,
-				Data<TL, 3, TG>& LUC, Data<TD, 1, TG>& Density,
+  void ComputeBiogenicEmissions(Data<TTemp, 3, TG>& Temperature,
+				Data<TP, 3, TG>& PAR,
+				Data<TL, 3, TG>& LUC,
+				Data<TD, 1, TG>& Density,
 				Data<TEFI, 1, TG>& EF_isoprene,
 				Data<TEFT, 1, TG>& EF_terpenes,
 				Data<TEFN, 1, TG>& EF_NO,
-				Data<TI, 3, TG>& Isoprene, Data<TT, 3, TG>& Terpenes, 
+				Data<TI, 3, TG>& Isoprene,
+				Data<TT, 3, TG>& Terpenes, 
 				Data<TN, 3, TG>& NO)
   {
 

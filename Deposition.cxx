@@ -35,7 +35,8 @@ namespace AtmoData
   /*!
     \param surface_temperature surface temperature (K).
     \param solar_radiation solar radiation (W.m^{-2}).
-    \param species species name, useful only if species=="O3" or species=="SO2".
+    \param species species name, useful only if species=="O3"
+    or species=="SO2".
     \param reactivity reactivity factor for the species.
     \param diffusivity molecular diffusivity for the species in air.
     \param Henry Henry constant for the species.
@@ -44,10 +45,12 @@ namespace AtmoData
     \param Rac in-canopy aerodynamic resistance.
     \param RgsS soil resistance for SO2.
     \param RgsO soil resistance for O3.
-    \param RclS resistance due to exposed surface in the lower canopy, for SO2.
+    \param RclS resistance due to exposed surface in the lower canopy,
+    for SO2.
     \param RclO resistance due to exposed surface in the lower canopy, for O3.
     \param limit (optional) upper limit for resistances. Default: 1.e10.
-    \param D_H2O (optional) molecular diffusivity for water vapor. Default: 0.25.
+    \param D_H2O (optional) molecular diffusivity for water vapor.
+    Default: 0.25.
     \return the bulk surface resistance.
   */
   template <class T>
@@ -65,7 +68,8 @@ namespace AtmoData
     if ( (surface_temperature<0.01) || (surface_temperature>39.99))
       Rsx = 1.e30;
     else
-      Rsx = Ri * (1. + 400. / ((solar_radiation + 0.1) * (solar_radiation + 0.1)))
+      Rsx = Ri * (1. + 400. / ((solar_radiation + 0.1)
+			       * (solar_radiation + 0.1)))
 	* (400. / (surface_temperature * (40. - surface_temperature)));
     Rsx *= D_H2O / diffusivity;
 

@@ -1,4 +1,5 @@
-// Copyright (C) 2003-2004 Vivien Mallet
+// Copyright (C) 2003-2004 Ecole Nationale des Ponts et Chaussees
+//     Author: Vivien Mallet
 //
 // This file is part of AtmoData library.
 // AtmoData library is a tool for data processing in atmospheric

@@ -356,7 +356,7 @@ namespace AtmoData
     if (data_size>(file_size-12*(Nt-i)+i*rec_length))
       {
 	throw IOError("FormatBinary<T>::Read(ifstream& FileStream, Array<T, N>& A)",
-		    "Unable to read " + to_str(data_size) + " byte(s)." +
+		      "Unable to read " + to_str(data_size) + " byte(s)." +
 		      " The input stream is only "
 		      + to_str((file_size/(rec_length+12)+i)*rec_length) + " byte(s) long.");
       }

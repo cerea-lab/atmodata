@@ -152,8 +152,8 @@ namespace AtmoData
     R = sqrt(x*x + y*y);
 
     auxl = tan(psi1/2.0)
-	  * pow(auxsig * R * kappa / (Earth_radius_*sin(psi1)),
-		  1.0/kappa);
+      * pow(auxsig * R * kappa / (Earth_radius_*sin(psi1)),
+	    1.0/kappa);
     lat = auxsig * 90.0 - 2.0 * conv * atan(auxl);
 
     if (y == 0.0)
@@ -428,8 +428,8 @@ namespace AtmoData
 	auxtan = x<0.? (-pi_/2.) : (pi_/2.);
 	lambdaprima = lambdac_ + conv * auxtan / kappa;
       }
-      else
-	lambdaprima = lambdac_ + conv * atan(x/(auxsig*y)) /kappa;
+    else
+      lambdaprima = lambdac_ + conv * atan(x/(auxsig*y)) /kappa;
     
     if (lambdaprima < 180.0)
       lon = lambdaprima + 360.0;

@@ -284,6 +284,12 @@ namespace AtmoData
     reference pressure.
     \param date date in the form YYYYMMDD.
     \param Attenuation (output) cloud attenuation coefficient.
+    \note Dimensions of LowIndices, MediumIndices and HighIndices are
+    Nt x Ny x Nx x 2. Along the last dimension, those arrays store the index
+    of the cloud base and the index of the cloud top (in this order). Those
+    indices are indices of interfaces. E.g., if LowIndices(t, y, x, 0) equals
+    2 and  LowIndices(t, y, x, 1) equals 4, then a cloud lies in layers 2
+    and 3.
   */
   template <class TL, class TMC, class THC, class T, class TG>
   void ComputeAttenuation_LWC(Data<TL, 4, TG>& LiquidWaterContent,
@@ -317,23 +323,17 @@ namespace AtmoData
 	    // Low clouds are between lb and lt.
 	    lb = LowIndices(h, j, i, 0);
 	    lt = LowIndices(h, j, i, 1);
-	    // In case there is no low cloud, lt is set to -1.
-	    lt = (lt == 0) ? -1 : lt;
 	    // Medium clouds are between mb and mt.
 	    mb = MediumIndices(h, j, i, 0);
 	    mt = MediumIndices(h, j, i, 1);
-	    // In case there is no medium cloud, mt is set to -1.
-	    mt = (mt == 0) ? -1 : mt;
 	    // High clouds are between hb and ht.
 	    hb = HighIndices(h, j, i, 0);
 	    ht = HighIndices(h, j, i, 1);
-	    // In case there is no high cloud, ht is set to -1.
-	    ht = (ht == 0) ? -1 : ht;
 
 	    // Searches for the cloud basis.
 	    lower = -1;
-	    if (lb == -1)
-	      if (mb == -1)
+	    if (lb == 0)
+	      if (mb == 0)
 		lower = hb;
 	      else
 		lower = mb;
@@ -356,8 +356,8 @@ namespace AtmoData
 		  dz = Attenuation[1].Value(h, k+1, j, i)
 		    - Attenuation[1].Value(h, k, j, i);
 
-		if ( (k >= lb && k <= lt) || (k >= mb && k <= mt)
-		     || (k >= hb && k <= ht))  // In a cloud.
+		if ( (k >= lb && k < lt) || (k >= mb && k < mt)
+		     || (k >= hb && k < ht))  // In a cloud.
 		  // kg/m^3 to g/m^3.
 		  w += dz * 1000. * LiquidWaterContent(h, k, j, i);
 	      }
@@ -380,7 +380,7 @@ namespace AtmoData
 	    
 	    /*** Below clouds ***/
 	    // If tau <= 5., nothing is done.
-	    for (k = 0; k <= lower && tau > 5.; k++)
+	    for (k = 0; k < lower && tau > 5.; k++)
 	      {
 		// Zenith angle.
 		cos_zenith_angle =
@@ -415,7 +415,7 @@ namespace AtmoData
 
 	    /*** In cloud ***/
 	    // If tau <= 5., nothing is done.
-	    for (k = lower + 1; k < upper && tau > 5.; k++)
+	    for (k = lower; k < upper && tau > 5.; k++)
 	      {
 		// Zenith angle.
 		cos_zenith_angle =

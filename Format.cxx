@@ -801,7 +801,6 @@ namespace AtmoData
 		// with data corresponding to the current time step.
 		Array<float, N-1> SubA(data + time_step * nb_record,
 				       dim_SubA, neverDeleteData);
-
 		// Puts the field into SubA.
 		this->ReadField(FileStream, sub_header, SubA);
 	      }
@@ -856,62 +855,47 @@ namespace AtmoData
     nz = SH.end_index(2) - SH.start_index(2) + 1;
     if (trim(SH.staggering) == "C")
       {
-	// MM5 order is 'generally' (sic) YXZ, but
-	// for one dimensional fields where *_index(0) is x.
-	if (N != 1)
-	  {
-	    nx = SH.end_index(1) - SH.start_index(1);
-	    ny = SH.end_index(0) - SH.start_index(0);
-	  }
-	else
-	  {
-	    nx = SH.end_index(0) - SH.start_index(0);
-	    ny = 0;
-	  }
+	ny = SH.end_index(0) - SH.start_index(0);
+	nx = SH.end_index(1) - SH.start_index(1);
 
-	dimensions = string("(") + to_str(nz) + ", " + to_str(ny) 
-	  + "+1, " + to_str(nx) + "+1)";
+	if (nx == 0)
+	  nx = 1;
+
+	dimensions = string("(") + to_str(nz) + ", " + to_str(nx)
+	  + "+1, " + to_str(ny) + "+1)";
 	location = " (located at cross points) ";
       }
     else
       {
-	if (N != 1)
-	  {
-	    nx = SH.end_index(1) - SH.start_index(1) + 1;
-	    ny = SH.end_index(0) - SH.start_index(0) + 1;
-	  }
-	else
-	  {
-	    nx = SH.end_index(0) - SH.start_index(0) + 1;
-	    ny = 1;
-	  }
+	ny = SH.end_index(0) - SH.start_index(0) + 1;
+	nx = SH.end_index(1) - SH.start_index(1) + 1;
 
-	dimensions = string("(") + to_str(nz) + ", " + to_str(ny) 
-	  + ", " + to_str(nx) + ")";
+	dimensions = string("(") + to_str(nz) + ", " + to_str(nx)
+	  + ", " + to_str(ny) + ")";
 	location = " (located at dot points) ";
       }
     
     if (N == 1)
       {
-	nx_A = A.extent(0);
-	dimensions_A = string("(") + to_str(nx_A) + ")";
+	ny_A = A.extent(0);
+	dimensions_A = string("(") + to_str(ny_A) + ")";
       }
     else if (N == 2)
       {
-	ny_A = A.extent(0);
-	nx_A = A.extent(1);
-	dimensions_A = string("(") + to_str(ny_A) + ", " + to_str(nx_A) + ")";
+	nx_A = A.extent(0);
+	ny_A = A.extent(1);
+	dimensions_A = string("(") + to_str(nx_A) + ", " + to_str(ny_A) + ")";
       }
     else
       {
 	nz_A = A.extent(0);
-	ny_A = A.extent(1);
-	nx_A = A.extent(2);
-	dimensions_A = string("(") + to_str(nz_A) + ", " + to_str(ny_A)
-	  + ", " + to_str(nx_A) + ")";
+	nx_A = A.extent(1);
+	ny_A = A.extent(2);
+	dimensions_A = string("(") + to_str(nz_A) + ", " + to_str(nx_A)
+	  + ", " + to_str(ny_A) + ")";
       }
 
-    if (max(1, nz_A) != nz || max(1, ny_A) != ny || nx_A != nx)
+    if (ny_A != ny || max(1, nz_A) != nz || max(1, nx_A) != nx)
       throw IOError(string("FormatMM5<T>::ReadField(ifstream& FileStream,") +
 		    " MM5SubHeader& SH, Array<float, N>& A)",
 		    string("Dimensions of the stored field") + location + "are "

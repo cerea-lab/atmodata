@@ -56,14 +56,14 @@ namespace AtmoData
   class MM5LccIndToLonlat
   {
   protected:
-    //! Coarse domain grid dimension in North-South direction.
-    const int imx_;
     //! Coarse domain grid dimension in East-West direction.
     const int jmx_;
-    //! North-South location in the coarse domain of the South-West corner.
-    const double ix_;
+    //! Coarse domain grid dimension in North-South direction.
+    const int imx_;
     //! East-West location in the coarse domain of the South-West corner.
     const double jx_;
+    //! North-South location in the coarse domain of the South-West corner.
+    const double ix_;
     //! Coarse domain center latitude (degree).
     const double phic_;
     //! Coarse domain center longitude (degree).
@@ -95,14 +95,14 @@ namespace AtmoData
   class LonlatToMM5LccInd
   {
   protected:
-    //! Coarse domain grid dimension in North-South direction.
-    const int imx_;
     //! Coarse domain grid dimension in East-West direction.
     const int jmx_;
-    //! North-South location in the coarse domain of the South-West corner.
-    const double ix_;
+    //! Coarse domain grid dimension in North-South direction.
+    const int imx_;
     //! East-West location in the coarse domain of the South-West corner.
     const double jx_;
+    //! North-South location in the coarse domain of the South-West corner.
+    const double ix_;
     //! Coarse domain center latitude (degree).
     const double phic_;
     //! Coarse domain center longitude (degree).
@@ -134,14 +134,14 @@ namespace AtmoData
   class MM5MercIndToLonlat
   {
   protected:
-    //! Coarse domain grid dimension in North-South direction.
-    const int imx_;
     //! Coarse domain grid dimension in East-West direction.
     const int jmx_;
-    //! North-South location in the coarse domain of the South-West corner.
-    const double ix_;
+    //! Coarse domain grid dimension in North-South direction.
+    const int imx_;
     //! East-West location in the coarse domain of the South-West corner.
     const double jx_;
+    //! North-South location in the coarse domain of the South-West corner.
+    const double ix_;
     //! Coarse domain center latitude (degree).
     const double phic_;
     //! Coarse domain center longitude (degree).
@@ -171,14 +171,14 @@ namespace AtmoData
   class LonlatToMM5MercInd
   {
   protected:
-    //! Coarse domain grid dimension in North-South direction.
-    const int imx_;
     //! Coarse domain grid dimension in East-West direction.
     const int jmx_;
-    //! North-South location in the coarse domain of the South-West corner.
-    const double ix_;
+    //! Coarse domain grid dimension in North-South direction.
+    const int imx_;
     //! East-West location in the coarse domain of the South-West corner.
     const double jx_;
+    //! North-South location in the coarse domain of the South-West corner.
+    const double ix_;
     //! Coarse domain center latitude (degree).
     const double phic_;
     //! Coarse domain center longitude (degree).
@@ -208,14 +208,14 @@ namespace AtmoData
   class MM5StereIndToLonlat
   {
   protected:
-    //! Coarse domain grid dimension in North-South direction.
-    const int imx_;
     //! Coarse domain grid dimension in East-West direction.
     const int jmx_;
-    //! North-South location in the coarse domain of the South-West corner.
-    const double ix_;
+    //! Coarse domain grid dimension in North-South direction.
+    const int imx_;
     //! East-West location in the coarse domain of the South-West corner.
     const double jx_;
+    //! North-South location in the coarse domain of the South-West corner.
+    const double ix_;
     //! Coarse domain center latitude (degree).
     const double phic_;
     //! Coarse domain center longitude (degree).
@@ -245,14 +245,14 @@ namespace AtmoData
   class LonlatToMM5StereInd
   {
   protected:
-    //! Coarse domain grid dimension in North-South direction.
-    const int imx_;
     //! Coarse domain grid dimension in East-West direction.
     const int jmx_;
-    //! North-South location in the coarse domain of the South-West corner.
-    const double ix_;
+    //! Coarse domain grid dimension in North-South direction.
+    const int imx_;
     //! East-West location in the coarse domain of the South-West corner.
     const double jx_;
+    //! North-South location in the coarse domain of the South-West corner.
+    const double ix_;
     //! Coarse domain center latitude (degree).
     const double phic_;
     //! Coarse domain center longitude (degree).

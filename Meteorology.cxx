@@ -235,6 +235,40 @@ namespace AtmoData
   }
 
 
+  //! Computes the relative humidity from the specific humidity.
+  /*!
+    \param SpecificHumidity specific humidity (kg/kg).
+    \param Temperature temperature (or virtual temperature) (K).
+    \param Pressure pressure (Pa).
+    \param RelativeHumidity (output) relative humidity.
+  */
+  template<class TS, class TT, class TP, class T, class TG>
+  void ComputeRelativeHumidity(Data<TS, 4, TG>& SpecificHumidity,
+			       Data<TT, 4, TG>& Temperature,
+			       Data<TP, 4, TG>& Pressure,
+			       Data<T, 4, TG>& RelativeHumidity)
+  {
+    int h, k, j, i;
+    int Nt(RelativeHumidity.GetLength(0));
+    int Nz(RelativeHumidity.GetLength(1));
+    int Ny(RelativeHumidity.GetLength(2));
+    int Nx(RelativeHumidity.GetLength(3));
+
+    T P_sat;
+    for (h = 0; h < Nt; h++)
+      for (k = 0; k < Nz; k++)
+	for (j = 0; j < Ny; j++)
+	  for (i = 0; i < Nx; i++)
+	    {
+	      P_sat = 611.2 * exp(17.67 * (Temperature(h, k, j, i) - 273.15)
+				  / (Temperature(h, k, j, i) - 29.65));
+	      RelativeHumidity(h, k, j, i) = SpecificHumidity(h, k, j, i)
+		* (Pressure(h, k, j, i) - P_sat)
+		/ (0.62197 * P_sat * (1.0 - SpecificHumidity(h, k, j, i)));
+	    }
+  }
+
+
   //! Computes the module of a 2D-vectors field.
   /*!
     This function was initially dedicated to winds. In this case, zonal winds and meridional

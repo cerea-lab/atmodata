@@ -48,6 +48,12 @@ namespace AtmoData
 				   Data<T, 3, TG>& PotentialTemperature,
 				   T P0 = 101325., T cp = 1005.,T r = 287.0);
 
+  template<class TS, class TT, class TP, class T, class TG>
+  void ComputeRelativeHumidity(Data<TS, 4, TG>& SpecificHumidity,
+			       Data<TT, 4, TG>& Temperature,
+			       Data<TP, 4, TG>& Pressure,
+			       Data<T, 4, TG>& RelativeHumidity);
+
   template<class TU, class TV, class T, class TG>
   void ComputeModule(Data<TU, 4, TG>& U, Data<TV, 4, TG>& V,
 		     Data<T, 4, TG>& Module);

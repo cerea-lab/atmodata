@@ -41,9 +41,9 @@ namespace AtmoData
   */
   template<class TU, class TV, class TW,
 	   class TTp, class T, class TG>
-  void LouisKz(Data<TU, 4, TG>& U, Data<TV, 4, TG>& V, Data<TW, 4, TG>& W,
-	       Data<TTp, 4, TG>& Tp, Data<T, 4, TG>& Kz,
-	       T B, T C, T D, T Ka, T z0, T L0)
+  void ComputeLouisKz(Data<TU, 4, TG>& U, Data<TV, 4, TG>& V, Data<TW, 4, TG>& W,
+		      Data<TTp, 4, TG>& Tp, Data<T, 4, TG>& Kz,
+		      T B, T C, T D, T Ka, T z0, T L0)
   {
 
     int h, i, j, k;

@@ -444,8 +444,8 @@ namespace AtmoData
 
   //! Computes the critical relative humidity.
   /*!
-    The relative humidity is set to CRH_0 if Pressure < P_0,
-    to CRH_1 if P_0 <= Pressure < P_1 and to CRH_2 otherwise.
+    The relative humidity is set to CRH_0 if Pressure > P_0,
+    to CRH_1 if P_0 >= Pressure > P_1 and to CRH_2 otherwise.
     \param Pressure pressure (Pa).
     \param CriticalRelativeHumidity (output) critical relative humidity.
     \param CRH_0 critical relative humidity in the first layer. Default: 0.75.
@@ -471,9 +471,9 @@ namespace AtmoData
       for (k = 0; k < Nz; k++)
 	for (j = 0; j < Ny; j++)
 	  for (i = 0; i < Nx; i++)
-	    if (Pressure(h, k, j, i) < P_0)
+	    if (Pressure(h, k, j, i) > P_0)
 	      CriticalRelativeHumidity(h, k, j, i) = CRH_0;
-	    else if (Pressure(h, k, j, i) < P_1)
+	    else if (Pressure(h, k, j, i) > P_1)
 	      CriticalRelativeHumidity(h, k, j, i) = CRH_1;
 	    else
 	      CriticalRelativeHumidity(h, k, j, i) = CRH_2;

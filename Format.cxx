@@ -167,6 +167,194 @@ namespace AtmoData
 
   }
 
+
+  /////////////////
+  // FORMATECMWF //
+  /////////////////
+
+  //! Default constructor.
+  FormatECMWF::FormatECMWF()  throw()
+  {
+    date_ = -1;
+  }
+
+  //! Constructor.
+  FormatECMWF::FormatECMWF(int date)  throw()
+  {
+    date_ = date;
+  }
+
+  //! Destructor.
+  FormatECMWF::~FormatECMWF()  throw()
+  {
+  }
+
+  //! Sets the date.
+  /*!
+    \param date date.
+  */
+  void FormatECMWF::SetDate(int date)
+  {
+    date_ = date;
+  }
+
+  //! Get the date.
+  /*!
+    \return The date.
+  */
+  int FormatECMWF::GetDate() const
+  {
+    return date_;
+  }
+
+  /********/
+  /* Data */
+  /********/
+ 
+  //! Reads a file in "ECMWF" format.
+  template<class TD, int N, class TG>
+  void FormatECMWF::Read(string FileName, Data<TD, N, TG>& D) const
+  {
+
+    this->Read(FileName, D.GetArray());
+
+  }
+
+  //! Reads a file in "ECMWF" format.
+  template<class TD, int N, class TG>
+  void FormatECMWF::Read(ifstream& FileStream, Data<TD, N, TG>& D) const
+  {
+
+    this->Read(FileStream, D.GetArray());
+
+  }
+
+  /*********/
+  /* Array */
+  /*********/
+
+  //! Reads a file in "ECMWF" format.
+  template<class T, int N>
+  void FormatECMWF::Read(string FileName, Array<T, N>& A) const
+  {
+
+    ifstream FileStream;
+    FileStream.open(FileName.c_str(), ifstream::in);
+    FileStream.flags(fstream::skipws);
+
+#ifdef DEBUG_SELDONDATA_IO
+    // Checks if the file was opened.
+    if (!FileStream.is_open())
+      throw IOError("FormatECMWF::Read(string FileName, Array<T, N>& A)",
+		    "Unable to open file \"" + FileName + "\".");
+#endif
+
+    this->Read(FileStream, A);
+
+    FileStream.close();
+
+  }
+
+  //! Reads a file in "ECMWF" format.
+  template<class T, int N>
+  void FormatECMWF::Read(ifstream& FileStream, Array<T, N>& A) const
+  {
+
+    int nb_elements = A.numElements();
+    unsigned long data_size = nb_elements * sizeof(T);
+    int Nt = A.extent(0);
+    int rec_length = data_size / Nt;
+
+    T* data = A.data();
+
+#ifdef DEBUG_SELDONDATA_IO
+
+    // Checks if the file ready.
+    if (!FileStream.good())
+      throw IOError("FormatECMWF::Read(ifstream& FileStream, Array<T, N>& A)",
+		    "File is not ready.");
+
+    // Checks records length.
+    streampos position;
+    position = FileStream.tellg();
+
+    int file_rec_length;
+    FileStream.read(reinterpret_cast<char*>(&file_rec_length), 4);
+    if (rec_length!=(file_rec_length-4))
+      throw IOError("FormatECMWF<T>::Read(ifstream& FileStream, Array<T, N>& A)",
+		    "Record length (as in file) is " + to_str(file_rec_length)
+		    + " byte(s)," + " but data record length is "
+		    + to_str(rec_length) + " byte(s) long.");
+
+    FileStream.seekg(position);
+
+#endif
+
+    int i = 0;
+
+    int date;
+    bool reading = (date_==-1);
+
+    while ( (!reading) && (FileStream.good()) )
+      {
+	// Record length.
+	FileStream.read(reinterpret_cast<char*>(&date), 4);
+	// Date.
+	FileStream.read(reinterpret_cast<char*>(&date), 4);
+
+	// Data.
+	FileStream.read(reinterpret_cast<char*>(data), rec_length);
+	reading = (date==date_);
+
+	// Record length.
+	FileStream.read(reinterpret_cast<char*>(&date), 4);
+
+	i = 1;
+      }
+    
+#ifdef DEBUG_SELDONDATA_IO
+
+    // Checks if all was read.
+    if (!reading)
+      throw IOError("FormatECMWF::Read(ifstream& FileStream, Array<T, N>& A)",
+		    "The date was not found.");
+
+    // Checks file length.
+    position = FileStream.tellg();
+    FileStream.seekg(0, ios::end);
+    unsigned long file_size = FileStream.tellg() - position;
+
+    if (data_size>(file_size-12*(Nt-i)+i*rec_length))
+      {
+	throw IOError("FormatBinary<T>::Read(ifstream& FileStream, Array<T, N>& A)",
+		    "Unable to read " + to_str(data_size) + " byte(s)." +
+		      " The input stream is only "
+		      + to_str(file_size/(rec_length+12)*rec_length) + " byte(s) long.");
+      }
+    FileStream.seekg(position);
+
+#endif
+
+    while ( (i<Nt) && (FileStream.good()) )
+      {
+	// Record length.
+	FileStream.read(reinterpret_cast<char*>(&date), 4);
+	// Date.
+	FileStream.read(reinterpret_cast<char*>(&date), 4);
+
+	// Data.
+	FileStream.read(reinterpret_cast<char*>(data) + rec_length * i,
+			rec_length);
+
+	// Record length.
+	FileStream.read(reinterpret_cast<char*>(&date), 4);
+	reading = (date==date_);
+
+	i++;
+      }
+    
+  }
+
 }  // namespace AtmoData.
 
 

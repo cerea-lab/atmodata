@@ -27,6 +27,11 @@
 #include "SeldonData.hxx"
 using namespace SeldonData;
 
+//! AtmoData namespace.
+namespace AtmoData
+{
+}
+
 #include "Common.hxx"
 
 #include "Meteorology.cxx"

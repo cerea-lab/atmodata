@@ -199,6 +199,101 @@ namespace AtmoData
   }
 
 
+  //! Computes the module of a 2D-vectors field.
+  /*!
+    This function was initially dedicated to winds. In this case, zonal winds and meridional
+    winds are provided and the module of the wind is computed (assuming that the vertical
+    wind is zero). Winds may be provided in two ways. The first option is to provide winds
+    on interfaces (along x for the zonal wind, along y for the meridional wind). 
+    The second option is simply to provide winds at nodes (i.e. where the module is defined).
+    \param U first component of vectors.
+    \param V second component of vectors.
+    \param Module module.
+  */
+  template<class TU, class TV, class T, class TG>
+  void ComputeModule(Data<TU, 4, TG>& U, Data<TV, 4, TG>& V,
+		     Data<T, 4, TG>& Module)
+  {
+
+    int h, i, j, k;
+
+    int Nx = Module.GetLength(3);
+    int Ny = Module.GetLength(2);
+    int Nz = Module.GetLength(1);
+    int Nt = Module.GetLength(0);
+
+    T u, v;
+
+    if ( (U.GetLength(3) == Nx + 1) && (V.GetLength(2) == Ny + 1) )
+      for (h=0; h<Nt; h++)
+	for (k=0; k<Nz; k++)
+	  for (j=0; j<Ny; j++)
+	    for (i=0; i<Nx; i++)
+	      {
+		u = 0.5 * (U(h, k, j, i+1) + U(h, k, j, i));
+		v = 0.5 * (V(h, k, j+1, i) + V(h, k, j, i));
+		Module(h, k, j, i) = sqrt(u*u + v*v);
+	      }
+    else
+      for (h=0; h<Nt; h++)
+	for (k=0; k<Nz; k++)
+	  for (j=0; j<Ny; j++)
+	    for (i=0; i<Nx; i++)
+	      {
+		u = U(h, k, j, i);
+		v = V(h, k, j, i);
+		Module(h, k, j, i) = sqrt(u*u + v*v);
+	      }
+
+  }
+
+
+  //! Computes the module of a 2D-vectors field on the surface.
+  /*!
+    This function was initially dedicated to winds. In this case, zonal winds and meridional
+    winds are provided and the module of the wind is computed (assuming that the vertical
+    wind is zero). Winds may be provided in two ways. The first option is to provide winds
+    on interfaces (along x for the zonal wind, along y for the meridional wind). 
+    The second option is simply to provide winds at nodes (i.e. where the module is defined).
+    \param U first component of vectors.
+    \param V second component of vectors.
+    \param Module surface module.
+  */
+  template<class TU, class TV, class T, class TG>
+  void ComputeModule(Data<TU, 4, TG>& U, Data<TV, 4, TG>& V,
+		     Data<T, 3, TG>& Module)
+  {
+
+    int h, i, j, k;
+
+    int Nx = Module.GetLength(2);
+    int Ny = Module.GetLength(1);
+    int Nt = Module.GetLength(0);
+
+    T u, v;
+
+    if ( (U.GetLength(3) == Nx + 1) && (V.GetLength(2) == Ny + 1) )
+      for (h=0; h<Nt; h++)
+	for (j=0; j<Ny; j++)
+	  for (i=0; i<Nx; i++)
+	    {
+	      u = 0.5 * (U(h, 0, j, i+1) + U(h, 0, j, i));
+	      v = 0.5 * (V(h, 0, j+1, i) + V(h, 0, j, i));
+	      Module(h, j, i) = sqrt(u*u + v*v);
+	    }
+    else
+      for (h=0; h<Nt; h++)
+	for (j=0; j<Ny; j++)
+	  for (i=0; i<Nx; i++)
+	    {
+	      u = U(h, 0, j, i);
+	      v = V(h, 0, j, i);
+	      Module(h, j, i) = sqrt(u*u + v*v);
+	    }
+
+  }
+
+
 }  // namespace AtmoData.
 
 #define ATMODATA_FILE_METEOROLOGY_CXX

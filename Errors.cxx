@@ -68,7 +68,7 @@ namespace AtmoData
 	    Data<T_comp, N, TG_comp>& data_comp,
 	    Function_Base<T_ref, bool>& test)
   {
-    T nge;
+    T_ref nge;
 
     T* data_ref_arr = data_ref.GetData();
     T0* data_comp_arr = data_comp.GetData();
@@ -142,7 +142,7 @@ namespace AtmoData
 	     Data<T_comp, N, TG_comp>& data_comp,
 	     Function_Base<T_ref, bool>& test)
   {
-    T bias;
+    T_ref bias;
 
     T* data_ref_arr = data_ref.GetData();
     T0* data_comp_arr = data_comp.GetData();
@@ -215,7 +215,7 @@ namespace AtmoData
 	    Data<T_comp, N, TG_comp>& data_comp,
 	    Function_Base<T_ref, bool>& test)
   {
-    T rms;
+    T_ref rms;
 
     T* data_ref_arr = data_ref.GetData();
     T0* data_comp_arr = data_comp.GetData();

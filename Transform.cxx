@@ -32,7 +32,7 @@ namespace AtmoData
     \param data data to be decumulated.
     \param length number of time steps over which data is cumulated.
     \param start (optional) index of the first complete cycle. Default: 0.
-   */
+  */
   template <class T, int N, class TG>
   void Decumulate(Data<T, N, TG>& data, int length,
 		  int start)

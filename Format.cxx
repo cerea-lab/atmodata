@@ -856,16 +856,36 @@ namespace AtmoData
     nz = SH.end_index(2) - SH.start_index(2) + 1;
     if (trim(SH.staggering) == "C")
       {
-	nx = SH.end_index(0) - SH.start_index(0);
-	ny = SH.end_index(1) - SH.start_index(1);
+	// MM5 order is 'generally' (sic) YXZ, but
+	// for one dimensional fields where *_index(0) is x.
+	if (N != 1)
+	  {
+	    nx = SH.end_index(1) - SH.start_index(1);
+	    ny = SH.end_index(0) - SH.start_index(0);
+	  }
+	else
+	  {
+	    nx = SH.end_index(0) - SH.start_index(0);
+	    ny = 0;
+	  }
+
 	dimensions = string("(") + to_str(nz) + ", " + to_str(ny) 
 	  + "+1, " + to_str(nx) + "+1)";
 	location = " (located at cross points) ";
       }
     else
       {
-	nx = SH.end_index(0) - SH.start_index(0) + 1;
-	ny = SH.end_index(1) - SH.start_index(1) + 1;
+	if (N != 1)
+	  {
+	    nx = SH.end_index(1) - SH.start_index(1) + 1;
+	    ny = SH.end_index(0) - SH.start_index(0) + 1;
+	  }
+	else
+	  {
+	    nx = SH.end_index(0) - SH.start_index(0) + 1;
+	    ny = 1;
+	  }
+
 	dimensions = string("(") + to_str(nz) + ", " + to_str(ny) 
 	  + ", " + to_str(nx) + ")";
 	location = " (located at dot points) ";

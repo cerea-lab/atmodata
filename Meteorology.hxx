@@ -18,21 +18,24 @@
 //     http://spacetown.free.fr/lib/atmodata
 
 
-#ifndef ATMODATA_FILE_ATMODATA_HXX
+#ifndef ATMODATA_FILE_METEOROLOGY_HXX
 
-#include "SeldonData.hxx"
-using namespace SeldonData;
+namespace AtmoData
+{
 
-#include "Common.hxx"
+  template<class TU, class TV, class TTp, class T, class TG>
+  void ComputeRichardson(Data<TU, 4, TG>& ZonalWind, Data<TV, 4, TG>& MeridionalWind,
+			 Data<TTp, 4, TG>& PotentialTemperature,
+			 Data<T, 4, TG>& SurfaceRichardson,
+			 T wind_threshold = 0.1);
 
-#include "Meteorology.cxx"
-#include "Kz.cxx"
-#include "Photolysis.cxx"
-#include "CoordTransform.cxx"
+  template<class TU, class TV, class TTp, class T, class TG>
+  void ComputeRichardson(Data<TU, 4, TG>& ZonalWind, Data<TV, 4, TG>& MeridionalWind,
+			 Data<TTp, 4, TG>& PotentialTemperature,
+			 Data<T, 3, TG>& SurfaceRichardson,
+			 T wind_threshold = 0.1);
 
-#include "Format.cxx"
+}  // namespace AtmoData.
 
-#include "Errors.cxx"
-
-#define ATMODATA_FILE_ATMODATA_HXX
+#define ATMODATA_FILE_METEOROLOGY_HXX
 #endif

@@ -246,6 +246,101 @@ namespace AtmoData
   }
 
 
+  /********
+   * CORR *
+   ********/
+
+  //! Computes the correlation between two data sets.
+  /*!
+    \param data_ref reference data.
+    \param data_comp data to be compared with 'data_ref'.
+    \param test boolean function with two parameters; the i-th
+    elements of 'data_ref' and 'data_comp' are taken into account
+    if 'test(data_ref(i), data_comp(i))' is true.
+    \return The correlation.
+  */
+  template<class T_ref, int N, class TG_ref,
+	   class T_comp, class TG_comp>
+  T_ref Corr_interpolation(Data<T_ref, N, TG_ref> data_ref,
+			   Data<T_comp, N, TG_comp>& data_comp,
+			   Function_Base<T_ref, bool>& test)
+  {
+    Data<T_ref, N, TG_ref> data_comp_interp(data_ref);
+    LinearInterpolationGeneral(data_comp, data_comp_interp);
+
+    return Corr(data_ref, data_comp_interp, test);
+  }
+
+
+  //! Computes the correlation between two data sets.
+  /*!
+    \param data_ref reference data.
+    \param data_comp data to be compared with 'data_ref'.
+    \param test boolean function with two parameters; the i-th
+    elements of 'data_ref' and 'data_comp' are taken into account
+    if 'test(data_ref(i), data_comp(i))' is true.
+    \return The correlation.
+  */
+  template<class T_ref, int N, class TG_ref,
+	   class T_comp, class TG_comp>
+  T_ref Corr(Data<T_ref, N, TG_ref> data_ref,
+	     Data<T_comp, N, TG_comp>& data_comp,
+	     Function_Base<T_ref, bool>& test)
+  {
+    T_ref corr;
+
+    T_ref* data_ref_arr = data_ref.GetData();
+    T_comp* data_comp_arr = data_comp.GetData();
+    int NbElements = data_ref.GetNbElements();
+
+#ifdef DEBUG_ATMODATA_DIMENSION
+
+    if (NbElements!=data_comp.GetNbElements())
+      throw WrongDim("AtmoData::Corr(Data<T_ref, " + to_str(N) +
+		     ">&, Data<T_comp, " + to_str(N) +
+		     ">&, Function_Base<T_ref, bool>&)",
+		     "Data sizes differ.");
+
+#endif
+    
+    int nb_elt = 0;
+    corr = T_ref(0);
+    T_ref mean_ref = T_ref(0);
+    T_comp mean_comp = T_comp(0);
+    T_ref var_ref = T_ref(0);
+    T_comp var_comp = T_comp(0);
+    T_ref covar = T_ref(0);
+    T_ref temp_ref;
+    T_comp temp_comp;
+
+    // Means.
+    for (int i=0; i<NbElements; i++)
+      if (test(data_ref_arr[i], data_comp_arr[i]))
+	{
+	  nb_elt++;
+	  mean_ref += data_ref_arr[i];
+	  mean_comp += data_comp_arr[i];
+	}
+    mean_ref = mean_ref / T_ref(nb_elt);
+    mean_comp = mean_comp / T_comp(nb_elt);
+
+    // Co-variances.
+    for (int i=0; i<NbElements; i++)
+      if (test(data_ref_arr[i], data_comp_arr[i]))
+	{
+	  temp_ref = data_ref_arr[i] - mean_ref;
+	  temp_comp = data_comp_arr[i] - mean_comp;
+	  covar += temp_ref * temp_comp;
+	  var_ref += temp_ref * temp_ref;
+	  var_comp += temp_comp * temp_comp;
+	}
+
+    corr = covar / sqrt(var_ref * var_comp);
+
+    return corr;
+  }
+
+
 }  // namespace AtmoData.
 
 

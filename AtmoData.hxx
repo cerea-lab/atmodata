@@ -28,6 +28,7 @@ using namespace SeldonData;
 #include "Meteorology.cxx"
 #include "Kz.cxx"
 #include "Photolysis.cxx"
+#include "Deposition.cxx"
 #include "CoordTransform.cxx"
 #include "Polair.cxx"
 

@@ -161,7 +161,7 @@ namespace AtmoData
     int nb_elt = 0;
     bias = T_ref(0);
     for (int i=0; i<NbElements; i++)
-      if (test(data_arr_ref(i), data_arr_comp(i)))
+      if (test(data_ref_arr[i], data_comp_arr[i]))
 	{
 	  nb_elt++;
 	  bias += data_ref_arr[i] - data_comp_arr[i];

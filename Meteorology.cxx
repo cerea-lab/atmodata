@@ -713,7 +713,7 @@ namespace AtmoData
 	    {
 	      crh = CriticalRelativeHumidity(h, k, j, i);
 	      tmp = RelativeHumidity(h, k, j, i) - crh;
-	      if (tmp < 0)
+	      if (tmp < 0. || crh == 1.)
 		CloudFraction(h, k, j, i) = 0.;
 	      else
 		{
@@ -756,7 +756,7 @@ namespace AtmoData
 	    {
 	      crh = CriticalRelativeHumidity(h, k, j, i);
 	      tmp = RelativeHumidity(h, k, j, i) - crh;
-	      if (tmp < 0)
+	      if (tmp < 0. || crh == 1.)
 		CloudFraction(h, k, j, i) = 0.;
 	      else
 		if (CloudFraction[1].Value(h, k, j, i)

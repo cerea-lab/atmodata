@@ -400,7 +400,7 @@ namespace AtmoData
     int Nx(CloudHeight.GetLength(2));    
 
     // Index "0" and "1" refer to two contiguous levels.
-    T rh0, rh1, rhc, dz, delta_z, s;
+    T rh0, rh1, rhc, s;
 
     T max_height = 2. * Pressure[1].Value(0, Nz-1, 0, 0);
     CloudHeight.Fill(max_height);

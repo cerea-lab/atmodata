@@ -85,7 +85,7 @@ namespace AtmoData
     // Checks if the file was opened.
     if (!FileStream.is_open())
       throw IOError("FormatCSV::Read(string FileName, Array<TA, N>& A)",
-		    "Unable to open file \"" + FileName + "\".");
+		    string("Unable to open file \"") + FileName + "\".");
 #endif
 
     this->Read(FileStream, A, S);
@@ -278,7 +278,7 @@ namespace AtmoData
     // Checks if the file was opened.
     if (!FileStream.is_open())
       throw IOError("FormatECMWF::Read(string FileName, Array<T, N>& A)",
-		    "Unable to open file \"" + FileName + "\".");
+		    string("Unable to open file \"") + FileName + "\".");
 #endif
 
     this->Read(FileStream, A);
@@ -314,9 +314,11 @@ namespace AtmoData
     int file_rec_length;
     FileStream.read(reinterpret_cast<char*>(&file_rec_length), 4);
     if (rec_length!=(file_rec_length-4))
-      throw IOError("FormatECMWF<T>::Read(ifstream& FileStream, Array<T, N>& A)",
-		    "Record length (as in file) is " + to_str(file_rec_length)
-		    + " byte(s)," + " but data record length is "
+      throw IOError(string("FormatECMWF<T>::Read(ifstream& FileStream, ")
+		    + "Array<T, N>& A)",
+		    string("Record length (as in file) is ")
+		    + to_str(file_rec_length)
+		    + string(" byte(s), but data record length is ")
 		    + to_str(rec_length) + " byte(s) long.");
 
     FileStream.seekg(position);
@@ -359,10 +361,12 @@ namespace AtmoData
 
     if (data_size>(file_size-12*(Nt-i)+i*rec_length))
       {
-	throw IOError("FormatBinary<T>::Read(ifstream& FileStream, Array<T, N>& A)",
-		      "Unable to read " + to_str(data_size) + " byte(s)." +
-		      " The input stream is only "
-		      + to_str((file_size/(rec_length+12)+i)*rec_length) + " byte(s) long.");
+	throw IOError(string("FormatBinary<T>::Read(ifstream& FileStream, ")
+		      + "Array<T, N>& A)",
+		      string("Unable to read ") + to_str(data_size)
+		      + string(" byte(s). The input stream is only ")
+		      + to_str((file_size/(rec_length+12)+i)*rec_length)
+		      + " byte(s) long.");
       }
     FileStream.seekg(position);
 
@@ -409,8 +413,8 @@ namespace AtmoData
 
     // Checks if the file ready.
     if (!FileStream.good())
-      throw IOError("FormatECMWF::Read(ifstream& FileStream, Array<TA, N>& A)",
-		    "File is not ready.");
+      throw IOError(string("FormatECMWF::Read(ifstream& FileStream, ")
+		    + "Array<TA, N>& A)", "File is not ready.");
 
     // Checks records length.
     streampos position;
@@ -419,9 +423,11 @@ namespace AtmoData
     int file_rec_length;
     FileStream.read(reinterpret_cast<char*>(&file_rec_length), 4);
     if (input_rec_length!=(file_rec_length-4))
-      throw IOError("FormatECMWF<T>::Read(ifstream& FileStream, Array<TA, N>& A)",
-		    "Record length (as in file) is "+ to_str(file_rec_length/sizeof(T))
-		    + " element(s)," + " but data record length is "
+      throw IOError(string("FormatECMWF<T>::Read(ifstream& FileStream, ")
+		    + "Array<TA, N>& A)",
+		    string("Record length (as in file) is ")
+		    + to_str(file_rec_length/sizeof(T))
+		    + string(" element(s), but data record length is ")
 		    + to_str(length) + " element(s) long.");
 
     FileStream.seekg(position);
@@ -459,8 +465,8 @@ namespace AtmoData
 
     // Checks if all was read.
     if (!reading)
-      throw IOError("FormatECMWF::Read(ifstream& FileStream, Array<TA, N>& A)",
-		    "The date was not found.");
+      throw IOError(string("FormatECMWF::Read(ifstream& FileStream, ")
+		    + "Array<TA, N>& A)", "The date was not found.");
 
     // Checks file length.
     position = FileStream.tellg();
@@ -469,10 +475,12 @@ namespace AtmoData
 
     if (data_size>((file_size-12*(Nt-i))/sizeof(T)*sizeof(TA)+i*rec_length))
       {
-	throw IOError("FormatBinary<T>::Read(ifstream& FileStream, Array<T, N>& A)",
-		      "Unable to read " + to_str(nb_elements) + " elements(s)."
-		      + " The input stream is only "
-		      + to_str((file_size/(12+input_rec_length)+i)*length) + " elements(s) long.");
+	throw IOError(string("FormatBinary<T>::Read(ifstream& FileStream, ")
+		      + "Array<T, N>& A)", string("Unable to read ")
+		      + to_str(nb_elements) + string(" elements(s).")
+		      + string(" The input stream is only ")
+		      + to_str((file_size/(12+input_rec_length)+i)*length)
+		      + " elements(s) long.");
       }
     FileStream.seekg(position);
 
@@ -553,7 +561,8 @@ namespace AtmoData
   //! Reads big header.
   void FormatMM5::ReadBigHeader(string FileName,
 				Array<int, 2>& BHI, Array<float, 2>& BHR,
-				Array<string, 2>& BHIC, Array<string, 2>& BHRC) const
+				Array<string, 2>& BHIC,
+				Array<string, 2>& BHRC) const
   {
 
     ifstream FileStream;
@@ -562,8 +571,10 @@ namespace AtmoData
 #ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if the file was opened.
     if (!FileStream.is_open())
-      throw IOError("FormatMM5<T>::ReadBigHeader(string FileName, Array<int, 2>&, Array<float, 2>&, Array<string, 2>&, Array<string, 2>&)",
-		    "Unable to open file \"" + FileName + "\".");
+      throw IOError(string("FormatMM5<T>::ReadBigHeader(string FileName, ")
+		    + string("Array<int, 2>&, Array<float, 2>&, ")
+		    + "Array<string, 2>&, Array<string, 2>&)",
+		    string("Unable to open file \"") + FileName + "\".");
 #endif
 
     this->ReadFlag(FileStream);
@@ -576,13 +587,16 @@ namespace AtmoData
   //! Reads big header.
   void FormatMM5::ReadBigHeader(ifstream& FileStream,
 				Array<int, 2>& BHI, Array<float, 2>& BHR,
-				Array<string, 2>& BHIC, Array<string, 2>& BHRC) const
+				Array<string, 2>& BHIC,
+				Array<string, 2>& BHRC) const
   {
 
 #ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if the file is ready.
     if (!FileStream.good())
-      throw IOError("FormatMM5<T>::ReadBigHeader(ifstream& FileStream, Array<int, 2>&, Array<float, 2>&, Array<string, 2>&, Array<string, 2>&)",
+      throw IOError(string("FormatMM5<T>::ReadBigHeader(ifstream& ")
+		    + string("FileStream, Array<int, 2>&, Array<float, 2>&, ")
+		    + "Array<string, 2>&, Array<string, 2>&)",
 		    "File is not ready.");
 #endif
 
@@ -609,14 +623,16 @@ namespace AtmoData
       for (j=0; j<50; j++)
 	{
 	  BHIC(i, j).resize(80);
-	  FileStream.read(const_cast<char*>(BHIC(i, j).c_str()), 80 * sizeof(char));
+	  FileStream.read(const_cast<char*>(BHIC(i, j).c_str()),
+			  80 * sizeof(char));
 	}
 
     for (i=0; i<20; i++)
       for (j=0; j<20; j++)
 	{
 	  BHRC(i, j).resize(80);
-	  FileStream.read(const_cast<char*>(BHRC(i, j).c_str()), 80 * sizeof(char));
+	  FileStream.read(const_cast<char*>(BHRC(i, j).c_str()),
+			  80 * sizeof(char));
 	}
 
     FileStream.read(reinterpret_cast<char*>(&length), 4);
@@ -624,7 +640,9 @@ namespace AtmoData
 #ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if all was read.
     if (!FileStream.good())
-      throw IOError("FormatMM5<T>::ReadBigHeader(ifstream& FileStream, Array<int, 2>&, Array<float, 2>&, Array<string, 2>&, Array<string, 2>&)",
+      throw IOError(string("FormatMM5<T>::ReadBigHeader(ifstream& ")
+		    + string("FileStream, Array<int, 2>&, Array<float, 2>&, ")
+		    + "Array<string, 2>&, Array<string, 2>&)",
 		    "Unable to read the big header.");
 #endif
 
@@ -650,8 +668,8 @@ namespace AtmoData
 #ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if the file is ready.
     if (!FileStream.good())
-      throw IOError("FormatMM5<T>::ReadSubHeader(ifstream& FileStream, MM5SubHeader& SH)",
-		    "File is not ready.");
+      throw IOError(string("FormatMM5<T>::ReadSubHeader(ifstream& ")
+		    + "FileStream, MM5SubHeader& SH)", "File is not ready.");
 #endif
 
     int length;
@@ -661,25 +679,32 @@ namespace AtmoData
 
     FileStream.read(reinterpret_cast<char*>(&SH.ndim), sizeof(int));
     swap(SH.ndim);
-    FileStream.read(reinterpret_cast<char*>(SH.start_index.data()), 4 * sizeof(int));
+    FileStream.read(reinterpret_cast<char*>(SH.start_index.data()),
+		    4 * sizeof(int));
     swap(SH.start_index);
-    FileStream.read(reinterpret_cast<char*>(SH.end_index.data()), 4 * sizeof(int));
+    FileStream.read(reinterpret_cast<char*>(SH.end_index.data()),
+		    4 * sizeof(int));
     swap(SH.end_index);
     FileStream.read(reinterpret_cast<char*>(&SH.xtime), sizeof(float));
     swap(SH.xtime);
-    FileStream.read(const_cast<char*>(SH.staggering.c_str()), 4 * sizeof(char));
-    FileStream.read(const_cast<char*>(SH.ordering.c_str()), 4 * sizeof(char));
-    FileStream.read(const_cast<char*>(SH.current_date.c_str()), 24 * sizeof(char));
+    FileStream.read(const_cast<char*>(SH.staggering.c_str()),
+		    4 * sizeof(char));
+    FileStream.read(const_cast<char*>(SH.ordering.c_str()),
+		    4 * sizeof(char));
+    FileStream.read(const_cast<char*>(SH.current_date.c_str()),
+		    24 * sizeof(char));
     FileStream.read(const_cast<char*>(SH.name.c_str()), 9 * sizeof(char));
     FileStream.read(const_cast<char*>(SH.unit.c_str()), 25 * sizeof(char));
-    FileStream.read(const_cast<char*>(SH.description.c_str()), 46 * sizeof(char));
+    FileStream.read(const_cast<char*>(SH.description.c_str()),
+		    46 * sizeof(char));
 
     FileStream.read(reinterpret_cast<char*>(&length), 4);
 
 #ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if all was read.
     if (!FileStream.good())
-      throw IOError("FormatMM5<T>::ReadSubHeader(ifstream& FileStream, MM5SubHeader& SH)",
+      throw IOError(string("FormatMM5<T>::ReadSubHeader(ifstream& ")
+		    + "FileStream, MM5SubHeader& SH)",
 		    "Unable to read the sub-header.");
 #endif
 
@@ -717,8 +742,9 @@ namespace AtmoData
 #ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if the file was opened.
     if (!FileStream.is_open())
-      throw IOError("ReadWholeField(string FileName, string FieldName, Array<float, N>& A)",
-		    "Unable to open file \"" + FileName + "\".");
+      throw IOError(string("ReadWholeField(string FileName, ")
+		    + "string FieldName, Array<float, N>& A)",
+		    string("Unable to open file \"") + FileName + "\".");
 #endif
 
     this->ReadWholeField(FileStream, FieldName, A);
@@ -743,15 +769,15 @@ namespace AtmoData
 #ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if the file is ready.
     if (N > 4)
-      throw IOError(string("FormatMM5<T>::ReadWholeField(ifstream& FileStream,") +
-		    " string FieldName, Array<float, N>& A)",
-		    string("Data array should have less than 4 dimensions but it has ")
-		    + to_str(N) + " dimensions.");
+      throw IOError(string("FormatMM5<T>::ReadWholeField(ifstream& ")
+		    + "FileStream, string FieldName, Array<float, N>& A)",
+		    string("Data array should have less than 4 dimensions")
+		    + string(" but it has ") + to_str(N) + " dimensions.");
 
     // Checks if the file is ready.
     if (!FileStream.good())
-      throw IOError(string("FormatMM5<T>::ReadWholeField(ifstream& FileStream,") +
-		    " string FieldName, Array<float, N>& A)",
+      throw IOError(string("FormatMM5<T>::ReadWholeField(ifstream& ")
+		    + "FileStream, string FieldName, Array<float, N>& A)",
 		    "File is not ready.");
 #endif
 
@@ -788,8 +814,9 @@ namespace AtmoData
 
 #ifdef SELDONDATA_DEBUG_CHECK_IO
 	    if (time_step >= nb_time_steps)
-	      throw IOError(string("FormatMM5<T>::ReadWholeField(ifstream& FileStream,") +
-			    " string FieldName, Array<float, N>& A)",
+	      throw IOError(string("FormatMM5<T>::ReadWholeField(ifstream& ")
+			    + string("FileStream, string FieldName, ")
+			    + "Array<float, N>& A)",
 			    string("Data file contains more than ")
 			    + to_str(nb_time_steps)
 			    + " steps. The whole field must be read.");
@@ -817,10 +844,11 @@ namespace AtmoData
 
 #ifdef SELDONDATA_DEBUG_CHECK_IO
     if (time_step < nb_time_steps)
-      throw IOError(string("FormatMM5<T>::ReadWholeField(ifstream& FileStream,") +
-		    " string FieldName, Array<float, N>& A)",
+      throw IOError(string("FormatMM5<T>::ReadWholeField(ifstream& ")
+		    + "FileStream, string FieldName, Array<float, N>& A)",
 		    string("Data file contains ") + to_str(time_step)
-		    + " steps, but the data array contains " + to_str(nb_time_steps)
+		    + string(" steps, but the data array contains ")
+		    + to_str(nb_time_steps)
 		    + " steps. Both data should be consistant.");
 #endif
 
@@ -844,8 +872,8 @@ namespace AtmoData
     if (N > 3)
       throw IOError(string("FormatMM5<T>::ReadField(ifstream& FileStream,") +
 		    " MM5SubHeader& SH, Array<float, N>& A)",
-		    string("Data array should have less than 3 dimensions but it has ")
-		    + to_str(N) + " dimensions.");
+		    string("Data array should have less than 3 dimensions")
+		    + string(" but it has ") + to_str(N) + " dimensions.");
 
     // Checks if the file is ready.
     if (!FileStream.good())
@@ -901,8 +929,9 @@ namespace AtmoData
     if (ny_A != ny || max(1, nz_A) != nz || max(1, nx_A) != nx)
       throw IOError(string("FormatMM5<T>::ReadField(ifstream& FileStream,") +
 		    " MM5SubHeader& SH, Array<float, N>& A)",
-		    string("Dimensions of the stored field") + location + "are "
-		    + dimensions + " but dimensions of the data array are "
+		    string("Dimensions of the stored field") + location
+		    + string("are ") + dimensions
+		    + string(" but dimensions of the data array are ")
 		    + dimensions_A + ".");
 #endif
 
@@ -913,7 +942,8 @@ namespace AtmoData
 
   //! Reads the field.
   template <int N>
-  void FormatMM5::ReadField(ifstream& FileStream, bool cross, Array<float, N>& A) const
+  void FormatMM5::ReadField(ifstream& FileStream, bool cross,
+			    Array<float, N>& A) const
   {
 
     unsigned long data_size = A.numElements() * sizeof(float);
@@ -922,7 +952,8 @@ namespace AtmoData
 #ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if the file is ready.
     if (!FileStream.good())
-      throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream, bool cross, Array<float, N>&)",
+      throw IOError(string("FormatMM5<T>::ReadField(ifstream& FileStream, ")
+		    + "bool cross, Array<float, N>&)",
 		    "File is not ready.");
 #endif
 
@@ -958,10 +989,12 @@ namespace AtmoData
 
 #ifdef SELDONDATA_DEBUG_CHECK_IO
 	if (int(data_size) != length)
-	  throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream, bool cross, Array<float, N>& A)",
-			"Size of the stored field (located at dot points) is "
-			+ to_str(length) + " byte(s) long"
-			+ " but the dimensions of the data array are "
+	  throw IOError(string("FormatMM5<T>::ReadField(ifstream& FileStream")
+			+ ", bool cross, Array<float, N>& A)",
+			string("Size of the stored field (located at dot")
+			+ string("points) is ") + to_str(length)
+			+ string(" byte(s) long but the dimensions ")
+			+ string("of the data array are ")
 			+ dimensions_A + ".");
 #endif
 
@@ -975,11 +1008,14 @@ namespace AtmoData
 	data_size = nx_A * sizeof(float);
 
 #ifdef SELDONDATA_DEBUG_CHECK_IO
-	if (max(1, nz_A) * (nx_A + 1) * (ny_A + 1) * int(sizeof(float)) != length)
-	  throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream, bool cross, Array<float, N>& A)",
-			"Size of the stored field (located at cross points) is "
-			+ to_str(length) + " byte(s) long" +
-			" but the dimensions of the data array are "
+	if (max(1, nz_A) * (nx_A + 1) * (ny_A + 1) * int(sizeof(float))
+	    != length)
+	  throw IOError(string("FormatMM5<T>::ReadField(ifstream& ")
+			+ "FileStream, bool cross, Array<float, N>& A)",
+			string("Size of the stored field (located ")
+			+ string("at cross points) is ")
+			+ to_str(length) + string(" byte(s) long")
+			+ string(" but the dimensions of the data array are ")
 			+ dimensions_A + ".");
 #endif
 
@@ -1002,7 +1038,8 @@ namespace AtmoData
 #ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if all was read.
     if (!FileStream.good())
-      throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream, bool cross, Array<float, N>&)",
+      throw IOError(string("FormatMM5<T>::ReadField(ifstream& FileStream")
+		    + ", bool cross, Array<float, N>&)",
 		    "Unable to read the field.");
 #endif
 
@@ -1019,8 +1056,8 @@ namespace AtmoData
 #ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if the file is ready.
     if (!FileStream.good())
-      throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream, Array<float, N>&)",
-		    "File is not ready.");
+      throw IOError(string("FormatMM5<T>::ReadField(ifstream& FileStream")
+		    + ", Array<float, N>&)", "File is not ready.");
 
     // Checks file length.
     streampos position;
@@ -1029,9 +1066,11 @@ namespace AtmoData
     unsigned long file_size = FileStream.tellg() - position;
 
     if (data_size + 8 > file_size)
-      throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream, Array<float, N>& A)",
-		    "Unable to read (" + to_str(data_size) + " + 8) byte(s)." +
-		    " The input stream is only " + to_str(file_size) + " byte(s) long.");
+      throw IOError(string("FormatMM5<T>::ReadField(ifstream& FileStream")
+		    + ", Array<float, N>& A)",
+		    string("Unable to read (") + to_str(data_size)
+		    + string(" + 8) byte(s). The input stream is only ")
+		    + to_str(file_size) + " byte(s) long.");
 
     FileStream.seekg(position);
 #endif
@@ -1049,7 +1088,8 @@ namespace AtmoData
 #ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if all was read.
     if (!FileStream.good())
-      throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream, Array<float, N>&)",
+      throw IOError(string("FormatMM5<T>::ReadField(ifstream& FileStream")
+		    + ", Array<float, N>&)",
 		    "Unable to read the field.");
 #endif
 
@@ -1084,8 +1124,9 @@ namespace AtmoData
 
     if (data_size + 4 > file_size)
       throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream)",
-		    "Unable to read (" + to_str(data_size) + " + 4) byte(s)." +
-		    " The input stream is only " + to_str(file_size) + " byte(s) long.");
+		    string("Unable to read (") + to_str(data_size)
+		    + string(" + 4) byte(s). The input stream is only ")
+		    + to_str(file_size) + " byte(s) long.");
 
     FileStream.seekg(position);
 #endif

@@ -138,11 +138,13 @@ namespace AtmoData
     void ReadWholeField(ifstream& FileStream, string FieldName, 
 			Array<float, N>& A) const;
     template <int N>
-    void ReadField(ifstream& FileStream, bool cross, Array<float, N>& A) const;
+    void ReadField(ifstream& FileStream, bool cross,
+		   Array<float, N>& A) const;
     template <int N, class TG>
     void ReadField(ifstream& FileStream, Data<float, N, TG>& A) const;
     template <int N>
-    void ReadField(ifstream& FileStream, MM5SubHeader& SH, Array<float, N>& A) const;
+    void ReadField(ifstream& FileStream, MM5SubHeader& SH,
+		   Array<float, N>& A) const;
     template <int N>
     void ReadField(ifstream& FileStream, Array<float, N>& A) const;
     void ReadField(ifstream& FileStream) const;

@@ -269,6 +269,123 @@ namespace AtmoData
   }
 
 
+  //! Computes the critival relative humidity.
+  /*!
+    Formula: CriticalRelativeHumidity = 1.0 - coeff0 * sig
+    * (1.0 - sig) * (1.0 + (sig - 0.5) * coeff1) where
+    sig = Pressure / SurfacePressure.
+    \param SurfacePressure surface pressure (Pa).
+    \param Pressure pressure (Pa).
+    \param CriticalRelativeHumidity (output) critical relative humidity.
+    \param coeff0 coefficient (see the formula). Default: 2.0.
+    \param coeff1 coefficient (see the formula). Default: sqrt(3.).
+  */
+  template<class TS, class TP, class T, class TG>
+  void ComputeCriticalRelativeHumidity(Data<TS, 3, TG>& SurfacePressure,
+				       Data<TP, 4, TG>& Pressure,
+				       Data<T, 4, TG>& CriticalRelativeHumidity,
+				       T coeff0, T coeff1)
+  {
+    int h, k, j, i;
+    int Nt(CriticalRelativeHumidity.GetLength(0));
+    int Nz(CriticalRelativeHumidity.GetLength(1));
+    int Ny(CriticalRelativeHumidity.GetLength(2));
+    int Nx(CriticalRelativeHumidity.GetLength(3));
+
+    T sig;
+    for (h = 0; h < Nt; h++)
+      for (k = 0; k < Nz; k++)
+	for (j = 0; j < Ny; j++)
+	  for (i = 0; i < Nx; i++)
+	    {
+	      sig = Pressure(h, k, j, i) / SurfacePressure(h, j, i);
+	      CriticalRelativeHumidity(h, k, j, i) = 1.0 - coeff0 * sig
+		* (1.0 - sig) * (1.0 + (sig - 0.5) * coeff1);
+	    }
+  }
+
+
+  //! Computes the critical relative humidity.
+  /*!
+    Formula: inside the boundary layer,
+    CriticalRelativeHumidity = BL_CRH and, above the boundary layer,
+    CriticalRelativeHumidity = 1.0 - coeff0 * sig
+    * (1.0 - sig) * (1.0 + (sig - 0.5) * coeff1) where
+    sig = Pressure / SurfacePressure.
+    \param BoundaryLayerHeight boundary layer height (m).
+    \param SurfacePressure surface pressure (Pa).
+    \param Pressure pressure (Pa).
+    \param CriticalRelativeHumidity (output) critical relative humidity.
+    \param coeff0 coefficient (see the formula). Default: 2.0.
+    \param coeff1 coefficient (see the formula). Default: sqrt(3.).
+    \param BL_CRH critical relative humidity within the boundary layer. Default: 0.98.
+  */
+  template<class TB, class TS, class TP, class T, class TG>
+  void ComputeCriticalRelativeHumidity(Data<TB, 3, TG>& BoundaryLayerHeight,
+				       Data<TS, 3, TG>& SurfacePressure,
+				       Data<TP, 4, TG>& Pressure,
+				       Data<T, 4, TG>& CriticalRelativeHumidity,
+				       T coeff0, T coeff1, T BL_CRH)
+  {
+    int h, k, j, i;
+    int Nt(CriticalRelativeHumidity.GetLength(0));
+    int Nz(CriticalRelativeHumidity.GetLength(1));
+    int Ny(CriticalRelativeHumidity.GetLength(2));
+    int Nx(CriticalRelativeHumidity.GetLength(3));
+
+    T sig;
+    for (h = 0; h < Nt; h++)
+      for (k = 0; k < Nz; k++)
+	for (j = 0; j < Ny; j++)
+	  for (i = 0; i < Nx; i++)
+	    if (CriticalRelativeHumidity[1].Value(h, k, j, i)
+		< BoundaryLayerHeight(h, j, i))
+	      CriticalRelativeHumidity(h, k, j, i) = BL_CRH;
+	    else
+	      {
+		sig = Pressure(h, k, j, i) / SurfacePressure(h, j, i);
+		CriticalRelativeHumidity(h, k, j, i) = 1.0 - coeff0 * sig
+		  * (1.0 - sig) * (1.0 + (sig - 0.5) * coeff1);
+	      }
+  }
+
+
+  //! Computes the critical relative humidity.
+  /*!
+    The relative humidity is set to CRH_0 is Pressure < P_0,
+    to CRH_1 if P_0 <= Pressure < P_1 and to CRH_2 otherwise.
+    \param Pressure pressure (Pa).
+    \param CriticalRelativeHumidity (output) critical relative humidity.
+    \param CRH_0 critical relative humidity in the first layer. Default: 0.75.
+    \param CRH_1 critical relative humidity in the second layer. Default: 0.95.
+    \param CRH_2 critical relative humidity in the third layer. Default: 0.95.
+    \param P_0 first pressure limit. Default: 70 000 Pa.
+    \param P_1 second pressure limit. Default: 40 000 Pa.
+  */
+  template<class TP, class T, class TG>
+  void ComputeCriticalRelativeHumidity(Data<TP, 4, TG>& Pressure,
+				       Data<T, 4, TG>& CriticalRelativeHumidity,
+				       T CRH_0, T CRH_1, T CRH_2, T P_0, T P_1)
+  {
+    int h, k, j, i;
+    int Nt(CriticalRelativeHumidity.GetLength(0));
+    int Nz(CriticalRelativeHumidity.GetLength(1));
+    int Ny(CriticalRelativeHumidity.GetLength(2));
+    int Nx(CriticalRelativeHumidity.GetLength(3));
+
+    for (h = 0; h < Nt; h++)
+      for (k = 0; k < Nz; k++)
+	for (j = 0; j < Ny; j++)
+	  for (i = 0; i < Nx; i++)
+	    if (Pressure(h, k, j, i) < P_0)
+	      CriticalRelativeHumidity(h, k, j, i) = CRH_0;
+	    else if (Pressure(h, k, j, i) < P_1)
+	      CriticalRelativeHumidity(h, k, j, i) = CRH_1;
+	    else
+	      CriticalRelativeHumidity(h, k, j, i) = CRH_2;
+  }
+
+
   //! Computes the module of a 2D-vectors field.
   /*!
     This function was initially dedicated to winds. In this case, zonal winds and meridional

@@ -228,6 +228,89 @@ namespace AtmoData
   }
 
 
+  //! Default constructor.
+  template <class T>
+  MM5StereIndToLonlat<T>::MM5StereIndToLonlat(int jmx, int imx, double jx, double ix, double phic,
+					      double lambdac, double phi1, double ds, int ratio)  throw():
+    jmx_(jmx), imx_(imx), jx_(jx), ix_(ix), phic_(phic), lambdac_(lambdac),
+    phi1_(phi1), ds_(ds), ratio_(ratio),
+    pi_(3.14159265358979323846264),
+    Earth_radius_(6370997.)
+  {
+    
+  }
+
+
+  //! Convertion operator.
+  /*!
+    \param j index of the MM5 grid along the East-West direction.
+    \param i index of the MM5 grid along the North-South direction.
+    \param lon longitude (output).
+    \param lat latitude (input).
+    \warning Indices order (in MM5) is confusing: j has to be provided first.
+  */
+  template <class T>
+  void MM5StereIndToLonlat<T>::operator() (const T j, const T i,
+					   T& lon, T& lat)
+  {
+ 
+    double ic0, jc0;
+    double ic, jc;
+    double conv;
+    double kappa;
+    double auxsig;
+    double psi1;
+    double auxc, yc;
+    double x, y, R;
+    double auxl;
+    double auxtan;
+    double lambdaprima;
+    double aux, Rs;
+    double auxij;
+
+
+    ic0 = (imx_ + 1.0) / 2.0;
+    jc0 = (jmx_ + 1.0) / 2.0;
+
+    ic = (ic0 - ix_) * ratio_ + 0.5;
+    jc = (jc0 - jx_) * ratio_ + 0.5;
+
+    conv = 180. / pi_;
+
+    kappa = 1.0;
+
+    auxsig = phic_<0? -1.0 : 1.0;
+
+    psi1 = auxsig * (pi_/2.0 - abs(phi1_)/conv);
+
+    auxc = (auxsig * 90.0 - phic_) / conv;
+    yc = - Earth_radius_ * sin(auxc) * ((1.0 + cos(psi1)) / (1.0 + cos(auxc)));
+
+    x = (jc - j - 1) * ds_;
+    y = (i + 1 - ic) * ds_ + yc;
+    R = sqrt(x*x + y*y);
+
+    auxl = R/((1.0 + cos(psi1)) * Earth_radius_);
+    lat = auxsig * 90.0 - 2.0 * conv * atan(auxl);
+
+    if (y == 0.0)
+      {
+	auxtan = x<0.? (-pi_/2.) : (pi_/2.);
+	lambdaprima = lambdac_ + conv * auxtan / kappa;
+      }
+      else
+	lambdaprima = lambdac_ + conv * atan(x/(auxsig*y)) /kappa;
+    
+    if (lambdaprima < 180.0)
+      lon = lambdaprima + 360.0;
+    if ((-180.0 <= lambdaprima) && (lambdaprima <= 180.0))
+      lon = lambdaprima;
+    if (lambdaprima > 180.0)
+      lon = lambdaprima - 360.0;
+
+  }
+
+
 }  // namespace AtmoData.
 
 #define ATMODATA_FILE_COORDTRANSFORM_CXX

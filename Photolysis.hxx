@@ -24,7 +24,7 @@ namespace AtmoData
 {
 
   template<class T>
-  T ZenithAngle(T lat, T lon, int idate, T ut);
+  T ZenithAngle(T lon, T lat, int idate, T ut);
 
   template <class TT, class TP, class TH, class TL,
 	    class TMC, class THC, class T, class TG>

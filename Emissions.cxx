@@ -1,5 +1,8 @@
-// Copyright (C) 2003-2004 Ecole Nationale des Ponts et Chaussees
+// Copyright (C) 2003-2004 CEREA
 //     Author: Vivien Mallet
+//
+// CEREA (http://www.enpc.fr/cerea) is a joint laboratory of
+// ENPC (http://www.enpc.fr) and EDF R&D (http://www.edf.fr).
 //
 // This file is part of AtmoData library.
 // AtmoData library is a tool for data processing in atmospheric

@@ -303,6 +303,63 @@ namespace AtmoData
 
   //! Default constructor.
   template <class T>
+  LonlatToMM5MercInd<T>::LonlatToMM5MercInd(int jmx, int imx, double jx, double ix, double phic,
+					    double lambdac, double phi1, double ds0, int ratio)  throw():
+    jmx_(jmx), imx_(imx), jx_(jx), ix_(ix), phic_(phic), lambdac_(lambdac),
+    phi1_(phi1), ds0_(ds0), ratio_(ratio),
+    pi_(3.14159265358979323846264),
+    Earth_radius_(6370997.)
+  {
+    
+  }
+
+
+  //! Convertion operator.
+  /*!
+    \param lon longitude.
+    \param lat latitude.
+    \param j index of the MM5 grid along the East-West direction.
+    \param i index of the MM5 grid along the North-South direction.
+    \warning Indices order (in MM5) is confusing: j and i are swapped with respect to
+    the natural order.
+  */
+  template <class T>
+  void LonlatToMM5MercInd<T>::operator() (const T lon, const T lat,
+					  T& j, T& i)
+  {
+
+    double ic0, jc0;
+    double ic, jc;
+    double c2;
+    double yc;
+    double conv;
+    double aux;
+    double x, y;
+
+    ic0 = (imx_ + 1.0) / 2.0;
+    jc0 = (jmx_ + 1.0) / 2.0;
+
+    ic = (ic0 - ix_) * ratio_ + 0.5;
+    jc = (jc0 - jx_) * ratio_ + 0.5;
+
+    conv = 180. / pi_;
+
+    c2 = Earth_radius_ * cos(phi1_/conv);
+    aux = phic_ / conv;
+    yc = c2 * log((1.0 + sin(aux)) / cos(aux));
+
+    x = c2 * (lon - lambdac_) / conv;
+    aux = lat / conv;
+    y = c2 * log((1.0 + sin(aux)) / cos(aux));
+
+    i = (ic0 + (y-yc)/ds0_ - ix_) * ratio_ - 0.5;
+    j = (jc0 + x/ds0_ - jx_) * ratio_ - 0.5;
+
+  }
+
+
+  //! Default constructor.
+  template <class T>
   MM5StereIndToLonlat<T>::MM5StereIndToLonlat(int jmx, int imx, double jx, double ix, double phic,
 					      double lambdac, double phi1, double ds, int ratio)  throw():
     jmx_(jmx), imx_(imx), jx_(jx), ix_(ix), phic_(phic), lambdac_(lambdac),

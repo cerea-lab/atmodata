@@ -145,6 +145,137 @@ namespace AtmoData
   }
 
 
+  //! Computes the cloud attenuation for photolysis rates.
+  /*!
+    \param Temperature temperature (K).
+    \param Pressure pressure (Pa).
+    \param Humidity specific humidity (unitless).
+    \param LiquidWaterContent liquid water content (kg/m^3).
+    \param MediumCloudiness medium cloudiness (in [0, 1]).
+    \param HighCloudiness high cloudiness (in [0, 1]).
+    \param CriticalRelativeHumidity function that returns the critical
+    relative humidity as function of the altitude, the pressure and reference pressure.
+    \param date date in the form YYYYMMDD.
+    \param Attenuation (output) cloud attenuation coefficient.
+  */
+  template <class TT, class TP, class TH, class TL,
+	    class TMC, class THC, class T, class TG>
+  void Attenuation_LWC(Data<TT, 4, TG>& Temperature, Data<TP, 4, TG>& Pressure,
+		       Data<TH, 4, TG>& Humidity, Data<TL, 4, TG>& LiquidWaterContent,
+		       Data<TMC, 3, TG>& MediumCloudiness, Data<THC, 3, TG>& HighCloudiness,
+		       T (CriticalRelativeHumidity)(const T&, const T&, const T&),
+		       int date, Data<T, 4, TG>& Attenuation)
+  {
+
+    int h, k, j, i;
+    int Nt(Attenuation.GetLength(0));
+    int Nz(Attenuation.GetLength(1));
+    int Ny(Attenuation.GetLength(2));
+    int Nx(Attenuation.GetLength(3));
+    
+
+    // Index "0" and "1" refer to two contiguous levels.
+    T rh0, rh1, rhc, dz, delta_z,
+      lwc0, lwc1, lw, w, tau, opt_depth, s, tr;
+
+    for (h=0; h<Nt; h++)
+      for (j=0; j<Ny; j++)
+	for (i=0; i<Nx; i++)
+	  {
+
+	    // Specific humidity to relative humidity.
+	    s = 611. * pow(10., 7.5 * (Temperature(h, Nz-1, j, i) - 273.15)
+			   / (Temperature(h, Nz-1, j, i) - 35.85));
+	    rh0 = Pressure(h, Nz-1, j, i) * Humidity(h, Nz-1, j, i)
+	      / (0.62197 + Humidity(h, Nz-1, j, i)) / s;
+	    // kg/m^3 to g/m^3.
+	    lwc0 = 1000. * LiquidWaterContent(h, Nz-1, j, i);
+
+	    w = 0;
+	    
+	    for (k=Nz-1; k>=0; k--)
+	      {
+
+		if (k==Nz-1)
+		  dz = Attenuation[1].Value(h, Nz-1, j, i)
+		    - Attenuation[1].Value(h, Nz-2, j, i);
+		else
+		  dz = Attenuation[1].Value(h, k+1, j, i)
+		    - Attenuation[1].Value(h, k, j, i);
+
+		// Specific humidity to relative humidity.
+		s = 611. * pow(10., 7.5 * (Temperature(h, k, j, i) - 273.15)
+			       / (Temperature(h, k, j, i) - 35.85));
+		rh1 = Pressure(h, k, j, i) * Humidity(h, k, j, i)
+		  / (0.62197 + Humidity(h, k, j, i)) / s;
+		// kg/m^3 to g/m^3.
+		lwc1 = 1000. * LiquidWaterContent(h, k, j, i);
+
+		// Critical relative humidity.
+		rhc = CriticalRelativeHumidity(Attenuation[1].Value(h, k, j, i),
+					       Pressure(h, k, j, i),
+					       Pressure(h, 0, j, i));
+
+		if ( (rh0>rhc) && (rh1>rhc) )  // In a cloud.
+		  w += dz * (lwc0 + lwc1) / 2.0;
+		else if ( (rh0>rhc) && (rh1<rhc) )  // Below a cloud.
+		  {
+		    delta_z = dz * (rh0 - rhc) / (rh0 - rh1);
+		    w += lwc1 * delta_z + (lwc0 - lwc1) / dz * .5
+		      * (2.0 * dz - delta_z) * delta_z;
+		  }
+		else if ( (rh0<rhc) && (rh1>rhc) )  // Above a cloud.
+		  {
+		    delta_z = dz * (rh1 - rhc) / (rh1 - rh0);
+		    w += lwc1 * delta_z + (lwc0 - lwc1) / dz * .5
+		      * delta_z * delta_z;
+		  }
+		// For the next level.
+		rh0 = rh1;
+		lwc0 = lwc1;
+
+		// Computes liquid water path.
+		if (w>0.)
+		  lw = log10(w);
+		else
+		  lw = 0.;
+
+		// Computes the cloud optical depth according to Stephens (1978).
+		if (lw<=0.)
+		  tau = 0.;
+		else
+		  tau = pow(10., 0.2633 + 1.7095 * log(lw));
+
+		// Computes the cloud transmissivity.
+		if (tau<5.)
+		  tr = 1.;
+		else
+		  tr = (5. - exp(-tau)) / (4. + 0.42*tau);
+
+		// Zenith angle.
+		T cos_zenith_angle;
+		cos_zenith_angle = cos( ZenithAngle(Attenuation[3].Value(h, k, j, i),
+						    Attenuation[2].Value(h, k, j, i),
+						    date, Attenuation[0].Value(h, k, j, i))
+					* 0.0174532925199433 );
+		cos_zenith_angle = abs(cos_zenith_angle);
+
+		// Computes the attenuation coefficient.
+		if (tr==1)
+		  Attenuation(h, k, j, i) = 1.0
+		    + (min(1.0, MediumCloudiness(h, j, i) + HighCloudiness(h, j, i)))
+		    * (1.6 * cos_zenith_angle - 1.0);
+		else
+		  Attenuation(h, k, j, i) = 1.0
+		    + (min(1.0, MediumCloudiness(h, j, i) + HighCloudiness(h, j, i)))
+		    * ( (1.-tr) * cos_zenith_angle );
+
+	      }
+
+	  }
+  }
+
+
 }  // namespace AtmoData.
 
 #define ATMODATA_FILE_PHOTOLYSIS_CXX

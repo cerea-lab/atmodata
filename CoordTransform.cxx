@@ -43,7 +43,7 @@ namespace AtmoData
     \param x_ abscissa in Lambert azimuthal equal area.
     \param y_ ordinate in Lambert azimuthal equal area.
     \param lon longitude (output).
-    \param lat latitude (input).
+    \param lat latitude (ouput).
   */
   template <class T>
   void LaeaToLonlat<T>::operator() (const T x_, const T y_,
@@ -103,7 +103,7 @@ namespace AtmoData
     \param j index of the MM5 grid along the East-West direction.
     \param i index of the MM5 grid along the North-South direction.
     \param lon longitude (output).
-    \param lat latitude (input).
+    \param lat latitude (output).
     \warning Indices order (in MM5) is confusing: j has to be provided first.
   */
   template <class T>
@@ -265,7 +265,7 @@ namespace AtmoData
     \param j index of the MM5 grid along the East-West direction.
     \param i index of the MM5 grid along the North-South direction.
     \param lon longitude (output).
-    \param lat latitude (input).
+    \param lat latitude (output).
     \warning Indices order (in MM5) is confusing: j has to be provided first.
   */
   template <class T>
@@ -376,7 +376,7 @@ namespace AtmoData
     \param j index of the MM5 grid along the East-West direction.
     \param i index of the MM5 grid along the North-South direction.
     \param lon longitude (output).
-    \param lat latitude (input).
+    \param lat latitude (output).
     \warning Indices order (in MM5) is confusing: j has to be provided first.
   */
   template <class T>

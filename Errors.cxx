@@ -35,30 +35,6 @@ namespace AtmoData
 
   //! Computes the normalized gross error between two data sets.
   /*!
-    Data to be compared with reference data is interpolated on
-    reference-data grid.
-    \param data_ref reference data.
-    \param data_comp data to be compared with 'data_ref'.
-    \param test boolean function with two parameters; the i-th
-    elements of 'data_ref' and 'data_comp' are taken into account
-    if 'test(data_ref(i), data_comp(i))' is true.
-    \return The normalized gross error.
-  */
-  template<class T_ref, int N, class TG_ref,
-	   class T_comp, class TG_comp>
-  T_ref NGE_interpolation(Data<T_ref, N, TG_ref> data_ref,
-			  Data<T_comp, N, TG_comp>& data_comp,
-			  Function_Base<T_ref, bool>& test)
-  {
-    Data<T_ref, N, TG_ref> data_comp_interp(data_ref);
-    LinearInterpolationGeneral(data_comp, data_comp_interp);
-
-    return NGE(data_ref, data_comp_interp, test);
-  }
-
-
-  //! Computes the normalized gross error between two data sets.
-  /*!
     \param data_ref reference data.
     \param data_comp data to be compared with 'data_ref'.
     \param test boolean function with two parameters; the i-th
@@ -106,30 +82,6 @@ namespace AtmoData
   /********
    * BIAS *
    ********/
-
-  //! Computes the bias between two data sets.
-  /*!
-    Data to be compared with reference data is interpolated on
-    reference-data grid.
-    \param data_ref reference data.
-    \param data_comp data to be compared with 'data_ref'.
-    \param test boolean function with two parameters; the i-th
-    elements of 'data_ref' and 'data_comp' are taken into account
-    if 'test(data_ref(i), data_comp(i))' is true.
-    \return The bias.
-  */
-  template<class T_ref, int N, class TG_ref,
-	   class T_comp, class TG_comp>
-  T_ref Bias_interpolation(Data<T_ref, N, TG_ref> data_ref,
-			   Data<T_comp, N, TG_comp>& data_comp,
-			   Function_Base<T_ref, bool>& test)
-  {
-    Data<T_ref, N, TG_ref> data_comp_interp(data_ref);
-    LinearInterpolationGeneral(data_comp, data_comp_interp);
-
-    return Bias(data_ref, data_comp_interp, test);
-  }
-
 
   //! Computes the bias between two data sets.
   /*!
@@ -182,30 +134,6 @@ namespace AtmoData
 
   //! Computes the root mean square between two data sets.
   /*!
-    Data to be compared with reference data is interpolated on
-    reference-data grid.
-    \param data_ref reference data.
-    \param data_comp data to be compared with 'data_ref'.
-    \param test boolean function with two parameters; the i-th
-    elements of 'data_ref' and 'data_comp' are taken into account
-    if 'test(data_ref(i), data_comp(i))' is true.
-    \return The root mean square.
-  */
-  template<class T_ref, int N, class TG_ref,
-	   class T_comp, class TG_comp>
-  T_ref RMS_interpolation(Data<T_ref, N, TG_ref> data_ref,
-			  Data<T_comp, N, TG_comp>& data_comp,
-			  Function_Base<T_ref, bool>& test)
-  {
-    Data<T_ref, N, TG_ref> data_comp_interp(data_ref);
-    LinearInterpolationGeneral(data_comp, data_comp_interp);
-
-    return RMS(data_ref, data_comp_interp, test);
-  }
-
-
-  //! Computes the root mean square between two data sets.
-  /*!
     \param data_ref reference data.
     \param data_comp data to be compared with 'data_ref'.
     \param test boolean function with two parameters; the i-th
@@ -252,30 +180,6 @@ namespace AtmoData
   /***************
    * RelativeRMS *
    ***************/
-
-  //! Computes the relative root mean square between two data sets.
-  /*!
-    Data to be compared with reference data is interpolated on
-    reference-data grid.
-    \param data_ref reference data.
-    \param data_comp data to be compared with 'data_ref'.
-    \param test boolean function with two parameters; the i-th
-    elements of 'data_ref' and 'data_comp' are taken into account
-    if 'test(data_ref(i), data_comp(i))' is true.
-    \return The relative root mean square.
-  */
-  template<class T_ref, int N, class TG_ref,
-	   class T_comp, class TG_comp>
-  T_ref RelativeRMS_interpolation(Data<T_ref, N, TG_ref> data_ref,
-				  Data<T_comp, N, TG_comp>& data_comp,
-				  Function_Base<T_ref, bool>& test)
-  {
-    Data<T_ref, N, TG_ref> data_comp_interp(data_ref);
-    LinearInterpolationGeneral(data_comp, data_comp_interp);
-
-    return RelativeRMS(data_ref, data_comp_interp, test);
-  }
-
 
   //! Computes the relative root mean square between two data sets.
   /*!
@@ -326,28 +230,6 @@ namespace AtmoData
   /********
    * CORR *
    ********/
-
-  //! Computes the correlation between two data sets.
-  /*!
-    \param data_ref reference data.
-    \param data_comp data to be compared with 'data_ref'.
-    \param test boolean function with two parameters; the i-th
-    elements of 'data_ref' and 'data_comp' are taken into account
-    if 'test(data_ref(i), data_comp(i))' is true.
-    \return The correlation.
-  */
-  template<class T_ref, int N, class TG_ref,
-	   class T_comp, class TG_comp>
-  T_ref Corr_interpolation(Data<T_ref, N, TG_ref> data_ref,
-			   Data<T_comp, N, TG_comp>& data_comp,
-			   Function_Base<T_ref, bool>& test)
-  {
-    Data<T_ref, N, TG_ref> data_comp_interp(data_ref);
-    LinearInterpolationGeneral(data_comp, data_comp_interp);
-
-    return Corr(data_ref, data_comp_interp, test);
-  }
-
 
   //! Computes the correlation between two data sets.
   /*!

@@ -354,6 +354,74 @@ namespace AtmoData
   }
 
 
+  //! Computes the pressure from the surface pressure.
+  /*!
+    Formula: Pressure_k = alpha_k * P0 + beta_k * SurfacePressure,
+    where k is the level index.
+    \param alpha coefficients.
+    \param beta coefficients.
+    \param SurfacePressure surface pressure.
+    \param Pressure pressure.
+    \param P0 (optional) standard pressure. Default: 101325 Pa.
+  */
+  template <class Ta, class Tb, class TSP,
+	    class T, class TG>
+  void ComputePressure(Data<Ta, 1, TG>& alpha, Data<Tb, 1, TG>& beta,
+		       Data<TSP, 3, TG>& SurfacePressure,
+		       Data<T, 4, TG>& Pressure, T P0)
+  {
+
+    int h, i, j, k;
+
+    int Nx = Pressure.GetLength(3);
+    int Ny = Pressure.GetLength(2);
+    int Nz = Pressure.GetLength(1);
+    int Nt = Pressure.GetLength(0);
+
+    for (h=0; h<Nt; h++)
+      for (k=0; k<Nz; k++)
+	for (j=0; j<Ny; j++)
+	  for (i=0; i<Nx; i++)
+	    Pressure(h, k, j, i) = alpha(k) * P0
+	      + beta(k) * SurfacePressure(h, j, i);
+
+  }
+
+
+  //! Computes the virtual temperature.
+  /*!
+    The virtual temperature is computed according to: T_v = (1 + c * q) * T
+    where T_s is the virtual temperature, q the specific humidity,
+    T the temperature and c a coefficient (0.608, usually).
+    \param Temperature temperature (K).
+    \param SpecificHumidity specific humidity (kg/kg).
+    \param VirtualTemperature virtual temperature (K).
+    \param c (optional) coefficient. Default: 0.608.
+    \note Temperature and VirtualTemperature may be the same object.
+  */
+  template <class TT, class TH, class T, class TG>
+  void ComputeVirtualTemperature(Data<TT, 4, TG>& Temperature,
+				 Data<TH, 4, TG>& SpecificHumidity,
+				 Data<T, 4, TG>& VirtualTemperature, T c)
+  {
+
+    int h, i, j, k;
+
+    int Nx = VirtualTemperature.GetLength(3);
+    int Ny = VirtualTemperature.GetLength(2);
+    int Nz = VirtualTemperature.GetLength(1);
+    int Nt = VirtualTemperature.GetLength(0);
+
+    for (h=0; h<Nt; h++)
+      for (k=0; k<Nz; k++)
+	for (j=0; j<Ny; j++)
+	  for (i=0; i<Nx; i++)
+	    VirtualTemperature(h, k, j, i) = Temperature(h, k, j, i)
+	      * (1 + c * SpecificHumidity(h, k, j, i));
+
+  }
+
+
 }  // namespace AtmoData.
 
 #define ATMODATA_FILE_METEOROLOGY_CXX

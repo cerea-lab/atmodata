@@ -56,6 +56,17 @@ namespace AtmoData
 			  T (CriticalRelativeHumidity)(const T&, const T&, const T&),
 			  Data<T, 3, TG>& CloudHeight);
 
+  template <class Ta, class Tb, class TSP,
+	    class T, class TG>
+  void ComputePressure(Data<Ta, 1, TG>& alpha, Data<Tb, 1, TG>& beta,
+		       Data<TSP, 3, TG>& SurfacePressure,
+		       Data<T, 4, TG>& Pressure, T P0 = 101325.);
+
+  template <class TT, class TH, class T, class TG>
+  void ComputeVirtualTemperature(Data<TT, 4, TG>& Temperature,
+				 Data<TH, 4, TG>& SpecificHumidity,
+				 Data<T, 4, TG>& VirtualTemperature, T c = 0.608);
+
 }  // namespace AtmoData.
 
 #define ATMODATA_FILE_METEOROLOGY_HXX

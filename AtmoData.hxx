@@ -26,7 +26,6 @@ using namespace SeldonData;
 #include "Common.hxx"
 
 #include "Kz.cxx"
-#include "Winds.cxx"
 #include "Photolysis.cxx"
 #include "CoordTransform.cxx"
 

@@ -313,8 +313,9 @@ namespace AtmoData
 	      P_sat = 611.2 * exp(17.67 * (Temperature(h, k, j, i) - 273.15)
 				  / (Temperature(h, k, j, i) - 29.65));
 	      RelativeHumidity(h, k, j, i) = SpecificHumidity(h, k, j, i)
-		* (Pressure(h, k, j, i) - P_sat)
-		/ (0.62197 * P_sat * (1.0 - SpecificHumidity(h, k, j, i)));
+		* Pressure(h, k, j, i)
+		/ ( (0.62197 * (1.0 - SpecificHumidity(h, k, j, i))
+		     + SpecificHumidity(h, k, j, i) ) * P_sat);
 	    }
   }
 

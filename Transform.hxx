@@ -18,25 +18,17 @@
 //     http://spacetown.free.fr/lib/atmodata
 
 
-#ifndef ATMODATA_FILE_ATMODATA_HXX
+#ifndef ATMODATA_FILE_TRANSFORM_HXX
 
-#include "SeldonData.hxx"
-using namespace SeldonData;
+namespace AtmoData
+{
 
-#include "Common.hxx"
+  
+  template <class T, int N, class TG>
+  void Decumulate(Data<T, N, TG>& data, int length);
 
-#include "Meteorology.cxx"
-#include "Kz.cxx"
-#include "Photolysis.cxx"
-#include "Emissions.cxx"
-#include "Deposition.cxx"
-#include "CoordTransform.cxx"
-#include "Transform.cxx"
-#include "Polair.cxx"
+  
+}  // namespace AtmoData.
 
-#include "Format.cxx"
-
-#include "Errors.cxx"
-
-#define ATMODATA_FILE_ATMODATA_HXX
+#define ATMODATA_FILE_TRANSFORM_HXX
 #endif

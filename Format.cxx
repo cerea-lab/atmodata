@@ -694,11 +694,188 @@ namespace AtmoData
   /* Field */
   /*********/
 
+  //! Reads an whole field given its name
+  template <int N, class TG>
+  void FormatMM5::ReadWholeField(string FileName, string FieldName,
+				 Data<float, N, TG>& A) const
+  {
+    this->ReadWholeField(FileName, FieldName, A.GetArray());
+  }
+
+  //! Reads an whole field given its name
+  template <int N>
+  void FormatMM5::ReadWholeField(string FileName, string FieldName,
+				 Array<float, N>& A) const
+  {
+    ifstream FileStream;
+    FileStream.open(FileName.c_str(), ifstream::binary);
+
+#ifdef SELDONDATA_DEBUG_CHECK_IO
+    // Checks if the file was opened.
+    if (!FileStream.is_open())
+      throw IOError("ReadWholeField(string FileName, string FieldName, Array<float, N>& A)",
+		    "Unable to open file \"" + FileName + "\".");
+#endif
+
+    this->ReadWholeField(FileStream, FieldName, A);
+
+    FileStream.close();
+  }
+
+  //! Reads an whole field given its name
+  template <int N, class TG>
+  void FormatMM5::ReadWholeField(ifstream& FileStream, string FieldName,
+				 Data<float, N, TG>& A) const
+  {
+    this->ReadWholeField(FileStream, FieldName, A.GetArray());
+  }
+
+  //! Reads an whole field given its name
+  template <int N>
+  void FormatMM5::ReadWholeField(ifstream& FileStream, string FieldName,
+				 Array<float, N>& A) const
+  {
+
+#ifdef SELDONDATA_DEBUG_CHECK_IO
+    // Checks if the file is ready.
+    if (N > 4)
+      throw IOError(string("FormatMM5<T>::ReadWholeField(ifstream& FileStream,") +
+		    " string FieldName, Array<float, N>& A)",
+		    string("Data array should have less than 4 dimensions but it has ")
+		    + to_str(N) + " dimensions.");
+
+    // Checks if the file is ready.
+    if (!FileStream.good())
+      throw IOError(string("FormatMM5<T>::ReadWholeField(ifstream& FileStream,") +
+		    " string FieldName, Array<float, N>& A)",
+		    "File is not ready.");
+#endif
+
+    int nb_elements = A.numElements();
+    int nb_time_steps = A.extent(0);
+    int nb_record = nb_elements / nb_time_steps;
+    
+    float* data = A.data();
+
+    // Dimensions of A and of the subdomain of A.
+    TinyVector<int, N> dim_A(A.shape());
+    TinyVector<int, N-1> dim_SubA;
+
+    // Sets dimensions of SubA from dimensions of A.
+    for (int i = 0; i < N-1; i++)
+      dim_SubA(i) = dim_A(i+1);
+
+    MM5SubHeader sub_header;
+
+    // Skips big header.
+    this->ReadFlag(FileStream);
+    this->ReadBigHeader(FileStream);
+
+    int flag;
+    int time_step = 0;
+
+    // Searches for specified field.
+    while (!is_empty(FileStream))
+      {
+	flag = this->ReadFlag(FileStream);
+	
+	if (flag == 1)
+	  {
+
+#ifdef SELDONDATA_DEBUG_CHECK_IO
+	    if (time_step >= nb_time_steps)
+	      throw IOError(string("FormatMM5<T>::ReadWholeField(ifstream& FileStream,") +
+			    " string FieldName, Array<float, N>& A)",
+			    string("Data file contains more than ")
+			    + to_str(nb_time_steps)
+			    + " steps. The whole field must be read.");
+#endif
+
+	    this->ReadSubHeader(FileStream, sub_header);
+
+	    // If the field matches the requested one.
+	    if (sub_header.name == fill(FieldName, 9))
+	      {
+		// Creates a subarray of A, one dimension less,
+		// with data corresponding to the current time step.
+		Array<float, N-1> SubA(data + time_step * nb_record,
+				       dim_SubA, neverDeleteData);
+
+		// Puts the field into SubA.
+		this->ReadField(FileStream, sub_header, SubA);
+	      }
+	    else
+	      // Skips the field.
+	      this->ReadField(FileStream);
+	  }
+	else
+	  time_step++;
+      }
+
+#ifdef SELDONDATA_DEBUG_CHECK_IO
+	    if (time_step < nb_time_steps)
+	      throw IOError(string("FormatMM5<T>::ReadWholeField(ifstream& FileStream,") +
+			    " string FieldName, Array<float, N>& A)",
+			    string("Data file contains ") + to_str(time_step)
+			    + " steps, but the data array contains " + to_str(nb_time_steps)
+                            + " steps. Both data should be consistant.");
+#endif
+
+  }
+
   //! Reads the field.
   template <int N, class TG>
   void FormatMM5::ReadField(ifstream& FileStream, Data<float, N, TG>& D) const
   {
     this->ReadField(FileStream, D.GetArray());
+  }
+
+  //! Reads the field.
+  template <int N>
+  void FormatMM5::ReadField(ifstream& FileStream, MM5SubHeader& SH,
+			    Array<float, N>& A) const
+  {
+
+#ifdef SELDONDATA_DEBUG_CHECK_IO
+    // Checks the data array has an acceptable shape.
+    if (N > 3)
+      throw IOError(string("FormatMM5<T>::ReadField(ifstream& FileStream,") +
+		    " MM5SubHeader& SH, Array<float, N>& A)",
+		    string("Data array should have less than 3 dimensions but it has ")
+		    + to_str(N) + " dimensions.");
+
+    // Checks if the file is ready.
+    if (!FileStream.good())
+      throw IOError(string("FormatMM5<T>::ReadField(ifstream& FileStream,") +
+		    " MM5SubHeader& SH, Array<float, N>& A)",
+		    "File is not ready.");
+
+    int nx, ny, nz;
+    if (trim(SH.staggering) == "C")
+      {
+	nx = SH.end_index(0) - SH.start_index(0);
+	ny = SH.end_index(1) - SH.start_index(1);
+      }
+    else
+      {
+	nx = SH.end_index(0) - SH.start_index(0) + 1;
+	ny = SH.end_index(1) - SH.start_index(1) + 1;
+      }
+    nz = SH.end_index(2) - SH.start_index(2) + 1;
+
+    if (A.extent(0) != nz || A.extent(1) != ny || A.extent(2) != nx)
+      throw IOError(string("FormatMM5<T>::ReadField(ifstream& FileStream,") +
+		    " MM5SubHeader& SH, Array<float, N>& A)",
+		    string("Dimensions of the stored field are ")
+		    + "("+ to_str(nx) + ", " + to_str(ny) + ", " + to_str(nz)
+		    + ") but dimensions of the data array are "
+		    + "("+ to_str(A.extent(2)) + ", " + to_str(A.extent(1))
+		    + ", " + to_str(A.extent(0)) + ").");
+#endif
+
+    // Puts the field into A.
+    this->ReadField(FileStream, A);
+
   }
 
   //! Reads the field.
@@ -859,7 +1036,6 @@ namespace AtmoData
 
     return *this;
   }
-
 
 }  // namespace AtmoData.
 

@@ -115,8 +115,8 @@ namespace AtmoData
 	      /***********/
 	      /* F(R, z) */
 
-	      derivative = log( (Tp(h, k, j, i)) / (Tp(h, k-1, j, i)) )
-		/ ( Nodes(k) - Nodes(k-1) );
+              derivative = ( (Tp(h, k, j, i)) - (Tp(h, k-1, j, i)) )
+                / ( Nodes(k) - Nodes(k-1) ) / Tp(h, k-1, j, i);
 
 	      R = g * derivative / ( dWind_dz * dWind_dz );
 

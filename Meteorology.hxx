@@ -41,6 +41,12 @@ namespace AtmoData
 				   Data<T, 4, TG>& PotentialTemperature,
 				   T P0 = 101325., T cp = 1005.,T r = 287.0);
 
+  template<class TT, class TP, class T, class TG>
+  void ComputePotentialTemperature(Data<TT, 3, TG>& Temperature,
+				   Data<TP, 3, TG>& Pressure,
+				   Data<T, 3, TG>& PotentialTemperature,
+				   T P0 = 101325., T cp = 1005.,T r = 287.0);
+
   template<class TU, class TV, class T, class TG>
   void ComputeModule(Data<TU, 4, TG>& U, Data<TV, 4, TG>& V,
 		     Data<T, 4, TG>& Module);

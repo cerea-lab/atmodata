@@ -199,6 +199,41 @@ namespace AtmoData
   }
 
 
+  //! Computes the potential temperature.
+  /*!
+    Formula: PotentialTemperature = Temperature * (Pressure / P0)^(-r/cp).
+    \param Temperature temperature (or virtual temperature).
+    \param Pressure pressure.
+    \param PotentialTemperature (output) potential temperature.
+    \param P0 (optional) standard pressure. Default: 101325 Pa.
+    \param cp (optional) specific heat of dry air at constant pressure.
+    Default: 1005 J.kg^{-1}.K^{-1}.
+    \param r (optional) molar gas constant for air. Default: 287.0 J.kg^{-1}.K^{-1}.
+  */
+  template<class TT, class TP, class T, class TG>
+  void ComputePotentialTemperature(Data<TT, 3, TG>& Temperature,
+				   Data<TP, 3, TG>& Pressure,
+				   Data<T, 3, TG>& PotentialTemperature,
+				   T P0, T cp, T r)
+  {
+
+    int h, i, j, k;
+
+    int Nx = PotentialTemperature.GetLength(2);
+    int Ny = PotentialTemperature.GetLength(1);
+    int Nt = PotentialTemperature.GetLength(0);
+
+    T ratio = -r / cp;
+
+    for (h=0; h<Nt; h++)
+      for (j=0; j<Ny; j++)
+	for (i=0; i<Nx; i++)
+	  PotentialTemperature(h, j, i) =
+	    Temperature(h, j, i) * pow(Pressure(h, j, i) / P0, ratio);
+    
+  }
+
+
   //! Computes the module of a 2D-vectors field.
   /*!
     This function was initially dedicated to winds. In this case, zonal winds and meridional

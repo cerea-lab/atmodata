@@ -173,21 +173,21 @@ namespace AtmoData
   /////////////////
 
   //! Default constructor.
-  template <class T>
+  template<class T>
   FormatECMWF<T>::FormatECMWF()  throw()
   {
     date_ = -1;
   }
 
   //! Constructor.
-  template <class T>
+  template<class T>
   FormatECMWF<T>::FormatECMWF(int date)  throw()
   {
     date_ = date;
   }
 
   //! Destructor.
-  template <class T>
+  template<class T>
   FormatECMWF<T>::~FormatECMWF()  throw()
   {
   }
@@ -196,7 +196,7 @@ namespace AtmoData
   /*!
     \param date date.
   */
-  template <class T>
+  template<class T>
   void FormatECMWF<T>::SetDate(int date)
   {
     date_ = date;
@@ -206,7 +206,7 @@ namespace AtmoData
   /*!
     \return The date.
   */
-  template <class T>
+  template<class T>
   int FormatECMWF<T>::GetDate() const
   {
     return date_;
@@ -217,7 +217,7 @@ namespace AtmoData
   /********/
  
   //! Reads a file in "ECMWF" format.
-  template <class T>
+  template<class T>
   template<class TD, int N, class TG>
   void FormatECMWF<T>::Read(string FileName, Data<TD, N, TG>& D) const
   {
@@ -227,7 +227,7 @@ namespace AtmoData
   }
 
   //! Reads a file in "ECMWF" format.
-  template <class T>
+  template<class T>
   template<class TD, int N, class TG>
   void FormatECMWF<T>::Read(ifstream& FileStream, Data<TD, N, TG>& D) const
   {
@@ -241,9 +241,9 @@ namespace AtmoData
   /*********/
 
   //! Reads a file in "ECMWF" format.
-  template <class T>
-  template<int N>
-  void FormatECMWF<T>::Read(string FileName, Array<T, N>& A) const
+  template<class T>
+  template<class TA, int N>
+  void FormatECMWF<T>::Read(string FileName, Array<TA, N>& A) const
   {
 
     ifstream FileStream;
@@ -264,7 +264,7 @@ namespace AtmoData
   }
 
   //! Reads a file in "ECMWF" format.
-  template <class T>
+  template<class T>
   template<int N>
   void FormatECMWF<T>::Read(ifstream& FileStream, Array<T, N>& A) const
   {
@@ -354,6 +354,117 @@ namespace AtmoData
 	// Data.
 	FileStream.read(reinterpret_cast<char*>(data) + rec_length * i,
 			rec_length);
+
+	// Record length.
+	FileStream.read(reinterpret_cast<char*>(&date), 4);
+	reading = (date==date_);
+
+	i++;
+      }
+    
+  }
+
+  //! Reads a file in "ECMWF" format.
+  template<class T>
+  template<class TA, int N>
+  void FormatECMWF<T>::Read(ifstream& FileStream, Array<TA, N>& A) const
+  {
+
+    int nb_elements = A.numElements();
+    unsigned long data_size = nb_elements * sizeof(TA);
+    int Nt = A.extent(0);
+    int rec_length = data_size / Nt;
+    int length = rec_length/sizeof(TA);
+
+    TA* data_output = A.data();
+
+    int input_rec_length = length*sizeof(T);
+    T* data = new T[length];
+
+#ifdef DEBUG_SELDONDATA_IO
+
+    // Checks if the file ready.
+    if (!FileStream.good())
+      throw IOError("FormatECMWF::Read(ifstream& FileStream, Array<TA, N>& A)",
+		    "File is not ready.");
+
+    // Checks records length.
+    streampos position;
+    position = FileStream.tellg();
+
+    int file_rec_length;
+    FileStream.read(reinterpret_cast<char*>(&file_rec_length), 4);
+    if (input_rec_length!=(file_rec_length-4))
+      throw IOError("FormatECMWF<T>::Read(ifstream& FileStream, Array<TA, N>& A)",
+		    "Record length (as in file) is "+ to_str(file_rec_length/sizeof(T))
+		    + " element(s)," + " but data record length is "
+		    + to_str(length) + " element(s) long.");
+
+    FileStream.seekg(position);
+
+#endif
+
+    int i = 0;
+    int j;
+
+    int date;
+    bool reading = (date_==-1);
+
+    while ( (!reading) && (FileStream.good()) )
+      {
+	// Record length.
+	FileStream.read(reinterpret_cast<char*>(&date), 4);
+	// Date.
+	FileStream.read(reinterpret_cast<char*>(&date), 4);
+
+	// Data.
+	FileStream.read(reinterpret_cast<char*>(data), input_rec_length);
+	reading = (date==date_);
+
+	if (reading)
+	  for (j=0; j<length; j++)
+	    data_output[j] = data[j];
+
+	// Record length.
+	FileStream.read(reinterpret_cast<char*>(&date), 4);
+
+	i = 1;
+      }
+    
+#ifdef DEBUG_SELDONDATA_IO
+
+    // Checks if all was read.
+    if (!reading)
+      throw IOError("FormatECMWF::Read(ifstream& FileStream, Array<TA, N>& A)",
+		    "The date was not found.");
+
+    // Checks file length.
+    position = FileStream.tellg();
+    FileStream.seekg(0, ios::end);
+    unsigned long file_size = FileStream.tellg() - position;
+
+    if (data_size>((file_size-12*(Nt-i))/sizeof(T)*sizeof(TA)+i*rec_length))
+      {
+	throw IOError("FormatBinary<T>::Read(ifstream& FileStream, Array<T, N>& A)",
+		      "Unable to read " + to_str(nb_elements) + " elements(s)."
+		      + " The input stream is only "
+		      + to_str((file_size/(12+input_rec_length)+i)*length) + " elements(s) long.");
+      }
+    FileStream.seekg(position);
+
+#endif
+
+    while ( (i<Nt) && (FileStream.good()) )
+      {
+	// Record length.
+	FileStream.read(reinterpret_cast<char*>(&date), 4);
+	// Date.
+	FileStream.read(reinterpret_cast<char*>(&date), 4);
+
+	// Data.
+	FileStream.read(reinterpret_cast<char*>(data), input_rec_length);
+	for (j=0; j<length; j++)
+	  data_output[j + i*length] = data[j];
 
 	// Record length.
 	FileStream.read(reinterpret_cast<char*>(&date), 4);

@@ -62,10 +62,12 @@ namespace AtmoData
 
     // Array.
 
-    template<int N>
-    void Read(string FileName, Array<T, N>& A) const;
+    template<class TA, int N>
+    void Read(string FileName, Array<TA, N>& A) const;
     template<int N>
     void Read(ifstream& FileStream, Array<T, N>& A) const;
+    template<class TA, int N>
+    void Read(ifstream& FileStream, Array<TA, N>& A) const;
 
   };  
 

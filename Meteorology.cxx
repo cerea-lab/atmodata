@@ -567,7 +567,7 @@ namespace AtmoData
 	for (j=0; j<Ny; j++)
 	  for (i=0; i<Nx; i++)
 	    MiddleHeight.Value(h, k, j, i) = InterfHeight.Value(h, k, j, i)
-	      - r / g * Temperature(h, k, j, i)
+	      + r / g * Temperature(h, k, j, i)
 	      * (1. - Pressure(h, k+1, j, i)
 		 / (Pressure(h, k, j, i) - Pressure(h, k+1, j, i))
 		 * log(Pressure(h, k, j, i) / Pressure(h, k+1, j, i)));

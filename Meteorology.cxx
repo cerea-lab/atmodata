@@ -441,6 +441,51 @@ namespace AtmoData
   }
 
 
+  //! Computes the altitudes at interfaces from pressure and temperature fields.
+  /*!
+    Level heights are computed according to:
+    Z_{k+1/2} = Z_{k-1/2} - (r * T_k / g) * log(P_{k+1/2}/P_{k-1/2})
+    where Z is the altitude, T the temperature, P the pressure,
+    k the level index, r the molar gas constant for dry air
+    and g the standard gravity.
+    \param Pressure pressure (Pa).
+    \param Height (output) altitudes (m).
+    \param g (optional) standard gravity. Default: 9.80665.
+    \param r (optional) molar gas constant for dry air. Default: 287.0.
+    \param ground_set (optional) true if ground-level altitudes are set,
+    false if they have to be set (they are set to zero in this case). Default: false.
+    \note Temperature is provided at middle points (not interfaces).
+    Pressure and Height are defined at interfaces (including ground-level).
+  */
+  template<class TP, class TT, class T, class TG>
+  void ComputeInterfHeight(Data<TP, 4, TG>& Pressure, Data<TT, 4, TG>& Temperature,
+			   Grid<T>& Height, bool ground_set, T g, T r)
+  {
+
+    int h, i, j, k;
+
+    int Nx = Height.GetLength(3);
+    int Ny = Height.GetLength(2);
+    int Nz = Height.GetLength(1) - 1;
+    int Nt = Height.GetLength(0);
+
+    if (!ground_set)
+      for (h=0; h<Nt; h++)
+	for (j=0; j<Ny; j++)
+	  for (i=0; i<Nx; i++)
+	    Height.Value(h, 0, j, i) = T(0);
+
+    for (h=0; h<Nt; h++)
+      for (k=0; k<Nz; k++)
+	for (j=0; j<Ny; j++)
+	  for (i=0; i<Nx; i++)
+	    Height.Value(h, k+1, j, i) = Height.Value(h, k, j, i)
+	      - r / g * Temperature(h, k, j, i)
+	      * log(Pressure(h, k+1, j, i) / Pressure(h, k, j, i));
+
+  }
+
+
   //! Computes the virtual temperature.
   /*!
     The virtual temperature is computed according to: T_v = (1 + c * q) * T

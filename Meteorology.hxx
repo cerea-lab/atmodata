@@ -67,6 +67,12 @@ namespace AtmoData
 		     Data<TT, 4, TG>& Temperature,
 		     Grid<T>& Height, T g = 9.80665, T r = 287.0);
 
+  template<class TPS, class TP, class TT, class T, class TG>
+  void ComputeInterfHeight(Data<TPS, 3, TG>& SurfacePressure, Data<TP, 4, TG>& Pressure,
+			   Data<TT, 4, TG>& Temperature,
+			   Grid<T>& Height, bool ground_set = false,
+			   T g = 9.80665, T r = 287.0);
+
   template <class TT, class TH, class T, class TG>
   void ComputeVirtualTemperature(Data<TT, 4, TG>& Temperature,
 				 Data<TH, 4, TG>& SpecificHumidity,

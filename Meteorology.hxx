@@ -84,6 +84,14 @@ namespace AtmoData
 			       Data<TP, 4, TG>& Pressure,
 			       Data<T, 4, TG>& RelativeHumidity);
 
+  template<class TH, class TS, class TW, class TL, class T, class TG>
+  void ComputeSurfaceHumidity_diag(Data<TH, 4, TG>& Humidity,
+				   Data<TS, 3, TG>& SaturationHumidity,
+				   Data<TW, 3, TG>& SoilWater,
+				   Data<TL, 3, TG>& LUC, int sea_index,
+				   Data<T, 3, TG>& SurfaceHumidity,
+				   T veg = 1.0, T theta_cap = 0.323);
+
   template<class TS, class TP, class T, class TG>
   void ComputeCriticalRelativeHumidity(Data<TS, 3, TG>& SurfacePressure,
 				       Data<TP, 4, TG>& Pressure,

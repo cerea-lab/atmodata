@@ -475,6 +475,57 @@ namespace AtmoData
   }
 
 
+  //! Computes the surface specific humidity.
+  /*!
+    \param Humidity specific humidity (kg/kg).
+    \param SaturationHumidity saturation humidity (kg/kg).
+    \param SoilWater volumetric soil water content (m^3/m^3).
+    \param LUC land use coverage in format Nc x Ny x Nx where Nc is the
+    number of land use categories. LUC(c, j, i) is the relative surface
+    (in [0, 1]) of the category c in the cell (j, i).
+    \param sea_index index of the sea category in LUC.
+    \param SurfaceHumidity (output) surface specific humidity (kg/kg).
+    \param veg (optional) the vegetation proportion (in [0, 1]) on the ground.
+    Default: 1.0.
+    \param theta_cap (optional) soil moisture at field capacity (m^3/m^3).
+    Default: 0.323 m^3/m^3.
+  */
+  template<class TH, class TS, class TW, class TL, class T, class TG>
+  void ComputeSurfaceHumidity_diag(Data<TH, 4, TG>& Humidity,
+				   Data<TS, 3, TG>& SaturationHumidity,
+				   Data<TW, 3, TG>& SoilWater,
+				   Data<TL, 3, TG>& LUC, int sea_index,
+				   Data<T, 3, TG>& SurfaceHumidity,
+				   T veg, T theta_cap)
+  {
+    int h, j, i;
+
+    int Nt(SurfaceHumidity.GetLength(0));
+    int Ny(SurfaceHumidity.GetLength(1));
+    int Nx(SurfaceHumidity.GetLength(2));
+
+    T q_sat, alpha;
+    for (h = 0; h < Nt; h++)
+      for (j = 0; j < Ny; j++)
+	for (i = 0; i < Nx; i++)
+	  {
+	    q_sat = SaturationHumidity(h, j, i);
+	    
+	    if (SoilWater(h, j, i) < theta_cap)
+	      // 1.963495 = pi / 1.6.
+	      alpha = 0.5 * (1. - cos(1.963495 * SoilWater(h, j, i)
+				      / theta_cap));
+	    else
+	      alpha = 1.0;
+
+	    SurfaceHumidity(h, j, i) = LUC(sea_index, j, i) * q_sat
+	      + (1.0 - LUC(sea_index, j, i))
+	      * ( alpha * q_sat + veg * (1. - alpha)
+		  * min(q_sat, Humidity(h, 0, j, i)) );
+	  }
+  }
+
+
   //! Computes the critival relative humidity.
   /*!
     Formula: CriticalRelativeHumidity = 1.0 - coeff0 * sig

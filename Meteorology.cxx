@@ -419,9 +419,9 @@ namespace AtmoData
     relative humidity as function of the altitude, the pressure and reference pressure.
     \param CloudHeight (output) altitudes of cloud basis.
   */
-  template <class TT, class TP, class TH,
+  template <class TP, class TH,
 	    class T, class TG>
-  void ComputeCloudHeight(Data<TT, 4, TG>& Temperature, Data<TP, 4, TG>& Pressure,
+  void ComputeCloudHeight(Data<TP, 4, TG>& Pressure,
 			  Data<TH, 4, TG>& Humidity,
 			  T (CriticalRelativeHumidity)(const T&, const T&, const T&),
 			  Data<T, 3, TG>& CloudHeight)
@@ -473,30 +473,26 @@ namespace AtmoData
 
   //! Computes the height of cloud basis.
   /*!
-    \param Temperature temperature (K).
-    \param Pressure pressure (Pa).
     \param Humidity relative humidity (kg/kg).
     \param CriticalRelativeHumidity critical relative humidity.
     \param CloudHeight (output) altitudes of cloud basis.
   */
-  template <class TT, class TP, class TH,
-	    class TCRH, class T, class TG>
-  void ComputeCloudHeight(Data<TT, 4, TG>& Temperature, Data<TP, 4, TG>& Pressure,
-			  Data<TH, 4, TG>& Humidity,
+  template <class TH, class TCRH, class T, class TG>
+  void ComputeCloudHeight(Data<TH, 4, TG>& Humidity,
 			  Data<TCRH, 4, TG>& CriticalRelativeHumidity,
 			  Data<T, 3, TG>& CloudHeight)
   {
 
     int h, k, j, i;
     int Nt(CloudHeight.GetLength(0));
-    int Nz(Pressure.GetLength(1));
+    int Nz(Humidity.GetLength(1));
     int Ny(CloudHeight.GetLength(1));
     int Nx(CloudHeight.GetLength(2));    
 
     // Index "0" and "1" refer to two contiguous levels.
     T rh0, rh1, rhc;
 
-    T max_height = 2. * Pressure[1].Value(0, Nz-1, 0, 0);
+    T max_height = 2. * Humidity[1].Value(0, Nz-1, 0, 0);
     CloudHeight.Fill(max_height);
 
     for (h=0; h<Nt; h++)
@@ -516,7 +512,7 @@ namespace AtmoData
 		rhc = CriticalRelativeHumidity(h, k, j, i);
 
 		if (rh1 >= rhc)  // Above a cloud.
-		  CloudHeight(h, j, i) = Pressure[1].Value(h, k, j, i);
+		  CloudHeight(h, j, i) = Humidity[1].Value(h, k, j, i);
 
 		// For the next level.
 		rh0 = rh1;

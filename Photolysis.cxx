@@ -34,10 +34,12 @@ namespace AtmoData
   // zenith found in TUV (Tropospheric Ultraviolet & Visible radiation model).
   // This subroutine was provided under the GNU General Public License
   // under the following copyright:
-  // Copyright (C) 1994,95,96  University Corporation for Atmospheric Research.
+  // Copyright (C) 1994,95,96  University Corporation for Atmospheric
+  // Research.
   /*! Calculates solar zenith angle for a given time and location.
     Calculation is based on equations given in:  Paltridge and Platt,
-    Radiative Processes in Meteorology and Climatology, Elsevier, pp. 62,63, 1976.
+    Radiative Processes in Meteorology and Climatology, Elsevier,
+    pp. 62,63, 1976.
     Fourier coefficients originally from:  Spencer, J.W., 1971, Fourier
     series representation of the position of the sun, Search, 2:172.
     Note:  This approximate program does not account for changes from year
@@ -45,7 +47,8 @@ namespace AtmoData
     \param lon longitude of location (degrees).
     \param lat latitude of location (degrees).
     \param idate date in the form YYYYMMDD.
-    \param ut local time in decimal UT (e.g., 16.25 means 15 minutes after 4 pm).
+    \param ut local time in decimal UT (e.g., 16.25 means 15 minutes
+    after 4 pm).
     \return solar zenith angle (degrees).
   */
   template<class T>
@@ -157,7 +160,6 @@ namespace AtmoData
     \param LiquidWaterContent liquid water content (kg/m^3).
     \param MediumCloudiness medium cloudiness (in [0, 1]).
     \param HighCloudiness high cloudiness (in [0, 1]).
-    relative humidity as function of the altitude, the pressure and reference pressure.
     \param date date in the form YYYYMMDD.
     \param Attenuation (output) cloud attenuation coefficient.
   */
@@ -230,7 +232,8 @@ namespace AtmoData
 		else
 		  lw = 0.;
 
-		// Computes the cloud optical depth according to Stephens (1978).
+		// Computes the cloud optical depth according
+		// to Stephens (1978).
 		if (lw <= 0.)
 		  tau = 0.;
 		else
@@ -244,20 +247,23 @@ namespace AtmoData
 
 		// Zenith angle.
 		T cos_zenith_angle;
-		cos_zenith_angle = cos( ZenithAngle(Attenuation[3].Value(h, k, j, i),
-						    Attenuation[2].Value(h, k, j, i),
-						    date, Attenuation[0].Value(h, k, j, i))
-					* 0.0174532925199433 );
+		cos_zenith_angle =
+		  cos( ZenithAngle(Attenuation[3].Value(h, k, j, i),
+				   Attenuation[2].Value(h, k, j, i),
+				   date, Attenuation[0].Value(h, k, j, i))
+		       * 0.0174532925199433 );
 		cos_zenith_angle = abs(cos_zenith_angle);
 
 		// Computes the attenuation coefficient.
 		if (tr == 1)
 		  Attenuation(h, k, j, i) = 1.0
-		    + (min(1.0, MediumCloudiness(h, j, i) + HighCloudiness(h, j, i)))
+		    + (min(1.0, MediumCloudiness(h, j, i)
+			   + HighCloudiness(h, j, i)))
 		    * (1.6 * cos_zenith_angle - 1.0);
 		else
 		  Attenuation(h, k, j, i) = 1.0
-		    + (min(1.0, MediumCloudiness(h, j, i) + HighCloudiness(h, j, i)))
+		    + (min(1.0, MediumCloudiness(h, j, i)
+			   + HighCloudiness(h, j, i)))
 		    * ( (1.-tr) * cos_zenith_angle );
 
 	      }
@@ -274,7 +280,8 @@ namespace AtmoData
     \param HighIndices vertical indices of base and top of high clouds.
     \param MediumCloudiness medium cloudiness (in [0, 1]).
     \param HighCloudiness high cloudiness (in [0, 1]).
-    relative humidity as function of the altitude, the pressure and reference pressure.
+    relative humidity as function of the altitude, the pressure and
+    reference pressure.
     \param date date in the form YYYYMMDD.
     \param Attenuation (output) cloud attenuation coefficient.
   */
@@ -295,8 +302,10 @@ namespace AtmoData
     
     Attenuation.Fill(1.);
 
-    // Index "0" and "1" refer to two contiguous levels.
+    // Indices "0" and "1" refer to two contiguous levels.
     T dz, lw, w, tau, tr(0.);
+    // "l": low, "m": medium, "h": high.
+    // "b": bottom, "t": top.
     int lb, lt, mb, mt, hb, ht, lower, upper;
     T cos_zenith_angle, alpha;
 
@@ -305,18 +314,23 @@ namespace AtmoData
 	for (i=0; i<Nx; i++)
 	  {
 
-	    w = 0;
-
+	    // Low clouds are between lb and lt.
 	    lb = LowIndices(h, j, i, 0);
 	    lt = LowIndices(h, j, i, 1);
+	    // In case there is no low cloud, lt is set to -1.
 	    lt = (lt == 0) ? -1 : lt;
+	    // Medium clouds are between mb and mt.
 	    mb = MediumIndices(h, j, i, 0);
 	    mt = MediumIndices(h, j, i, 1);
+	    // In case there is no medium cloud, mt is set to -1.
 	    mt = (mt == 0) ? -1 : mt;
+	    // High clouds are between hb and ht.
 	    hb = HighIndices(h, j, i, 0);
 	    ht = HighIndices(h, j, i, 1);
+	    // In case there is no high cloud, ht is set to -1.
 	    ht = (ht == 0) ? -1 : ht;
 
+	    // Searches for the cloud basis.
 	    lower = -1;
 	    if (lb == -1)
 	      if (mb == -1)
@@ -326,9 +340,13 @@ namespace AtmoData
 	    else
 	      lower = lb;
 
+	    // Searches for the cloud top.
 	    upper = max(lt, mt);
 	    upper = max(upper, ht);
 
+	    w = 0;
+
+	    // Starting from the top.
 	    for (k=Nz-1; k>=0; k--)
 	      {
 		if (k==Nz-1)
@@ -360,31 +378,34 @@ namespace AtmoData
 	    if (tau > 5.)
 	      tr = (5. - exp(-tau)) / (4. + 0.42*tau);
 	    
-	    /*** Lower ***/
+	    /*** Below clouds ***/
 	    // If tau <= 5., nothing is done.
 	    for (k = 0; k <= lower && tau > 5.; k++)
 	      {
 		// Zenith angle.
-		cos_zenith_angle = cos( ZenithAngle(Attenuation[3].Value(h, k, j, i),
-						    Attenuation[2].Value(h, k, j, i),
-						    date, Attenuation[0].Value(h, k, j, i))
-					* 0.0174532925199433 );
+		cos_zenith_angle =
+		  cos( ZenithAngle(Attenuation[3].Value(h, k, j, i),
+				   Attenuation[2].Value(h, k, j, i),
+				   date, Attenuation[0].Value(h, k, j, i))
+		       * 0.0174532925199433 );
 		cos_zenith_angle = abs(cos_zenith_angle);
 
 		// Computes the attenuation coefficient.
-		Attenuation(h, k, j, i) = 1.0
-		  + MediumCloudiness(h, j, i) * (1.6 * tr * cos_zenith_angle - 1.0);
+		Attenuation(h, k, j, i) = 1.0 + MediumCloudiness(h, j, i)
+		  * (1.6 * tr * cos_zenith_angle - 1.0);
 	      }
 
-	    /*** Upper ***/
+	    /*** Above clouds ***/
 	    // If tau <= 5., nothing is done.
+	    // Note: the loop is safe because if upper == -1, then tau == 0.
 	    for (k = upper; k < Nz && tau > 5.; k++)
 	      {
 		// Zenith angle.
-		cos_zenith_angle = cos( ZenithAngle(Attenuation[3].Value(h, k, j, i),
-						    Attenuation[2].Value(h, k, j, i),
-						    date, Attenuation[0].Value(h, k, j, i))
-					* 0.0174532925199433 );
+		cos_zenith_angle =
+		  cos( ZenithAngle(Attenuation[3].Value(h, k, j, i),
+				   Attenuation[2].Value(h, k, j, i),
+				   date, Attenuation[0].Value(h, k, j, i))
+		       * 0.0174532925199433 );
 		cos_zenith_angle = abs(cos_zenith_angle);
 
 		// Computes the attenuation coefficient.
@@ -397,10 +418,11 @@ namespace AtmoData
 	    for (k = lower + 1; k < upper && tau > 5.; k++)
 	      {
 		// Zenith angle.
-		cos_zenith_angle = cos( ZenithAngle(Attenuation[3].Value(h, k, j, i),
-						    Attenuation[2].Value(h, k, j, i),
-						    date, Attenuation[0].Value(h, k, j, i))
-					* 0.0174532925199433 );
+		cos_zenith_angle =
+		  cos( ZenithAngle(Attenuation[3].Value(h, k, j, i),
+				   Attenuation[2].Value(h, k, j, i),
+				   date, Attenuation[0].Value(h, k, j, i))
+		       * 0.0174532925199433 );
 		cos_zenith_angle = abs(cos_zenith_angle);
 
 		// Computes the attenuation coefficient.

@@ -28,13 +28,15 @@ namespace AtmoData
 {
 
   template<class TU, class TV, class TTp, class T, class TG>
-  void ComputeRichardson(Data<TU, 4, TG>& ZonalWind, Data<TV, 4, TG>& MeridionalWind,
+  void ComputeRichardson(Data<TU, 4, TG>& ZonalWind,
+			 Data<TV, 4, TG>& MeridionalWind,
 			 Data<TTp, 4, TG>& PotentialTemperature,
 			 Data<T, 4, TG>& Richardson,
 			 T wind_threshold = 0.1);
 
   template<class TU, class TV, class TTp, class T, class TG>
-  void ComputeRichardson(Data<TU, 4, TG>& ZonalWind, Data<TV, 4, TG>& MeridionalWind,
+  void ComputeRichardson(Data<TU, 4, TG>& ZonalWind,
+			 Data<TV, 4, TG>& MeridionalWind,
 			 Data<TTp, 4, TG>& PotentialTemperature,
 			 Data<T, 3, TG>& SurfaceRichardson,
 			 T wind_threshold = 0.1);
@@ -67,7 +69,8 @@ namespace AtmoData
   void ComputeCriticalRelativeHumidity_extended(Data<TS, 3, TG>& SurfacePressure,
 						Data<TP, 4, TG>& Pressure,
 						Data<T, 4, TG>& CriticalRelativeHumidity,
-						T coeff0 = 1.1, T coeff1 = sqrt(1.3),
+						T coeff0 = 1.1,
+						T coeff1 = sqrt(1.3),
 						T a0 = 0., T a1 = 1.1);
 
   template<class TB, class TS, class TP, class T, class TG>
@@ -81,7 +84,8 @@ namespace AtmoData
   template<class TP, class T, class TG>
   void ComputeCriticalRelativeHumidity(Data<TP, 4, TG>& Pressure,
 				       Data<T, 4, TG>& CriticalRelativeHumidity,
-				       T CRH_0 = 0.75, T CRH_1 = 0.95, T CRH_2 = 0.95,
+				       T CRH_0 = 0.75, T CRH_1 = 0.95,
+				       T CRH_2 = 0.95,
 				       T P_0 = 70000., T P_1 = 40000.);
 
   template<class TR, class TC, class T, class TG>
@@ -121,14 +125,17 @@ namespace AtmoData
 
   template <class TT, class TP, class TH,
 	    class T, class TG>
-  void ComputeCloudHeight(Data<TT, 4, TG>& Temperature, Data<TP, 4, TG>& Pressure,
+  void ComputeCloudHeight(Data<TT, 4, TG>& Temperature,
+			  Data<TP, 4, TG>& Pressure,
 			  Data<TH, 4, TG>& Humidity,
-			  T (CriticalRelativeHumidity)(const T&, const T&, const T&),
+			  T (CriticalRelativeHumidity)(const T&, const T&,
+						       const T&),
 			  Data<T, 3, TG>& CloudHeight);
 
   template <class TT, class TP, class TH,
 	    class TCRH, class T, class TG>
-  void ComputeCloudHeight(Data<TT, 4, TG>& Temperature, Data<TP, 4, TG>& Pressure,
+  void ComputeCloudHeight(Data<TT, 4, TG>& Temperature,
+			  Data<TP, 4, TG>& Pressure,
 			  Data<TH, 4, TG>& Humidity,
 			  Data<TCRH, 4, TG>& CriticalRelativeHumidity,
 			  Data<T, 3, TG>& CloudHeight);
@@ -147,24 +154,28 @@ namespace AtmoData
 		       Data<T, 4, TG>& Pressure, T P0 = 101325.);
 
   template<class TPS, class TP, class TT, class T, class TG>
-  void ComputeHeight(Data<TPS, 3, TG>& SurfacePressure, Data<TP, 4, TG>& Pressure,
+  void ComputeHeight(Data<TPS, 3, TG>& SurfacePressure,
+		     Data<TP, 4, TG>& Pressure,
 		     Data<TT, 4, TG>& Temperature,
 		     Grid<T>& Height, T g = 9.80665, T r = 287.0);
 
   template<class TP, class TT, class T, class TG>
-  void ComputeInterfHeight(Data<TP, 4, TG>& Pressure, Data<TT, 4, TG>& Temperature,
+  void ComputeInterfHeight(Data<TP, 4, TG>& Pressure,
+			   Data<TT, 4, TG>& Temperature,
 			   Grid<T>& Height, bool ground_set = false,
 			   T g = 9.80665, T r = 287.0);
 
   template<class TP, class TT, class T, class TG>
-  void ComputeMiddleHeight(Data<TP, 4, TG>& Pressure, Data<TT, 4, TG>& Temperature,
+  void ComputeMiddleHeight(Data<TP, 4, TG>& Pressure,
+			   Data<TT, 4, TG>& Temperature,
 			   Grid<T>& InterfHeight, Grid<T>& MiddleHeight,
 			   T g = 9.80665, T r = 287.0);
 
   template <class TT, class TH, class T, class TG>
   void ComputeVirtualTemperature(Data<TT, 4, TG>& Temperature,
 				 Data<TH, 4, TG>& SpecificHumidity,
-				 Data<T, 4, TG>& VirtualTemperature, T c = 0.608);
+				 Data<T, 4, TG>& VirtualTemperature,
+				 T c = 0.608);
 
 }  // namespace AtmoData.
 

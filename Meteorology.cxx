@@ -40,7 +40,7 @@ namespace AtmoData
     \param MeridionalWind meridional wind.
     \param PotentialTemperature potential temperature.
     \param Richardson (output) Richardson number.
-    \param wind_threshold (optional) minimum of the wind shear. Default: 0.1.
+    \param wind_threshold (optional) minimum of the wind shear. Default: 0.001.
   */
   template<class TU, class TV, class TTp, class T, class TG>
   void ComputeRichardson(Data<TU, 4, TG>& ZonalWind,
@@ -143,7 +143,7 @@ namespace AtmoData
     \param MeridionalWind meridional wind.
     \param PotentialTemperature potential temperature.
     \param SurfaceRichardson (output) surface Richardson number.
-    \param wind_threshold (optional) minimum of the wind shear. Default: 0.1.
+    \param wind_threshold (optional) minimum of the wind shear. Default: 0.001.
   */
   template<class TU, class TV, class TTp, class T, class TG>
   void ComputeRichardson(Data<TU, 4, TG>& ZonalWind,

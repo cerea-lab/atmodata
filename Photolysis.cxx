@@ -303,10 +303,13 @@ namespace AtmoData
 
 	    lb = LowIndices(h, j, i, 0);
 	    lt = LowIndices(h, j, i, 1);
+	    lt = (lt == 0) ? -1 : lt;
 	    mb = MediumIndices(h, j, i, 0);
 	    mt = MediumIndices(h, j, i, 1);
+	    mt = (mt == 0) ? -1 : mt;
 	    hb = HighIndices(h, j, i, 0);
 	    ht = HighIndices(h, j, i, 1);
+	    ht = (ht == 0) ? -1 : ht;
 
 	    for (k=Nz-1; k>=0; k--)
 	      {

@@ -294,6 +294,52 @@ namespace AtmoData
   }
 
 
+  //! Computes the module of a 2D-vectors field on the surface.
+  /*!
+    This function was initially dedicated to winds. In this case, zonal winds and meridional
+    winds are provided and the module of the wind is computed (assuming that the vertical
+    wind is zero). Winds may be provided in two ways. The first option is to provide winds
+    on interfaces (along x for the zonal wind, along y for the meridional wind). 
+    The second option is simply to provide winds at nodes (i.e. where the module is defined).
+    \param U first component of vectors.
+    \param V second component of vectors.
+    \param Module (output) surface module.
+  */
+  template<class TU, class TV, class T, class TG>
+  void ComputeModule(Data<TU, 3, TG>& U, Data<TV, 3, TG>& V,
+		     Data<T, 3, TG>& Module)
+  {
+
+    int h, i, j;
+
+    int Nx = Module.GetLength(2);
+    int Ny = Module.GetLength(1);
+    int Nt = Module.GetLength(0);
+
+    T u, v;
+
+    if ( (U.GetLength(2) == Nx + 1) && (V.GetLength(1) == Ny + 1) )
+      for (h=0; h<Nt; h++)
+	for (j=0; j<Ny; j++)
+	  for (i=0; i<Nx; i++)
+	    {
+	      u = 0.5 * (U(h, j, i+1) + U(h, j, i));
+	      v = 0.5 * (V(h, j+1, i) + V(h, j, i));
+	      Module(h, j, i) = sqrt(u*u + v*v);
+	    }
+    else
+      for (h=0; h<Nt; h++)
+	for (j=0; j<Ny; j++)
+	  for (i=0; i<Nx; i++)
+	    {
+	      u = U(h, j, i);
+	      v = V(h, j, i);
+	      Module(h, j, i) = sqrt(u*u + v*v);
+	    }
+
+  }
+
+
   //! Computes the height of cloud basis.
   /*!
     \param Temperature temperature (K).

@@ -49,7 +49,7 @@ namespace AtmoData
   {
 
     T zen;
-    T azim, caz, raz;
+    // T azim, caz, raz;
 
     T lbut,lzut;
     T rlt;

@@ -1,0 +1,25 @@
+o------------------o
+| ATMODATA HISTORY |
+o------------------o
+
+
+Version 0.2 (2003-06-10)
+-----------
+
+** Improvements:
+
+- Added format 'FormatECMWF' to read ECMWF binaries.
+
+** Bug fixes:
+
+
+Version 0.1 (2003-04-16)
+-----------
+
+** Improvements:
+
+- Louis formula for Kz
+- Vertical wind
+- Reads ".csv" files
+
+** Bug fixes:

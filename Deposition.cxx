@@ -35,6 +35,16 @@ namespace AtmoData
     \param reactivity reactivity factor for the species.
     \param diffusivity molecular diffusivity for the species in air.
     \param Henry Henry constant for the species.
+    \param Ri minimum bulk canopy stomatal resistance for water vapour.
+    \param Rlu resistance of the outer surfaces in the upper canopy.
+    \param Rac in-canopy aerodynamic resistance.
+    \param RgsS soil resistance for SO2.
+    \param RgsO soil resistance for O3.
+    \param RclS resistance due to exposed surface in the lower canopy, for SO2.
+    \param RclO resistance due to exposed surface in the lower canopy, for O3.
+    \param limit (optional) upper limit for resistances. Default: 1.e10.
+    \param D_H2O (optional) molecular diffusivity for water vapor. Default: 0.25.
+    \return the bulk surface resistance.
   */
   template <class T>
   inline T ComputeWesely(T surface_temperature, T solar_radiation,

@@ -441,6 +441,75 @@ namespace AtmoData
   }
 
 
+  //! Default constructor.
+  template <class T>
+  LonlatToMM5StereInd<T>::LonlatToMM5StereInd(int jmx, int imx, double jx, double ix, double phic,
+					      double lambdac, double phi1, double ds0, int ratio)  throw():
+    jmx_(jmx), imx_(imx), jx_(jx), ix_(ix), phic_(phic), lambdac_(lambdac),
+    phi1_(phi1), ds0_(ds0), ratio_(ratio),
+    pi_(3.14159265358979323846264),
+    Earth_radius_(6370997.)
+  {
+    
+  }
+
+
+  //! Convertion operator.
+  /*!
+    \param lon longitude.
+    \param lat latitude.
+    \param j index of the MM5 grid along the East-West direction.
+    \param i index of the MM5 grid along the North-South direction.
+    \warning Indices order (in MM5) is confusing: j and i are swapped with respect to
+    the natural order.
+  */
+  template <class T>
+  void LonlatToMM5StereInd<T>::operator() (const T lon, const T lat,
+					   T& j, T& i)
+  {
+ 
+    double ic0, jc0;
+    double ic, jc;
+    double conv;
+    double kappa;
+    double auxsig;
+    double psi1;
+    double auxc, yc;
+    double x, y, R;
+    double auxl;
+    double auxtan;
+    double lambdaprima;
+    double aux, Rs;
+    double auxij;
+
+
+    ic0 = (imx_ + 1.0) / 2.0;
+    jc0 = (jmx_ + 1.0) / 2.0;
+
+    ic = (ic0 - ix_) * ratio_ + 0.5;
+    jc = (jc0 - jx_) * ratio_ + 0.5;
+
+    conv = 180. / pi_;
+
+    kappa = 1.0;
+
+    auxsig = phic_<0? -1.0 : 1.0;
+
+    psi1 = auxsig * (pi_/2.0 - abs(phi1_)/conv);
+
+    auxc = (auxsig * 90.0 - phic_) / conv;
+    yc = - Earth_radius_ * sin(auxc) * ((1.0 + cos(psi1)) / (1.0 + cos(auxc)));
+
+    aux = (auxsig * 90.0 - lat) / conv;
+    Rs = Earth_radius_ * sin(aux) * ((1.0 + cos(psi1)) / (1.0 + cos(aux)));
+
+    auxij = kappa * (lon - lambdac_) / conv;
+    i = (ic0 - (yc / ds0_ + Rs * cos(auxij) / ds0_) - ix_) * ratio_ - 0.5;
+    j = (jc0 + auxsig * Rs * sin(auxij) / ds0_ - jx_) * ratio_ - 0.5;
+
+  }
+
+
 }  // namespace AtmoData.
 
 #define ATMODATA_FILE_COORDTRANSFORM_CXX

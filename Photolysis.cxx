@@ -149,7 +149,7 @@ namespace AtmoData
   /*!
     \param Temperature temperature (K).
     \param Pressure pressure (Pa).
-    \param Humidity specific humidity (unitless).
+    \param Humidity specific humidity (kg/kg).
     \param LiquidWaterContent liquid water content (kg/m^3).
     \param MediumCloudiness medium cloudiness (in [0, 1]).
     \param HighCloudiness high cloudiness (in [0, 1]).

@@ -35,7 +35,7 @@ namespace AtmoData
     \param ZonalWind zonal wind.
     \param MeridionalWind meridional wind.
     \param PotentialTemperature potential temperature.
-    \param Richardson Richardson number.
+    \param Richardson (output) Richardson number.
     \param wind_threshold (optional) minimum of the wind module. Default: 0.1.
   */
   template<class TU, class TV, class TTp, class T, class TG>
@@ -106,7 +106,7 @@ namespace AtmoData
     \param ZonalWind zonal wind.
     \param MeridionalWind meridional wind.
     \param PotentialTemperature potential temperature.
-    \param SurfaceRichardson surface Richardson number.
+    \param SurfaceRichardson (output) surface Richardson number.
     \param wind_threshold (optional) minimum of the wind module. Default: 0.1.
   */
   template<class TU, class TV, class TTp, class T, class TG>
@@ -166,7 +166,7 @@ namespace AtmoData
     Formula: PotentialTemperature = Temperature * (Pressure / P0)^(-r/cp).
     \param Temperature temperature (or virtual temperature).
     \param Pressure pressure.
-    \param PotentialTemperature potential temperature.
+    \param PotentialTemperature (output) potential temperature.
     \param P0 (optional) standard pressure. Default: 101325 Pa.
     \param cp (optional) specific heat of dry air at constant pressure.
     Default: 1005 J.kg^{-1}.K^{-1}.
@@ -208,7 +208,7 @@ namespace AtmoData
     The second option is simply to provide winds at nodes (i.e. where the module is defined).
     \param U first component of vectors.
     \param V second component of vectors.
-    \param Module module.
+    \param Module (output) module.
   */
   template<class TU, class TV, class T, class TG>
   void ComputeModule(Data<TU, 4, TG>& U, Data<TV, 4, TG>& V,
@@ -257,7 +257,7 @@ namespace AtmoData
     The second option is simply to provide winds at nodes (i.e. where the module is defined).
     \param U first component of vectors.
     \param V second component of vectors.
-    \param Module surface module.
+    \param Module (output) surface module.
   */
   template<class TU, class TV, class T, class TG>
   void ComputeModule(Data<TU, 4, TG>& U, Data<TV, 4, TG>& V,
@@ -294,6 +294,15 @@ namespace AtmoData
   }
 
 
+  //! Computes the height of cloud basis.
+  /*!
+    \param Temperature temperature (K).
+    \param Pressure pressure (Pa).
+    \param Humidity specific humidity (kg/kg).
+    \param CriticalRelativeHumidity function that returns the critical
+    relative humidity as function of the altitude, the pressure and reference pressure.
+    \param CloudHeight (output) altitudes of cloud basis.
+  */
   template <class TT, class TP, class TH,
 	    class T, class TG>
   void ComputeCloudHeight(Data<TT, 4, TG>& Temperature, Data<TP, 4, TG>& Pressure,
@@ -361,7 +370,7 @@ namespace AtmoData
     \param alpha coefficients.
     \param beta coefficients.
     \param SurfacePressure surface pressure.
-    \param Pressure pressure.
+    \param Pressure (output) pressure.
     \param P0 (optional) standard pressure. Default: 101325 Pa.
   */
   template <class Ta, class Tb, class TSP,
@@ -395,7 +404,7 @@ namespace AtmoData
     T the temperature and c a coefficient (0.608, usually).
     \param Temperature temperature (K).
     \param SpecificHumidity specific humidity (kg/kg).
-    \param VirtualTemperature virtual temperature (K).
+    \param VirtualTemperature (output) virtual temperature (K).
     \param c (optional) coefficient. Default: 0.608.
     \note Temperature and VirtualTemperature may be the same object.
   */

@@ -18,19 +18,39 @@
 //     http://spacetown.free.fr/lib/atmodata
 
 
-#ifndef ATMODATA_FILE_ATMODATA_HXX
+#ifndef ATMODATA_FILE_COORDTRANSFORM_HXX
 
-#include "SeldonData.hxx"
-using namespace SeldonData;
+#include <cmath>
 
-#include "Kz.cxx"
-#include "Winds.cxx"
-#include "Photolysis.cxx"
-#include "CoordTransform.cxx"
+namespace AtmoData
+{
+  
+  //! Coordinate transformation from Lambert azimuthal equal area
+  //! to longitude/latitude.
+  template<class T>
+  class LaeaToLonlat
+  {
+  protected:
+    //! Earth radius.
+    const T Earth_radius_;
+    //! pi.
+    const T pi_;
+    //! Numerical limit assumed to be 0.
+    const T limit_;
 
-#include "Format.cxx"
+    //! Latitude of origin.
+    T lat_origin_;
+    //! Longitude of origin.
+    T lon_origin_;
 
-#include "Errors.cxx"
+  public:
+    LaeaToLonlat(T lon_origin, T lat_origin)  throw();
+    void operator() (const T x, const T y,
+		     T& lon, T& lat);
+  };
 
-#define ATMODATA_FILE_ATMODATA_HXX
+
+}  // namespace AtmoData.
+
+#define ATMODATA_FILE_COORDTRANSFORM_HXX
 #endif

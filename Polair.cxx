@@ -54,7 +54,8 @@ namespace AtmoData
       for (k=0; k<Nz; k++)
 	for (j=0; j<Ny; j++)
 	  for (i=0; i<Nx; i++)
-	    ZonalWind(h, k, j, i) /= cos(ZonalWind[2].Value(h, k, j, i) * ratio);
+	    ZonalWind(h, k, j, i) /= cos(ZonalWind[2].Value(h, k, j, i)
+					 * ratio);
 
   }
 
@@ -83,7 +84,8 @@ namespace AtmoData
       for (k=0; k<Nz; k++)
 	for (j=0; j<Ny; j++)
 	  for (i=0; i<Nx; i++)
-	    MeridionalWind(h, k, j, i) *= cos(MeridionalWind[2].Value(h, k, j, i) * ratio);
+	    MeridionalWind(h, k, j, i) *= cos(MeridionalWind[2].Value(h, k, j, i)
+					      * ratio);
 
   }
 

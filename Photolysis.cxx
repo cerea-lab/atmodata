@@ -156,7 +156,6 @@ namespace AtmoData
     \param LiquidWaterContent liquid water content (kg/m^3).
     \param MediumCloudiness medium cloudiness (in [0, 1]).
     \param HighCloudiness high cloudiness (in [0, 1]).
-    \param CriticalRelativeHumidity function that returns the critical
     relative humidity as function of the altitude, the pressure and reference pressure.
     \param date date in the form YYYYMMDD.
     \param Attenuation (output) cloud attenuation coefficient.

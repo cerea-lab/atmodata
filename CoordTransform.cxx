@@ -87,8 +87,8 @@ namespace AtmoData
 
   //! Default constructor.
   template <class T>
-  MM5LccIndToLonlat<T>::MM5LccIndToLonlat(int jmx, int imx, T jx, T ix, T phic, T lambdac,
-					  T phi1, T phi2, T ds, int ratio)  throw():
+  MM5LccIndToLonlat<T>::MM5LccIndToLonlat(int jmx, int imx, double jx, double ix, double phic, double lambdac,
+					  double phi1, double phi2, double ds, int ratio)  throw():
     jmx_(jmx), imx_(imx), jx_(jx), ix_(ix), phic_(phic), lambdac_(lambdac),
     phi1_(phi1), phi2_(phi2), ds_(ds), ratio_(ratio),
     pi_(3.14159265358979323846264),

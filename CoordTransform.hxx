@@ -61,29 +61,29 @@ namespace AtmoData
     //! Coarse domain grid dimension in East-West direction.
     const int jmx_;
     //! North-South location in the coarse domain of the South-West corner.
-    const T ix_;
+    const double ix_;
     //! East-West location in the coarse domain of the South-West corner.
-    const T jx_;
+    const double jx_;
     //! Coarse domain center latitude (degree).
-    const T phic_;
+    const double phic_;
     //! Coarse domain center longitude (degree).
-    const T lambdac_;
+    const double lambdac_;
     //! True latitude #1 (degree).
-    const T phi1_;
+    const double phi1_;
     //! True latitude #2 (degree).
-    const T phi2_;
+    const double phi2_;
     //! Grid distance (meters) of the current domain.
-    const T ds_;
+    const double ds_;
     //! Domain grid size ratio with respect to coarse domain.
     const int ratio_;
     //! Earth radius.
-    const T Earth_radius_;
+    const double Earth_radius_;
     //! pi.
-    const T pi_;
+    const double pi_;
 
   public:
-    MM5LccIndToLonlat(int jmx, int imx, T jx, T ix, T phic, T lambdac,
-		      T phi1, T phi2, T ds, int ratio)  throw();
+    MM5LccIndToLonlat(int jmx, int imx, double jx, double ix, double phic, double lambdac,
+		      double phi1, double phi2, double ds, int ratio)  throw();
     void operator() (const T j, const T i,
 		     T& lon, T& lat);
   };

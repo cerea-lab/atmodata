@@ -352,7 +352,7 @@ namespace AtmoData
 
   //! Computes the critical relative humidity.
   /*!
-    The relative humidity is set to CRH_0 is Pressure < P_0,
+    The relative humidity is set to CRH_0 if Pressure < P_0,
     to CRH_1 if P_0 <= Pressure < P_1 and to CRH_2 otherwise.
     \param Pressure pressure (Pa).
     \param CriticalRelativeHumidity (output) critical relative humidity.

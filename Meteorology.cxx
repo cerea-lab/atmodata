@@ -386,6 +386,91 @@ namespace AtmoData
   }
 
 
+  //! Computes the cloud fraction.
+  /*!
+    Formula: CloudFraction = [ (RelativeHumidity - CriticalRelativeHumidity)
+    / (1.0 - CriticalRelativeHumidity) ]^2
+    \param RelativeHumidity relative humidity.
+    \param CriticalRelativeHumidity critical relative humidity.
+    \param CloudFraction (output) cloud fraction.
+  */
+  template<class TR, class TC, class T, class TG>
+  void ComputeCloudFraction(Data<TR, 4, TG>& RelativeHumidity,
+			    Data<TC, 4, TG>& CriticalRelativeHumidity,
+			    Data<T, 4, TG>& CloudFraction)
+  {
+    int h, k, j, i;
+    int Nt(CloudFraction.GetLength(0));
+    int Nz(CloudFraction.GetLength(1));
+    int Ny(CloudFraction.GetLength(2));
+    int Nx(CloudFraction.GetLength(3));
+
+    T tmp, crh;
+    for (h = 0; h < Nt; h++)
+      for (k = 0; k < Nz; k++)
+	for (j = 0; j < Ny; j++)
+	  for (i = 0; i < Nx; i++)
+	    {
+	      crh = CriticalRelativeHumidity(h, k, j, i);
+	      tmp = RelativeHumidity(h, k, j, i) - crh;
+	      if (tmp < 0)
+		CloudFraction(h, k, j, i) = 0.;
+	      else
+		{
+		  tmp = tmp / (1. - crh);
+		  CloudFraction(h, k, j, i) = tmp * tmp;
+		}
+	    }
+  }
+
+
+  //! Computes the cloud fraction.
+  /*!
+    Formula: inside the boundary layer,
+    CloudFraction = 0.34 * [ (RelativeHumidity - CriticalRelativeHumidity)
+    / (1.0 - CriticalRelativeHumidity) ] and, above the boundary layer,
+    CloudFraction = [ (RelativeHumidity - CriticalRelativeHumidity)
+    / (1.0 - CriticalRelativeHumidity) ]^2
+    \param BoundaryLayerHeight boundary layer height (m).
+    \param RelativeHumidity relative humidity.
+    \param CriticalRelativeHumidity critical relative humidity.
+    \param CloudFraction (output) cloud fraction.
+  */
+  template<class TP, class TR, class TC, class T, class TG>
+  void ComputeCloudFraction(Data<TP, 3, TG>& BoundaryLayerHeight,
+			    Data<TR, 4, TG>& RelativeHumidity,
+			    Data<TC, 4, TG>& CriticalRelativeHumidity,
+			    Data<T, 4, TG>& CloudFraction)
+  {
+    int h, k, j, i;
+    int Nt(CloudFraction.GetLength(0));
+    int Nz(CloudFraction.GetLength(1));
+    int Ny(CloudFraction.GetLength(2));
+    int Nx(CloudFraction.GetLength(3));
+
+    T tmp, crh;
+    for (h = 0; h < Nt; h++)
+      for (k = 0; k < Nz; k++)
+	for (j = 0; j < Ny; j++)
+	  for (i = 0; i < Nx; i++)
+	    {
+	      crh = CriticalRelativeHumidity(h, k, j, i);
+	      tmp = RelativeHumidity(h, k, j, i) - crh;
+	      if (tmp < 0)
+		CloudFraction(h, k, j, i) = 0.;
+	      else
+		if (CloudFraction[1].Value(h, k, j, i)
+		    < BoundaryLayerHeight(h, j, i))
+		  CloudFraction(h, k, j, i) = 0.34 * tmp / (1. - crh);
+		else
+		  {
+		    tmp = tmp / (1. - crh);
+		    CloudFraction(h, k, j, i) = tmp * tmp;
+		  }
+	    }
+  }
+
+
   //! Computes the module of a 2D-vectors field.
   /*!
     This function was initially dedicated to winds. In this case, zonal winds and meridional

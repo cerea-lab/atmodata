@@ -74,6 +74,17 @@ namespace AtmoData
 				       T CRH_0 = 0.75, T CRH_1 = 0.95, T CRH_2 = 0.95,
 				       T P_0 = 70000., T P_1 = 40000.);
 
+  template<class TR, class TC, class T, class TG>
+  void ComputeCloudFraction(Data<TR, 4, TG>& RelativeHumidity,
+			    Data<TC, 4, TG>& CriticalRelativeHumidity,
+			    Data<T, 4, TG>& CloudFraction);
+
+  template<class TP, class TR, class TC, class T, class TG>
+  void ComputeCloudFraction(Data<TP, 3, TG>& BoundaryLayerHeight,
+			    Data<TR, 4, TG>& RelativeHumidity,
+			    Data<TC, 4, TG>& CriticalRelativeHumidity,
+			    Data<T, 4, TG>& CloudFraction);
+
   template<class TU, class TV, class T, class TG>
   void ComputeModule(Data<TU, 4, TG>& U, Data<TV, 4, TG>& V,
 		     Data<T, 4, TG>& Module);

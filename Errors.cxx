@@ -246,6 +246,80 @@ namespace AtmoData
   }
 
 
+  /***************
+   * RelativeRMS *
+   ***************/
+
+  //! Computes the relative root mean square between two data sets.
+  /*!
+    Data to be compared with reference data is interpolated on
+    reference-data grid.
+    \param data_ref reference data.
+    \param data_comp data to be compared with 'data_ref'.
+    \param test boolean function with two parameters; the i-th
+    elements of 'data_ref' and 'data_comp' are taken into account
+    if 'test(data_ref(i), data_comp(i))' is true.
+    \return The relative root mean square.
+  */
+  template<class T_ref, int N, class TG_ref,
+	   class T_comp, class TG_comp>
+  T_ref RelativeRMS_interpolation(Data<T_ref, N, TG_ref> data_ref,
+				  Data<T_comp, N, TG_comp>& data_comp,
+				  Function_Base<T_ref, bool>& test)
+  {
+    Data<T_ref, N, TG_ref> data_comp_interp(data_ref);
+    LinearInterpolationGeneral(data_comp, data_comp_interp);
+
+    return RelativeRMS(data_ref, data_comp_interp, test);
+  }
+
+
+  //! Computes the relative root mean square between two data sets.
+  /*!
+    \param data_ref reference data.
+    \param data_comp data to be compared with 'data_ref'.
+    \param test boolean function with two parameters; the i-th
+    elements of 'data_ref' and 'data_comp' are taken into account
+    if 'test(data_ref(i), data_comp(i))' is true.
+    \return The relative root mean square.
+  */
+  template<class T_ref, int N, class TG_ref,
+	   class T_comp, class TG_comp>
+  T_ref RelativeRMS(Data<T_ref, N, TG_ref> data_ref,
+		    Data<T_comp, N, TG_comp>& data_comp,
+		    Function_Base<T_ref, bool>& test)
+  {
+    T_ref relative_rms(0);
+
+    T_ref* data_ref_arr = data_ref.GetData();
+    T_comp* data_comp_arr = data_comp.GetData();
+    int NbElements = data_ref.GetNbElements();
+
+#ifdef DEBUG_ATMODATA_DIMENSION
+
+    if (NbElements!=data_comp.GetNbElements())
+      throw WrongDim("AtmoData::RelativeRMS(Data<T_ref, " + to_str(N) +
+		     ">&, Data<T_comp, " + to_str(N) +
+		     ">&, Function_Base<T_ref, bool>&)",
+		     "Data sizes differ.");
+
+#endif
+    
+    int nb_elt = 0;
+    for (int i=0; i<NbElements; i++)
+      if (test(data_ref_arr[i], data_comp_arr[i]))
+	{
+	  nb_elt++;
+	  relative_rms += (data_ref_arr[i] - data_comp_arr[i])
+	    * (data_ref_arr[i] - data_comp_arr[i])
+	    / (data_ref_arr[i] * data_ref_arr[i]);
+	}
+    relative_rms = sqrt(relative_rms / T_ref(nb_elt));
+
+    return relative_rms;
+  }
+
+
   /********
    * CORR *
    ********/

@@ -25,7 +25,8 @@ namespace AtmoData
 
   
   template <class T, int N, class TG>
-  void Decumulate(Data<T, N, TG>& data, int length);
+  void Decumulate(Data<T, N, TG>& data, int length,
+		  int start = 0);
 
   
 }  // namespace AtmoData.

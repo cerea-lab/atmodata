@@ -31,15 +31,17 @@ namespace AtmoData
     'data' stores values cumulated in time, where the time is the first dimension.
     \param data data to be decumulated.
     \param length number of time steps over which data is cumulated.
+    \param start (optional) index of the first complete cycle. Default: 0.
    */
   template <class T, int N, class TG>
-  void Decumulate(Data<T, N, TG>& data, int length)
+  void Decumulate(Data<T, N, TG>& data, int length,
+		  int start)
   {
     unsigned int n = data.GetNbElements();
     unsigned int l = n / data.GetLength(0);
 
     for (unsigned int i = data.GetLength(0) - 1; i > 0; i--)
-      if (i % length != 0)
+      if ((i - start) % length != 0)
 	{
 	  T* data_arr = &data.GetData()[l * i];
 	  T* data_prev = &data.GetData()[l * (i-1)];

@@ -217,7 +217,7 @@ namespace AtmoData
 				   T P0, T cp, T r)
   {
 
-    int h, i, j, k;
+    int h, i, j;
 
     int Nx = PotentialTemperature.GetLength(2);
     int Ny = PotentialTemperature.GetLength(1);

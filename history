@@ -3,6 +3,57 @@ o------------------o
 o------------------o
 
 
+Version 1.0 (2004-10-13)
+-----------
+
+** Improvements:
+
+- Added 'ComputeAttenuation_LWC' to compute the cloud attenuation.
+- Added 'ComputeWesely' which computes deposition velocities according to
+  the Wesely (1989) model.
+- Added 'ComputeBiogenicRates' and 'ComputeBiogenicEmissions' to compute
+  biogenic emissions.
+- Added the class 'FormatMM5' to read MM5 files.
+- Added coordinates transformations:
+   + LaeaToLonlat
+   + MM5LccIndToLonlat / LonlatToMM5LccInd
+   + MM5MercIndToLonlat / LonlatToMM5MercInd
+   + MM5StereIndToLonlat / LonlatToMM5StereInd
+- 'LouisKz' was improved and renamed into 'ComputeLouisKz'.
+- Added meteorological functions:
+   + ComputePressure
+   + ComputeVirtualTemperature
+   + ComputePotentialTemperature
+   + ComputeModule
+   + ComputeRichardson
+   + ComputeRelativeHumidity
+   + ComputeCriticalRelativeHumidity
+   + ComputeCriticalRelativeHumidity_extended
+   + ComputeSaturationHumidity
+   + ComputeSurfaceHumidity_diag
+   + ComputeCloudHeight
+   + ComputeCloudFraction
+   + ComputeCloudiness
+   + ComputeHeight, ComputeInterfHeight and ComputeMiddleHeight
+- Added:
+   + Decumulate
+   + RelativeRMS
+   + TransformZonalWind
+   + TransformMeridionalWind
+
+** Other changes:
+
+- Warning: in 'ZenithAngle', arguments 'lat' and 'lon' were switched and
+  the date format changed from YYMMDD to YYYYMMDD.
+- Removed:
+   - NGE_interpolation
+   - Bias_interpolation
+   - RMS_interpolation
+   - RelativeRMS_interpolation
+
+** Bug fixes:
+
+
 Version 0.3 (2003-08-04)
 -----------
 

@@ -26,6 +26,48 @@ namespace AtmoData
 {
 
 
+  /*!
+    Computes biogenic emission rates according to Simpson et al. (1999).
+    \param LUC Land use coverage.
+    \param EF_isoprene isoprene emission factors.
+    \param EF_terpenes terpenes emission factors.
+    \param EF_NO NO emission factors.
+    \param Isoprene isoprene emission rates.
+    \param Terpenes terpenes emission rates.
+    \param NO NO emission rates.
+  */
+  template <class TL, class TD, class TEFI, class TEFT,
+	    class TEFN, class TI, class TT, class TN, class TG>
+  void ComputeBiogenicRates(Data<TL, 3, TG>& LUC, Data<TD, 1, TG>& Density,
+			    Data<TEFI, 1, TG>& EF_isoprene,
+			    Data<TEFT, 1, TG>& EF_terpenes,
+			    Data<TEFN, 1, TG>& EF_NO,
+			    Data<TI, 2, TG>& Isoprene, Data<TT, 2, TG>& Terpenes, 
+			    Data<TN, 2, TG>& NO)
+  {
+
+    int h, i, j, k;
+
+    int Nx = Isoprene.GetLength(1);
+    int Ny = Isoprene.GetLength(0);
+    int Nc = LUC.GetLength(0);
+
+    Isoprene.SetZero();
+    Terpenes.SetZero();
+    NO.SetZero();
+
+    for (k=0; k<Nc; k++)
+      for (j=0; j<Ny; j++)
+	for (i=0; i<Nx; i++)
+	  {
+	    Isoprene(j, i) += Density(k) * EF_isoprene(k) * LUC(k, j, i);
+	    Terpenes(j, i) += Density(k) * EF_terpenes(k) * LUC(k, j, i);
+	    NO(j, i) += Density(k) * EF_NO(k) * 1.e-3 * LUC(k, j, i);
+	  }
+
+  }
+
+
   //! Computes biogenic emissions.
   /*!
     Computes biogenic emissions according to Simpson et al. (1999).

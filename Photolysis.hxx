@@ -18,18 +18,15 @@
 //     http://spacetown.free.fr/lib/atmodata
 
 
-#ifndef ATMODATA_FILE_ATMODATA_HXX
+#ifndef ATMODATA_FILE_PHOTOLYSIS_HXX
 
-#include "SeldonData.hxx"
-using namespace SeldonData;
+namespace AtmoData
+{
 
-#include "Kz.cxx"
-#include "Winds.cxx"
-#include "Photolysis.cxx"
+  template<class T>
+  T ZenithAngle(T lat, T lon, int idate, T ut);
 
-#include "Format.cxx"
+}  // namespace AtmoData.
 
-#include "Errors.cxx"
-
-#define ATMODATA_FILE_ATMODATA_HXX
+#define ATMODATA_FILE_PHOTOLYSIS_HXX
 #endif

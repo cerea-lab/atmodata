@@ -36,8 +36,8 @@ namespace AtmoData
     Earth_radius_(6370997.),    
     pi_(3.14159265358979323846264),
     limit_(1.e-15),
-    lon_origin_(lon_origin / 180. * pi_),
-    lat_origin_(lat_origin / 180. * pi_)
+    lat_origin_(lat_origin / 180. * pi_),
+    lon_origin_(lon_origin / 180. * pi_)
   {
 
   }
@@ -54,7 +54,7 @@ namespace AtmoData
   void LaeaToLonlat<T>::operator() (const T x_, const T y_, T& lon, T& lat)
   {
 
-    T rho, z, temp, cos_z, sin_z;
+    T rho, z, cos_z, sin_z;
     T x(x_/Earth_radius_), y(y_/Earth_radius_);
 
     rho = sqrt(x * x + y * y);

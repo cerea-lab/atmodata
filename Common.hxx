@@ -18,21 +18,38 @@
 //     http://spacetown.free.fr/lib/atmodata
 
 
-#ifndef ATMODATA_FILE_ATMODATA_HXX
+#ifndef ATMODATA_FILE_COMMON_HXX
 
-#include "SeldonData.hxx"
-using namespace SeldonData;
+namespace AtmoData
+{
 
-#include "Common.hxx"
+#define SWAP_4(a) ((a >> 24) & 0xFF) | ((a >> 8) & 0xFF00) | \
+      ((a << 8) & 0x00FF0000) | ((a << 24) & 0xFF000000)
+  
+  inline float swap(float& x)
+  {
+    return (*(unsigned *)&x = SWAP_4(*(unsigned *)&x));
+  }
+  
+  inline int swap(int& x)
+  {
+    return (*(unsigned *)&x = SWAP_4(*(unsigned *)&x));
+  }
+  
+  inline unsigned long swap(unsigned long& x)
+  {
+    return (*(unsigned *)&x = SWAP_4(*(unsigned *)&x));
+  }
+  
+  template <class T, int N>
+  inline void swap(Array<T, N>& A)
+  {
+    for (int i=0; i<A.size(); i++)
+      swap(A.data()[i]);
+  }
+  
+}  // namespace AtmoData.
 
-#include "Kz.cxx"
-#include "Winds.cxx"
-#include "Photolysis.cxx"
-#include "CoordTransform.cxx"
 
-#include "Format.cxx"
-
-#include "Errors.cxx"
-
-#define ATMODATA_FILE_ATMODATA_HXX
+#define ATMODATA_FILE_COMMON_HXX
 #endif

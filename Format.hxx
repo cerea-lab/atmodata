@@ -91,6 +91,70 @@ namespace AtmoData
 
   };  
 
+  // For MM5 sub-headers.
+  class MM5SubHeader;
+
+  //! Input/ouput class to read MM5 files (version 3).
+  class FormatMM5: public Format
+  {
+
+  protected:
+
+  public:
+    FormatMM5()  throw();
+    ~FormatMM5()  throw();
+
+    // Flag.
+    int ReadFlag(ifstream& FileStream) const;
+
+    // Big header.
+    void ReadBigHeader(string FileName,
+		       Array<int, 2>& BHI, Array<float, 2>& BHR,
+		       Array<string, 2>& BHIC, Array<string, 2>& BHRC) const;
+    void ReadBigHeader(ifstream& FileStream,
+		       Array<int, 2>& BHI, Array<float, 2>& BHR,
+		       Array<string, 2>& BHIC, Array<string, 2>& BHRC) const;
+    void ReadBigHeader(ifstream& FileStream) const;
+
+    // Sub-header.
+    void ReadSubHeader(ifstream& FileStream, MM5SubHeader& SH) const;
+    void ReadSubHeader(ifstream& FileStream) const;
+
+    // Field.
+    template <int N, class TG>
+    void ReadField(ifstream& FileStream, Data<float, N, TG>& A) const;
+    template <int N>
+    void ReadField(ifstream& FileStream, Array<float, N>& A) const;
+    void ReadField(ifstream& FileStream) const;
+
+  };
+
+  //! For MM5 sub-headers.
+  class MM5SubHeader
+  {
+
+  public:
+    int ndim;
+    Array<int, 1> start_index;
+    Array<int, 1> end_index;
+    float xtime;
+    string staggering;
+    string ordering;
+    string current_date;
+    string name;
+    string unit;
+    string description;
+
+  public:
+    MM5SubHeader()  throw();
+    MM5SubHeader(const MM5SubHeader&)  throw();
+    ~MM5SubHeader()  throw();
+
+    void Init();
+    MM5SubHeader& operator=(MM5SubHeader&);
+
+  };
+
 }  // namespace AtmoData.
 
 

@@ -495,6 +495,370 @@ namespace AtmoData
     
   }
 
+
+  ///////////////
+  // FORMATMM5 //
+  ///////////////
+
+  //! Default constructor.
+  FormatMM5::FormatMM5()  throw()
+  {
+  }
+
+  //! Destructor.
+  FormatMM5::~FormatMM5()  throw()
+  {
+  }
+
+  /********/
+  /* Flag */
+  /********/
+
+  //! Reads a flag.
+  int FormatMM5::ReadFlag(ifstream& FileStream) const
+  {
+
+#ifdef DEBUG_SELDONDATA_IO
+    // Checks if the file ready.
+    if (!FileStream.good())
+      throw IOError("FormatMM5<T>::ReadFlag(ifstream& FileStream)",
+		    "File is not ready.");
+#endif
+
+    int length, flag;
+
+    FileStream.read(reinterpret_cast<char*>(&length), 4);
+    FileStream.read(reinterpret_cast<char*>(&flag), 4);
+    FileStream.read(reinterpret_cast<char*>(&length), 4);
+
+#ifdef DEBUG_SELDONDATA_IO
+    // Checks if the flag was read.
+    if (!FileStream.good())
+      throw IOError("FormatMM5<T>::ReadFlag(ifstream& FileStream)",
+		    "Unable to read the flag.");
+#endif
+
+    return swap(flag);
+
+  }
+
+  /*************/
+  /* BigHeader */
+  /*************/
+
+  //! Reads big header.
+  void FormatMM5::ReadBigHeader(string FileName,
+				Array<int, 2>& BHI, Array<float, 2>& BHR,
+				Array<string, 2>& BHIC, Array<string, 2>& BHRC) const
+  {
+
+    ifstream FileStream;
+    FileStream.open(FileName.c_str(), ifstream::binary);
+
+#ifdef DEBUG_SELDONDATA_IO
+    // Checks if the file was opened.
+    if (!FileStream.is_open())
+      throw IOError("FormatMM5<T>::ReadBigHeader(string FileName, Array<int, 2>&, Array<float, 2>&, Array<string, 2>&, Array<string, 2>&)",
+		    "Unable to open file \"" + FileName + "\".");
+#endif
+
+    this->ReadFlag(FileStream);
+    this->ReadBigHeader(FileStream, BHI, BHR, BHIC, BHRC);
+
+    FileStream.close();
+
+  }
+
+  //! Reads big header.
+  void FormatMM5::ReadBigHeader(ifstream& FileStream,
+				Array<int, 2>& BHI, Array<float, 2>& BHR,
+				Array<string, 2>& BHIC, Array<string, 2>& BHRC) const
+  {
+
+#ifdef DEBUG_SELDONDATA_IO
+    // Checks if the file is ready.
+    if (!FileStream.good())
+      throw IOError("FormatMM5<T>::ReadBigHeader(ifstream& FileStream, Array<int, 2>&, Array<float, 2>&, Array<string, 2>&, Array<string, 2>&)",
+		    "File is not ready.");
+#endif
+
+    int i, j;
+    int length;
+    FileStream.read(reinterpret_cast<char*>(&length), 4);
+
+    BHI.resize(20, 50);
+    BHR.resize(20, 20);
+    BHIC.resize(50, 20);
+    BHRC.resize(20, 20);
+
+    FileStream.read(reinterpret_cast<char*>(BHI.data()), 1000 * sizeof(int));
+    for (i=0; i<20; i++)
+      for (j=0; j<50; j++)
+	swap(BHI(i, j));
+
+    FileStream.read(reinterpret_cast<char*>(BHR.data()), 400 * sizeof(float));
+    for (i=0; i<20; i++)
+      for (j=0; j<20; j++)
+	swap(BHR(i, j));
+
+    for (i=0; i<20; i++)
+      for (j=0; j<50; j++)
+	{
+	  BHIC(i, j).resize(80);
+	  FileStream.read(const_cast<char*>(BHIC(i, j).c_str()), 80 * sizeof(char));
+	}
+
+    for (i=0; i<20; i++)
+      for (j=0; j<20; j++)
+	{
+	  BHRC(i, j).resize(80);
+	  FileStream.read(const_cast<char*>(BHRC(i, j).c_str()), 80 * sizeof(char));
+	}
+
+    FileStream.read(reinterpret_cast<char*>(&length), 4);
+
+#ifdef DEBUG_SELDONDATA_IO
+    // Checks if all was read.
+    if (!FileStream.good())
+      throw IOError("FormatMM5<T>::ReadBigHeader(ifstream& FileStream, Array<int, 2>&, Array<float, 2>&, Array<string, 2>&, Array<string, 2>&)",
+		    "Unable to read the big header.");
+#endif
+
+  }
+
+  //! Reads big header.
+  void FormatMM5::ReadBigHeader(ifstream& FileStream) const
+  {
+
+    Array<int, 2> BHI;
+    Array<float, 2> BHR;
+    Array<string, 2> BHIC;
+    Array<string, 2> BHRC;
+    
+    this->ReadBigHeader(FileStream, BHI, BHR, BHIC, BHRC);
+
+  }
+
+  //! Reads sub-header.
+  void FormatMM5::ReadSubHeader(ifstream& FileStream, MM5SubHeader& SH) const
+  {
+
+#ifdef DEBUG_SELDONDATA_IO
+    // Checks if the file is ready.
+    if (!FileStream.good())
+      throw IOError("FormatMM5<T>::ReadSubHeader(ifstream& FileStream, MM5SubHeader& SH)",
+		    "File is not ready.");
+#endif
+
+    int length;
+    FileStream.read(reinterpret_cast<char*>(&length), 4);
+
+    SH.Init();
+
+    FileStream.read(reinterpret_cast<char*>(&SH.ndim), sizeof(int));
+    swap(SH.ndim);
+    FileStream.read(reinterpret_cast<char*>(SH.start_index.data()), 4 * sizeof(int));
+    swap(SH.start_index);
+    FileStream.read(reinterpret_cast<char*>(SH.end_index.data()), 4 * sizeof(int));
+    swap(SH.end_index);
+    FileStream.read(reinterpret_cast<char*>(&SH.xtime), sizeof(float));
+    swap(SH.xtime);
+    FileStream.read(const_cast<char*>(SH.staggering.c_str()), 4 * sizeof(char));
+    FileStream.read(const_cast<char*>(SH.ordering.c_str()), 4 * sizeof(char));
+    FileStream.read(const_cast<char*>(SH.current_date.c_str()), 24 * sizeof(char));
+    FileStream.read(const_cast<char*>(SH.name.c_str()), 9 * sizeof(char));
+    FileStream.read(const_cast<char*>(SH.unit.c_str()), 25 * sizeof(char));
+    FileStream.read(const_cast<char*>(SH.description.c_str()), 46 * sizeof(char));
+
+    FileStream.read(reinterpret_cast<char*>(&length), 4);
+
+#ifdef DEBUG_SELDONDATA_IO
+    // Checks if all was read.
+    if (!FileStream.good())
+      throw IOError("FormatMM5<T>::ReadSubHeader(ifstream& FileStream, MM5SubHeader& SH)",
+		    "Unable to read the sub-header.");
+#endif
+
+  }
+
+  //! Reads sub-header.
+  void FormatMM5::ReadSubHeader(ifstream& FileStream) const
+  {
+
+    MM5SubHeader SH;
+    this->ReadSubHeader(FileStream, SH);
+
+  }
+
+  /*********/
+  /* Field */
+  /*********/
+
+  //! Reads the field.
+  template <int N, class TG>
+  void FormatMM5::ReadField(ifstream& FileStream, Data<float, N, TG>& D) const
+  {
+    this->ReadField(FileStream, D.GetArray());
+  }
+
+  //! Reads the field.
+  template <int N>
+  void FormatMM5::ReadField(ifstream& FileStream, Array<float, N>& A) const
+  {
+
+    unsigned long data_size = A.numElements() * sizeof(float);
+    float* data = A.data();
+
+#ifdef DEBUG_SELDONDATA_IO
+    // Checks if the file is ready.
+    if (!FileStream.good())
+      throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream, Array<float, N>&)",
+		    "File is not ready.");
+
+    // Checks file length.
+    streampos position;
+    position = FileStream.tellg();
+    FileStream.seekg(0, ios::end);
+    unsigned long file_size = FileStream.tellg() - position;
+
+    if (data_size + 8 > file_size)
+      throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream, Array<float, N>& A)",
+		    "Unable to read (" + to_str(data_size) + " + 8) byte(s)." +
+		    " The input stream is only " + to_str(file_size) + " byte(s) long.");
+
+    FileStream.seekg(position);
+#endif
+
+    int length;
+    FileStream.read(reinterpret_cast<char*>(&length), 4);
+
+    FileStream.read(reinterpret_cast<char*>(data), data_size);
+    swap(A);
+
+    FileStream.read(reinterpret_cast<char*>(&length), 4);
+
+#ifdef DEBUG_SELDONDATA_IO
+    // Checks if all was read.
+    if (!FileStream.good())
+      throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream, Array<float, N>&)",
+		    "Unable to read the field.");
+#endif
+
+  }
+
+  //! Reads the field.
+  void FormatMM5::ReadField(ifstream& FileStream) const
+  {
+
+#ifdef DEBUG_SELDONDATA_IO
+    // Checks if the file is ready.
+    if (!FileStream.good())
+      throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream)",
+		    "File is not ready.");
+#endif
+
+    unsigned long data_size;
+    FileStream.read(reinterpret_cast<char*>(&data_size), 4);
+    swap(data_size);
+
+#ifdef DEBUG_SELDONDATA_IO
+    // Checks if the file is ready.
+    if (!FileStream.good())
+      throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream)",
+		    "File is not ready.");
+
+    // Checks file length.
+    streampos position;
+    position = FileStream.tellg();
+    FileStream.seekg(0, ios::end);
+    unsigned long file_size = FileStream.tellg() - position;
+
+    if (data_size + 4 > file_size)
+      throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream)",
+		    "Unable to read (" + to_str(data_size) + " + 4) byte(s)." +
+		    " The input stream is only " + to_str(file_size) + " byte(s) long.");
+
+    FileStream.seekg(position);
+#endif
+
+    FileStream.seekg(data_size, ios::cur);
+
+    unsigned long length;
+    FileStream.read(reinterpret_cast<char*>(&length), 4);
+    swap(length);
+
+#ifdef DEBUG_SELDONDATA_IO
+    // Checks if all was read.
+    if (!FileStream.good())
+      throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream)",
+		    "Unable to read the field.");
+    // Checks if record length is the same as 'data_size'.
+    if (length!=data_size)
+      throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream)",
+		    "Unable to get the field size.");
+#endif
+
+  }
+
+
+  //////////////////
+  // MM5SUBHEADER //
+  //////////////////
+
+  //! Default constructor.
+  MM5SubHeader::MM5SubHeader()  throw()
+  {
+  }
+
+  //! Copy constructor.
+  MM5SubHeader::MM5SubHeader(const MM5SubHeader& SH)  throw():
+    ndim(SH.ndim),
+    start_index(SH.start_index.copy()),
+    end_index(SH.end_index.copy()),
+    xtime(SH.xtime),
+    staggering(SH.staggering),
+    ordering(SH.ordering),
+    current_date(SH.current_date),
+    name(SH.name),
+    unit(SH.unit),
+    description(SH.description)
+  {
+  }
+
+  //! Destructor.
+  MM5SubHeader::~MM5SubHeader()  throw()
+  {
+  }
+
+  //! Initializes sizes.
+  void MM5SubHeader::Init()
+  {
+    start_index.resize(4);
+    end_index.resize(4);
+    staggering.resize(4);
+    ordering.resize(4);
+    current_date.resize(24);
+    name.resize(9);
+    unit.resize(25);
+    description.resize(46);
+  }
+
+  //! Copies a sub-header.
+  MM5SubHeader& MM5SubHeader::operator=(MM5SubHeader& SH)
+  {
+    this->ndim = SH.ndim;
+    this->start_index = SH.start_index.copy();
+    this->end_index = SH.end_index.copy();
+    this->xtime = SH.xtime;
+    this->staggering = SH.staggering;
+    this->ordering = SH.ordering;
+    this->current_date = SH.current_date;
+    this->name = SH.name;
+    this->unit = SH.unit;
+    this->description = SH.description;
+  }
+
+
 }  // namespace AtmoData.
 
 

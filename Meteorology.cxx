@@ -69,8 +69,8 @@ namespace AtmoData
 		u = 0.5 * (ZonalWind(h, k, j, i+1) + ZonalWind(h, k, j, i));
 		v = 0.5 * (MeridionalWind(h, k, j+1, i) + MeridionalWind(h, k, j, i));
 		wind = max(sqrt(u*u + v*v), wind_threshold);
-		SurfaceRichardson(h, k, j, i) = g * (PotentialTemperature(h, level, j, i)
-						     - PotentialTemperature(h, level - 1, j, i))
+		Richardson(h, k, j, i) = g * (PotentialTemperature(h, level, j, i)
+					      - PotentialTemperature(h, level - 1, j, i))
 		  * (Levels.Value(h, level, j, i) - Levels.Value(h, level - 1, j, i))
 		  / (wind*wind * PotentialTemperature(h, level - 1, j, i));
 
@@ -87,8 +87,8 @@ namespace AtmoData
 		u = ZonalWind(h, k, j, i);
 		v = MeridionalWind(h, k, j, i);
 		wind = max(sqrt(u*u + v*v), wind_threshold);
-		SurfaceRichardson(h, k, j, i) = g * (PotentialTemperature(h, level, j, i)
-						     - PotentialTemperature(h, level - 1, j, i))
+		Richardson(h, k, j, i) = g * (PotentialTemperature(h, level, j, i)
+					      - PotentialTemperature(h, level - 1, j, i))
 		  * (Levels.Value(h, level, j, i) - Levels.Value(h, level - 1, j, i))
 		  / (wind*wind * PotentialTemperature(h, level - 1, j, i));
 

@@ -526,7 +526,7 @@ namespace AtmoData
   }
 
 
-  //! Computes the critival relative humidity.
+  //! Computes the critical relative humidity.
   /*!
     Formula: CriticalRelativeHumidity = 1.0 - coeff0 * sig
     * (1.0 - sig) * (1.0 + (sig - 0.5) * coeff1) where

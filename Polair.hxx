@@ -18,22 +18,18 @@
 //     http://spacetown.free.fr/lib/atmodata
 
 
-#ifndef ATMODATA_FILE_ATMODATA_HXX
+#ifndef ATMODATA_FILE_POLAIR_HXX
 
-#include "SeldonData.hxx"
-using namespace SeldonData;
+namespace AtmoData
+{
 
-#include "Common.hxx"
+  template<class T, class TG>
+  void TransformZonalWind(Data<T, 4, TG>& ZonalWind);
 
-#include "Meteorology.cxx"
-#include "Kz.cxx"
-#include "Photolysis.cxx"
-#include "CoordTransform.cxx"
-#include "Polair.cxx"
+  template<class T, class TG>
+  void TransformMeridionalWind(Data<T, 4, TG>& MeridionalWind);
 
-#include "Format.cxx"
+}  // namespace AtmoData.
 
-#include "Errors.cxx"
-
-#define ATMODATA_FILE_ATMODATA_HXX
+#define ATMODATA_FILE_POLAIR_HXX
 #endif

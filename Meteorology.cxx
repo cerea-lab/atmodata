@@ -397,6 +397,50 @@ namespace AtmoData
   }
 
 
+  //! Computes the altitudes from pressure and temperature fields.
+  /*!
+    Level heights are computed according to:
+    Z_{k+1} = Z_k + (r * T_k / g) * log(P_k/P_{k+1})
+    where Z is the altitude, T the temperature, P the pressure,
+    k the level index, r the molar gas constant for dry air
+    and g the standard gravity.
+    \par For the first level, Z_0 = r * T_0 / g * log(PS / P_0)
+    where PS is the surface pressure.
+    \param SurfacePressure surface pressure (Pa).
+    \param Pressure pressure (Pa).
+    \param Height (output) altitudes (m).
+    \param g (optional) standard gravity. Default: 9.80665.
+    \param r (optional) molar gas constant for dry air. Default: 287.0.
+    \note Temperature, Pressure and Height must be defined on the same grid.
+  */
+  template<class TPS, class TP, class TT, class T, class TG>
+  void ComputeHeight(Data<TPS, 3, TG>& SurfacePressure, Data<TP, 4, TG>& Pressure,
+		     Data<TT, 4, TG>& Temperature,
+		     Grid<T>& Height, T g, T r)
+  {
+
+    int h, i, j, k;
+
+    int Nx = Height.GetLength(3);
+    int Ny = Height.GetLength(2);
+    int Nz = Height.GetLength(1);
+    int Nt = Height.GetLength(0);
+
+    for (h=0; h<Nt; h++)
+      for (k=0; k<Nz; k++)
+	for (j=0; j<Ny; j++)
+	  for (i=0; i<Nx; i++)
+	    if (k==0)
+	      Height.Value(h, k, j, i) = r / g * Temperature(h, k, j, i)
+		* log(SurfacePressure(h, j, i) / Pressure(h, k, j, i));
+	    else
+	      Height.Value(h, k, j, i) = Height.Value(h, k-1, j, i)
+		- r / g * Temperature(h, k, j, i)
+		* log(Pressure(h, k, j, i) / Pressure(h, k-1, j, i));
+
+  }
+
+
   //! Computes the virtual temperature.
   /*!
     The virtual temperature is computed according to: T_v = (1 + c * q) * T

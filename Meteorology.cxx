@@ -32,20 +32,21 @@ namespace AtmoData
 
   //! Computes the Richardson number.
   /*!
-    Winds may be provided in two ways. The first option is to provide winds on interfaces
-    (along x for the zonal wind, along y for the meridional wind). The second option is
-    simply to provide winds at nodes (i.e. where the potential temperature and the Richardson
-    number are defined).
+    Winds may be provided in two ways. The first option is to provide winds on
+    interfaces (along x for the zonal wind, along y for the meridional wind).
+    The second option is simply to provide winds at nodes (i.e. where the
+    potential temperature and the Richardson number are defined).
     \param ZonalWind zonal wind.
     \param MeridionalWind meridional wind.
     \param PotentialTemperature potential temperature.
     \param Richardson (output) Richardson number.
-    \param wind_threshold (optional) minimum of the wind module. Default: 0.1.
+    \param wind_threshold (optional) minimum of the wind shear. Default: 0.1.
   */
   template<class TU, class TV, class TTp, class T, class TG>
-  void ComputeRichardson(Data<TU, 4, TG>& ZonalWind, Data<TV, 4, TG>& MeridionalWind,
-			 Data<TTp, 4, TG>& PotentialTemperature, Data<T, 4, TG>& Richardson,
-			 T wind_threshold)
+  void ComputeRichardson(Data<TU, 4, TG>& ZonalWind,
+			 Data<TV, 4, TG>& MeridionalWind,
+			 Data<TTp, 4, TG>& PotentialTemperature,
+			 Data<T, 4, TG>& Richardson, T wind_threshold)
   {
 
     int h, i, j, k;
@@ -58,10 +59,11 @@ namespace AtmoData
     Grid<TG>& Levels = Richardson[1];
 
     const T g(9.81);
-    T u, v, wind;
+    T dudz, dvdz, dwinddz;
     int level;
 
-    if ( (ZonalWind.GetLength(3) == Nx + 1) && (MeridionalWind.GetLength(2) == Ny + 1) )
+    if (ZonalWind.GetLength(3) == Nx + 1
+	&& MeridionalWind.GetLength(2) == Ny + 1)
       for (h=0; h<Nt; h++)
 	for (k=0; k<Nz; k++)
 	  for (j=0; j<Ny; j++)
@@ -70,13 +72,32 @@ namespace AtmoData
 		
 		level = k==0 ? 1 : k;
 		
-		u = 0.5 * (ZonalWind(h, k, j, i+1) + ZonalWind(h, k, j, i));
-		v = 0.5 * (MeridionalWind(h, k, j+1, i) + MeridionalWind(h, k, j, i));
-		wind = max(sqrt(u*u + v*v), wind_threshold);
-		Richardson(h, k, j, i) = g * (PotentialTemperature(h, level, j, i)
-					      - PotentialTemperature(h, level - 1, j, i))
-		  * (Levels.Value(h, level, j, i) - Levels.Value(h, level - 1, j, i))
-		  / (wind*wind * PotentialTemperature(h, level - 1, j, i));
+		dudz = 0.5
+		  * ( (ZonalWind(h, level, j, i+1)
+		       - ZonalWind(h, level-1, j, i+1))
+		      / (ZonalWindLevels(h, level, j, i+1)
+			 - ZonalWindLevels(h, level-1, j, i+1))
+		      + (ZonalWind(h, level, j, i)
+			 - ZonalWind(h, level-1, j, i))
+		      / (ZonalWindLevels(h, level, j, i)
+			 - ZonalWindLevels(h, level-1, j, i)) );
+		dvdz = 0.5
+		  * ( (MeridionalWind(h, level, j+1, i)
+		       - MeridionalWind(h, level-1, j+1, i))
+		      / (MeridionalWindLevels(h, level, j+1, i)
+			 - MeridionalWindLevels(h, level-1, j+1, i))
+		      + (MeridionalWind(h, level, j, i)
+			 - MeridionalWind(h, level-1, j, i))
+		      / (MeridionalWindLevels(h, level, j, i)
+			 - MeridionalWindLevels(h, level-1, j, i)) );
+		dwinddz = max(sqrt(dudz*dudz + dvdz*dvdz), wind_threshold);
+		Richardson(h, k, j, i) =
+		  g * (PotentialTemperature(h, level, j, i)
+		       - PotentialTemperature(h, level - 1, j, i))
+		  / (dwinddz * dwinddz
+		     * PotentialTemperature(h, level - 1, j, i)
+		     * (Levels.Value(h, level, j, i)
+			- Levels.Value(h, level - 1, j, i)));
 
 	      }
     else
@@ -88,13 +109,22 @@ namespace AtmoData
 		
 		level = k==0 ? 1 : k;
 		
-		u = ZonalWind(h, k, j, i);
-		v = MeridionalWind(h, k, j, i);
-		wind = max(sqrt(u*u + v*v), wind_threshold);
-		Richardson(h, k, j, i) = g * (PotentialTemperature(h, level, j, i)
-					      - PotentialTemperature(h, level - 1, j, i))
-		  * (Levels.Value(h, level, j, i) - Levels.Value(h, level - 1, j, i))
-		  / (wind*wind * PotentialTemperature(h, level - 1, j, i));
+		dudz = (ZonalWind(h, level, j, i)
+			- ZonalWind(h, level-1, j, i))
+		  / (ZonalWindLevels(h, level, j, i)
+		     - ZonalWindLevels(h, level-1, j, i));
+		dvdz = (MeridionalWind(h, level, j, i)
+			- MeridionalWind(h, level-1, j, i))
+		      / (MeridionalWindLevels(h, level, j, i)
+			 - MeridionalWindLevels(h, level-1, j, i));
+		dwinddz = max(sqrt(dudz*dudz + dvdz*dvdz), wind_threshold);
+		Richardson(h, k, j, i) =
+		  g * (PotentialTemperature(h, level, j, i)
+		       - PotentialTemperature(h, level - 1, j, i))
+		  / (dwinddz * dwinddz
+		     * PotentialTemperature(h, level - 1, j, i)
+		     * (Levels.Value(h, level, j, i)
+			- Levels.Value(h, level - 1, j, i)));
 
 	      }
 
@@ -103,21 +133,21 @@ namespace AtmoData
 
   //! Computes the surface Richardson number.
   /*!
-    Winds may be provided in two ways. The first option is to provide winds on interfaces
-    (along x for the zonal wind, along y for the meridional wind). The second option is
-    simply to provide winds at nodes (i.e. where the potential temperature and the Richardson
-    number are defined).
+    Winds may be provided in two ways. The first option is to provide winds on
+    interfaces (along x for the zonal wind, along y for the meridional wind).
+    The second option is simply to provide winds at nodes (i.e. where the
+    potential temperature and the Richardson number are defined).
     \param ZonalWind zonal wind.
     \param MeridionalWind meridional wind.
     \param PotentialTemperature potential temperature.
     \param SurfaceRichardson (output) surface Richardson number.
-    \param wind_threshold (optional) minimum of the wind module. Default: 0.1.
+    \param wind_threshold (optional) minimum of the wind shear. Default: 0.1.
   */
   template<class TU, class TV, class TTp, class T, class TG>
-  void ComputeRichardson(Data<TU, 4, TG>& ZonalWind, Data<TV, 4, TG>& MeridionalWind,
+  void ComputeRichardson(Data<TU, 4, TG>& ZonalWind,
+			 Data<TV, 4, TG>& MeridionalWind,
 			 Data<TTp, 4, TG>& PotentialTemperature,
-			 Data<T, 3, TG>& SurfaceRichardson,
-			 T wind_threshold)
+			 Data<T, 3, TG>& SurfaceRichardson, T wind_threshold)
   {
 
     int h, i, j;
@@ -127,24 +157,36 @@ namespace AtmoData
     int Nt = SurfaceRichardson.GetLength(0);
 
     Grid<TG>& Levels = PotentialTemperature[1];
+    Grid<TG>& MeridionalWindLevels = MeridionalWind[1];
+    Grid<TG>& ZonalWindLevels = ZonalWind[1];
 
     const T g(9.81);
-    T u, v, wind;
+    T dudz, dvdz, dwinddz;
 
-    if ( (ZonalWind.GetLength(3) == Nx + 1) && (MeridionalWind.GetLength(2) == Ny + 1) )
+    if (ZonalWind.GetLength(3) == Nx + 1
+	&& MeridionalWind.GetLength(2) == Ny + 1)
       for (h=0; h<Nt; h++)
 	for (j=0; j<Ny; j++)
 	  for (i=0; i<Nx; i++)
 	    {
 		
-	      u = 0.5 * (ZonalWind(h, 0, j, i+1) + ZonalWind(h, 0, j, i));
-	      v = 0.5 * (MeridionalWind(h, 0, j+1, i) + MeridionalWind(h, 0, j, i));
-	      wind = max(sqrt(u*u + v*v), wind_threshold);
-	      SurfaceRichardson(h, j, i) = g * (PotentialTemperature(h, 1, j, i)
-						- PotentialTemperature(h, 0, j, i))
-		* (Levels.Value(h, 1, j, i) - Levels.Value(h, 0, j, i))
-		/ (wind*wind * PotentialTemperature(h, 0, j, i));
-
+	      dudz = 0.5
+		* (ZonalWind(h, 0, j, i+1)
+		   / ZonalWindLevels.Value(h, 0, j, i+1)
+		   + ZonalWind(h, 0, j, i)
+		   / ZonalWindLevels.Value(h, 0, j, i));
+	      dvdz = 0.5 *
+		(MeridionalWind(h, 0, j+1, i)
+		 / MeridionalWindLevels.Value(h, 0, j+1, i)
+		 + MeridionalWind(h, 0, j, i)
+		 / MeridionalWindLevels.Value(h, 0, j, i));
+	      dwinddz = max(sqrt(dudz*dudz + dvdz*dvdz), wind_threshold);
+	      SurfaceRichardson(h, j, i) =
+		g * (PotentialTemperature(h, 1, j, i)
+		     - PotentialTemperature(h, 0, j, i))
+		/ (dwinddz * dwinddz * PotentialTemperature(h, 0, j, i)
+		   * (Levels.Value(h, 1, j, i) - Levels.Value(h, 0, j, i)));
+	      
 	    }
     else
       for (h=0; h<Nt; h++)
@@ -152,13 +194,16 @@ namespace AtmoData
 	  for (i=0; i<Nx; i++)
 	    {
 		
-	      u = ZonalWind(h, 0, j, i);
-	      v = MeridionalWind(h, 0, j, i);
-	      wind = max(sqrt(u*u + v*v), wind_threshold);
-	      SurfaceRichardson(h, j, i) = g * (PotentialTemperature(h, 1, j, i)
-						- PotentialTemperature(h, 0, j, i))
-		* (Levels.Value(h, 1, j, i) - Levels.Value(h, 0, j, i))
-		/ (wind*wind * PotentialTemperature(h, 0, j, i));
+	      dudz = ZonalWind(h, 0, j, i)
+		/ ZonalWindLevels.Value(h, 0, j, i);
+	      dvdz = MeridionalWind(h, 0, j, i)
+		/ MeridionalWindLevels.Value(h, 0, j, i);
+	      dwinddz = max(sqrt(dudz*dudz + dvdz*dvdz), wind_threshold);
+	      SurfaceRichardson(h, j, i) =
+		g * (PotentialTemperature(h, 1, j, i)
+		     - PotentialTemperature(h, 0, j, i))
+		/ (dwinddz * dwinddz * PotentialTemperature(h, 0, j, i)
+		   * (Levels.Value(h, 1, j, i) - Levels.Value(h, 0, j, i)));
 
 	    }
 
@@ -174,7 +219,8 @@ namespace AtmoData
     \param P0 (optional) standard pressure. Default: 101325 Pa.
     \param cp (optional) specific heat of dry air at constant pressure.
     Default: 1005 J.kg^{-1}.K^{-1}.
-    \param r (optional) molar gas constant for air. Default: 287.0 J.kg^{-1}.K^{-1}.
+    \param r (optional) molar gas constant for air.
+    Default: 287.0 J.kg^{-1}.K^{-1}.
   */
   template<class TT, class TP, class T, class TG>
   void ComputePotentialTemperature(Data<TT, 4, TG>& Temperature,
@@ -212,7 +258,8 @@ namespace AtmoData
     \param P0 (optional) standard pressure. Default: 101325 Pa.
     \param cp (optional) specific heat of dry air at constant pressure.
     Default: 1005 J.kg^{-1}.K^{-1}.
-    \param r (optional) molar gas constant for air. Default: 287.0 J.kg^{-1}.K^{-1}.
+    \param r (optional) molar gas constant for air.
+    Default: 287.0 J.kg^{-1}.K^{-1}.
   */
   template<class TT, class TP, class T, class TG>
   void ComputePotentialTemperature(Data<TT, 3, TG>& Temperature,
@@ -325,7 +372,8 @@ namespace AtmoData
   void ComputeCriticalRelativeHumidity_extended(Data<TS, 3, TG>& SurfacePressure,
 						Data<TP, 4, TG>& Pressure,
 						Data<T, 4, TG>& CriticalRelativeHumidity,
-						T coeff0, T coeff1, T a0, T a1)
+						T coeff0, T coeff1,
+						T a0, T a1)
   {
     int h, k, j, i;
     int Nt(CriticalRelativeHumidity.GetLength(0));
@@ -340,7 +388,8 @@ namespace AtmoData
 	  for (i = 0; i < Nx; i++)
 	    {
 	      sig = Pressure(h, k, j, i) / SurfacePressure(h, j, i);
-	      CriticalRelativeHumidity(h, k, j, i) = 1.0 - coeff0 * pow(sig, a0)
+	      CriticalRelativeHumidity(h, k, j, i) =
+		1.0 - coeff0 * pow(sig, a0)
 		* pow(T(1.) - sig, a1) * (1.0 + (sig - 0.5) * coeff1);
 	    }
   }
@@ -359,7 +408,8 @@ namespace AtmoData
     \param CriticalRelativeHumidity (output) critical relative humidity.
     \param coeff0 coefficient (see the formula). Default: 2.0.
     \param coeff1 coefficient (see the formula). Default: sqrt(3.).
-    \param BL_CRH critical relative humidity within the boundary layer. Default: 0.98.
+    \param BL_CRH critical relative humidity within the boundary layer.
+    Default: 0.98.
   */
   template<class TB, class TS, class TP, class T, class TG>
   void ComputeCriticalRelativeHumidity(Data<TB, 3, TG>& BoundaryLayerHeight,
@@ -398,7 +448,8 @@ namespace AtmoData
     \param Pressure pressure (Pa).
     \param CriticalRelativeHumidity (output) critical relative humidity.
     \param CRH_0 critical relative humidity in the first layer. Default: 0.75.
-    \param CRH_1 critical relative humidity in the second layer. Default: 0.95.
+    \param CRH_1 critical relative humidity in the second layer.
+    Default: 0.95.
     \param CRH_2 critical relative humidity in the third layer. Default: 0.95.
     \param P_0 first pressure limit. Default: 70 000 Pa.
     \param P_1 second pressure limit. Default: 40 000 Pa.
@@ -406,7 +457,8 @@ namespace AtmoData
   template<class TP, class T, class TG>
   void ComputeCriticalRelativeHumidity(Data<TP, 4, TG>& Pressure,
 				       Data<T, 4, TG>& CriticalRelativeHumidity,
-				       T CRH_0, T CRH_1, T CRH_2, T P_0, T P_1)
+				       T CRH_0, T CRH_1, T CRH_2,
+				       T P_0, T P_1)
   {
     int h, k, j, i;
     int Nt(CriticalRelativeHumidity.GetLength(0));
@@ -514,11 +566,12 @@ namespace AtmoData
 
   //! Computes the module of a 2D-vectors field.
   /*!
-    This function was initially dedicated to winds. In this case, zonal winds and meridional
-    winds are provided and the module of the wind is computed (assuming that the vertical
-    wind is zero). Winds may be provided in two ways. The first option is to provide winds
-    on interfaces (along x for the zonal wind, along y for the meridional wind). 
-    The second option is simply to provide winds at nodes (i.e. where the module is defined).
+    This function was initially dedicated to winds. In this case, zonal winds
+    and meridional winds are provided and the module of the wind is computed
+    (assuming that the vertical wind is zero). Winds may be provided in two
+    ways. The first option is to provide winds on interfaces (along x for
+    the zonal wind, along y for the meridional wind). The second option is
+    simply to provide winds at nodes (i.e. where the module is defined).
     \param U first component of vectors.
     \param V second component of vectors.
     \param Module (output) module.
@@ -563,11 +616,12 @@ namespace AtmoData
 
   //! Computes the module of a 2D-vectors field on the surface.
   /*!
-    This function was initially dedicated to winds. In this case, zonal winds and meridional
-    winds are provided and the module of the wind is computed (assuming that the vertical
-    wind is zero). Winds may be provided in two ways. The first option is to provide winds
-    on interfaces (along x for the zonal wind, along y for the meridional wind). 
-    The second option is simply to provide winds at nodes (i.e. where the module is defined).
+    This function was initially dedicated to winds. In this case, zonal winds
+    and meridional winds are provided and the module of the wind is computed
+    (assuming that the vertical wind is zero). Winds may be provided in two
+    ways. The first option is to provide winds on interfaces (along x
+    for the zonal wind, along y for the meridional wind). The second option is
+    simply to provide winds at nodes (i.e. where the module is defined).
     \param U first component of vectors.
     \param V second component of vectors.
     \param Module (output) surface module.
@@ -609,11 +663,12 @@ namespace AtmoData
 
   //! Computes the module of a 2D-vectors field on the surface.
   /*!
-    This function was initially dedicated to winds. In this case, zonal winds and meridional
-    winds are provided and the module of the wind is computed (assuming that the vertical
-    wind is zero). Winds may be provided in two ways. The first option is to provide winds
-    on interfaces (along x for the zonal wind, along y for the meridional wind). 
-    The second option is simply to provide winds at nodes (i.e. where the module is defined).
+    This function was initially dedicated to winds. In this case, zonal winds
+    and meridional winds are provided and the module of the wind is computed
+    (assuming that the vertical wind is zero). Winds may be provided in two
+    ways. The first option is to provide winds on interfaces (along x for
+    the zonal wind, along y for the meridional wind). The second option is
+    simply to provide winds at nodes (i.e. where the module is defined).
     \param U first component of vectors.
     \param V second component of vectors.
     \param Module (output) surface module.
@@ -826,13 +881,16 @@ namespace AtmoData
     \param Pressure pressure (Pa).
     \param Humidity relative humidity (kg/kg).
     \param CriticalRelativeHumidity function that returns the critical
-    relative humidity as function of the altitude, the pressure and reference pressure.
+    relative humidity as function of the altitude, the pressure
+    and reference pressure.
     \param CloudHeight (output) altitudes of cloud basis.
   */
   template <class TP, class TH,
 	    class T, class TG>
-  void ComputeCloudHeight(Data<TP, 4, TG>& Pressure, Data<TH, 4, TG>& Humidity,
-			  T (CriticalRelativeHumidity)(const T&, const T&, const T&),
+  void ComputeCloudHeight(Data<TP, 4, TG>& Pressure,
+			  Data<TH, 4, TG>& Humidity,
+			  T (CriticalRelativeHumidity)(const T&, const T&,
+						       const T&),
 			  Data<T, 3, TG>& CloudHeight)
   {
 
@@ -1021,7 +1079,8 @@ namespace AtmoData
     \note Temperature, Pressure and Height must be defined on the same grid.
   */
   template<class TPS, class TP, class TT, class T, class TG>
-  void ComputeHeight(Data<TPS, 3, TG>& SurfacePressure, Data<TP, 4, TG>& Pressure,
+  void ComputeHeight(Data<TPS, 3, TG>& SurfacePressure,
+		     Data<TP, 4, TG>& Pressure,
 		     Data<TT, 4, TG>& Temperature,
 		     Grid<T>& Height, T g, T r)
   {
@@ -1048,7 +1107,8 @@ namespace AtmoData
   }
 
 
-  //! Computes the altitudes at interfaces from pressure and temperature fields.
+  //! Computes the altitudes at interfaces from pressure and
+  //! temperature fields.
   /*!
     Level heights are computed according to:
     Z_{k+1/2} = Z_{k-1/2} - (r * T_k / g) * log(P_{k+1/2}/P_{k-1/2})
@@ -1060,12 +1120,14 @@ namespace AtmoData
     \param g (optional) standard gravity. Default: 9.80665.
     \param r (optional) molar gas constant for dry air. Default: 287.0.
     \param ground_set (optional) true if ground-level altitudes are set,
-    false if they have to be set (they are set to zero in this case). Default: false.
+    false if they have to be set (they are set to zero in this case).
+    Default: false.
     \note Temperature is provided at middle points (not interfaces).
     Pressure and Height are defined at interfaces (including ground-level).
   */
   template<class TP, class TT, class T, class TG>
-  void ComputeInterfHeight(Data<TP, 4, TG>& Pressure, Data<TT, 4, TG>& Temperature,
+  void ComputeInterfHeight(Data<TP, 4, TG>& Pressure,
+			   Data<TT, 4, TG>& Temperature,
 			   Grid<T>& Height, bool ground_set, T g, T r)
   {
 
@@ -1111,7 +1173,8 @@ namespace AtmoData
     Pressure is defined at interfaces (including ground-level).
   */
   template<class TP, class TT, class T, class TG>
-  void ComputeMiddleHeight(Data<TP, 4, TG>& Pressure, Data<TT, 4, TG>& Temperature,
+  void ComputeMiddleHeight(Data<TP, 4, TG>& Pressure,
+			   Data<TT, 4, TG>& Temperature,
 			   Grid<T>& InterfHeight, Grid<T>& MiddleHeight,
 			   T g, T r)
   {

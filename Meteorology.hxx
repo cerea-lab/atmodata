@@ -67,6 +67,13 @@ namespace AtmoData
 			  T (CriticalRelativeHumidity)(const T&, const T&, const T&),
 			  Data<T, 3, TG>& CloudHeight);
 
+  template <class TT, class TP, class TH,
+	    class TCRH, class T, class TG>
+  void ComputeCloudHeight(Data<TT, 4, TG>& Temperature, Data<TP, 4, TG>& Pressure,
+			  Data<TH, 4, TG>& Humidity,
+			  Data<TCRH, 4, TG>& CriticalRelativeHumidity,
+			  Data<T, 3, TG>& CloudHeight);
+
   template <class Ta, class Tb, class TSP,
 	    class T, class TG>
   void ComputePressure(Data<Ta, 1, TG>& alpha, Data<Tb, 1, TG>& beta,

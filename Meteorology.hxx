@@ -97,6 +97,18 @@ namespace AtmoData
   void ComputeModule(Data<TU, 3, TG>& U, Data<TV, 3, TG>& V,
 		     Data<T, 3, TG>& Module);
 
+  template<class TC, class TP, class T, class TG>
+  void ComputeCloudiness(Data<TC, 4, TG>& CloudFraction,
+			 Data<TP, 4, TG>& Pressure,
+			 Grid<TG>& GridZ_interf,
+			 Data<int, 4>& LowIndices,
+			 Data<int, 4>& MediumIndices,
+			 Data<int, 4>& HighIndices,
+			 Data<T, 3, TG>& LowCloudiness,
+			 Data<T, 3, TG>& MediumCloudiness,
+			 Data<T, 3, TG>& HighCloudiness,
+			 T P_0 = 80000., T P_1 = 45000.);
+
   template <class TT, class TP, class TH,
 	    class T, class TG>
   void ComputeCloudHeight(Data<TT, 4, TG>& Temperature, Data<TP, 4, TG>& Pressure,

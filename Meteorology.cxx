@@ -612,6 +612,164 @@ namespace AtmoData
   }
 
 
+  //! Computes low, medium and high cloudiness, cloud base and top.
+  /*!
+    \param CloudFraction cloud fraction.
+    \param Pressure pressure (Pa).
+    \param GridZ_interf altitudes of interfaces (m).
+    \param LowIndices vertical indices of base and top of low clouds.
+    \param MediumIndices vertical indices of base and top of medium clouds.
+    \param HighIndices vertical indices of base and top of high clouds.
+    \param LowCloudiness low cloudiness.
+    \param MediumCloudiness medium cloudiness.
+    \param HighCloudiness high cloudiness.
+    \param P_0 first pressure limit. Default: 80 000 Pa.
+    \param P_1 second pressure limit. Default: 45 000 Pa.
+  */
+  template<class TC, class TP, class T, class TG>
+  void ComputeCloudiness(Data<TC, 4, TG>& CloudFraction,
+			 Data<TP, 4, TG>& Pressure,
+			 Grid<TG>& GridZ_interf,
+			 Data<int, 4>& LowIndices,
+			 Data<int, 4>& MediumIndices,
+			 Data<int, 4>& HighIndices,
+			 Data<T, 3, TG>& LowCloudiness,
+			 Data<T, 3, TG>& MediumCloudiness,
+			 Data<T, 3, TG>& HighCloudiness,
+			 T P_0, T P_1)
+  {
+    int h, k, j, i;
+    int Nt(CloudFraction.GetLength(0));
+    int Nz(CloudFraction.GetLength(1));
+    int Ny(CloudFraction.GetLength(2));
+    int Nx(CloudFraction.GetLength(3));
+
+    LowCloudiness.SetZero();
+    MediumCloudiness.SetZero();
+    HighCloudiness.SetZero();
+
+    TC cloud_max;
+    bool above, below;
+    int k_base, k_top, k_max;
+    for (h = 0; h < Nt; h++)
+      for (j = 0; j < Ny; j++)
+	for (i = 0; i < Nx; i++)
+	  {
+
+	    /*** Low clouds ***/
+	    cloud_max = 0;
+	    // The first level is excluded.
+	    for (k = 1; k < Nz && Pressure(h, k, j, i) > P_0; k++)
+	      cloud_max = max(cloud_max, CloudFraction(h, k, j, i));
+	    below = true; above = false;
+	    k_base = 0; k_top = 0;
+	    for (k = 1; k < Nz && Pressure(h, k, j, i) > P_0 && !above; k++)
+	      {
+		below = below && CloudFraction(h, k, j, i) < 0.5 * cloud_max;
+		above = !below && CloudFraction(h, k, j, i) < 0.5 * cloud_max;
+		if (!below && k_base == 0)
+		  k_base = k;
+		if (above)
+		  k_top = k;
+	      }
+	    k_max = k - 1;
+	    // Goes up to P_0.
+	    if (k_base > k_top)
+	      k_top = k_max;
+	    LowIndices(h, j, i, 0) = k_base;
+	    LowIndices(h, j, i, 1) = k_top;
+	    k = k_base;
+	    // k_top == 0 means no cloud.
+	    while (k <= k_top && k_top != 0)
+	      {
+		LowCloudiness(h, j, i) += CloudFraction(h, k, j, i)
+		  * (GridZ_interf.Value(h, k + 1, j, i)
+		     - GridZ_interf.Value(h, k, j, i));
+		k++;
+	      }
+	    if (k_top != 0)
+	      LowCloudiness(h, j, i) /=
+		GridZ_interf.Value(h, k_top + 1, j, i)
+		- GridZ_interf.Value(h, k_base, j, i);
+
+	    /*** Medium clouds ***/
+
+	    cloud_max = 0;
+	    // Starts above low clouds.
+	    for (k = k_max + 1; k < Nz && Pressure(h, k, j, i) > P_1; k++)
+	      cloud_max = max(cloud_max, CloudFraction(h, k, j, i));
+	    below = true; above = false;
+	    k_base = 0; k_top = 0;
+	    for (k = k_max + 1; k < Nz && Pressure(h, k, j, i) > P_1
+		   && !above; k++)
+	      {
+		below = below && CloudFraction(h, k, j, i) < 0.5 * cloud_max;
+		above = !below && CloudFraction(h, k, j, i) < 0.5 * cloud_max;
+		if (!below && k_base == 0)
+		  k_base = k;
+		if (above)
+		  k_top = k;
+	      }
+	    k_max = k - 1;
+	    // Goes up to P_1.
+	    if (k_base > k_top)
+	      k_top = k_max;
+	    MediumIndices(h, j, i, 0) = k_base;
+	    MediumIndices(h, j, i, 1) = k_top;
+	    k = k_base;
+	    // k_top == 0 means no cloud.
+	    while (k < k_top && k_top != 0)
+	      {
+		MediumCloudiness(h, j, i) += CloudFraction(h, k, j, i)
+		  * (GridZ_interf.Value(h, k + 1, j, i)
+		     - GridZ_interf.Value(h, k, j, i));
+		k++;
+	      }
+	    if (k_top != 0)
+	      MediumCloudiness(h, j, i) /=
+		GridZ_interf.Value(h, k_top + 1, j, i)
+		- GridZ_interf.Value(h, k_base, j, i);
+
+	    /*** High clouds ***/
+
+	    cloud_max = 0;
+	    // Starts above low clouds.
+	    for (k = k_max + 1; k < Nz; k++)
+	      cloud_max = max(cloud_max, CloudFraction(h, k, j, i));
+	    below = true; above = false;
+	    k_base = 0; k_top = 0;
+	    for (k = k_max + 1; k < Nz && !above; k++)
+	      {
+		below = below && CloudFraction(h, k, j, i) < 0.5 * cloud_max;
+		above = !below && CloudFraction(h, k, j, i) < 0.5 * cloud_max;
+		if (!below && k_base == 0)
+		  k_base = k;
+		if (above)
+		  k_top = k;
+	      }
+	    k_max = k - 1;
+	    // Goes up to the top.
+	    if (k_base > k_top)
+	      k_top = k_max;
+	    HighIndices(h, j, i, 0) = k_base;
+	    HighIndices(h, j, i, 1) = k_top;
+	    k = k_base;
+	    // k_top == 0 means no cloud.
+	    while (k < k_top && k_top != 0)
+	      {
+		HighCloudiness(h, j, i) += CloudFraction(h, k, j, i)
+		  * (GridZ_interf.Value(h, k + 1, j, i)
+		     - GridZ_interf.Value(h, k, j, i));
+		k++;
+	      }
+	    if (k_top != 0)
+	      HighCloudiness(h, j, i) /=
+		GridZ_interf.Value(h, k_top + 1, j, i)
+		- GridZ_interf.Value(h, k_base, j, i);
+	  }
+  }
+
+
   //! Computes the height of cloud basis.
   /*!
     \param Temperature temperature (K).

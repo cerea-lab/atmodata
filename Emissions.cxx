@@ -47,7 +47,7 @@ namespace AtmoData
 			    Data<TN, 2, TG>& NO)
   {
 
-    int h, i, j, k;
+    int i, j, k;
 
     int Nx = Isoprene.GetLength(1);
     int Ny = Isoprene.GetLength(0);

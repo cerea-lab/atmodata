@@ -38,14 +38,14 @@ namespace AtmoData
     series representation of the position of the sun, Search, 2:172.
     Note:  This approximate program does not account for changes from year
     to year.
+    \param lon longitude of location (degrees).
     \param lat latitude of location (degrees).
-    \param long longitude of location (degrees).
-    \param idate date in the form YYMMDD.
+    \param idate date in the form YYYYMMDD.
     \param ut local time in decimal UT (e.g., 16.25 means 15 minutes after 4 pm).
     \return solar zenith angle (degrees).
   */
   template<class T>
-  T ZenithAngle(T lat, T lon, int idate, T ut)
+  T ZenithAngle(T lon, T lat, int idate, T ut)
   {
 
     T azim, zen;
@@ -56,7 +56,7 @@ namespace AtmoData
     T csz, zr, caz, raz ;
     T sintz, costz, sin2tz, cos2tz, sin3tz, cos3tz;
 
-    int iiyear, imth, iday, ijd;
+    int iiiiyear, imth, iday, ijd;
     int imn[] = {31, 28, 31, 30, 31, 30,
 		 31, 31, 30, 31, 30, 31};
   
@@ -69,12 +69,13 @@ namespace AtmoData
     rlt = lat*dr;
 
     // Parse date.
-    iiyear = idate / 10000;
-    imth = (idate - iiyear * 10000) / 100;
-    iday = idate - iiyear * 10000 - imth * 100;
+    iiiiyear = idate / 10000;
+    imth = (idate - iiiiyear * 10000) / 100;
+    iday = idate - iiiiyear * 10000 - imth * 100;
 
     // Identifies and corrects leap years.
-    if (iiyear%4 == 0)
+    if ( ( (iiiiyear % 4 == 0) && (iiiiyear % 100 != 0) )
+	 || ( iiiiyear % 400 == 0) )
       imn[1] = 29;
     else
       imn[1] = 28;

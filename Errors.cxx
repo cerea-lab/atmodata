@@ -70,8 +70,8 @@ namespace AtmoData
   {
     T_ref nge;
 
-    T* data_ref_arr = data_ref.GetData();
-    T0* data_comp_arr = data_comp.GetData();
+    T_ref* data_ref_arr = data_ref.GetData();
+    T_comp* data_comp_arr = data_comp.GetData();
     int NbElements = data_ref.GetNbElements();
 
 #ifdef DEBUG_ATMODATA_DIMENSION
@@ -144,8 +144,8 @@ namespace AtmoData
   {
     T_ref bias;
 
-    T* data_ref_arr = data_ref.GetData();
-    T0* data_comp_arr = data_comp.GetData();
+    T_ref* data_ref_arr = data_ref.GetData();
+    T_comp* data_comp_arr = data_comp.GetData();
     int NbElements = data_ref.GetNbElements();
 
 #ifdef DEBUG_ATMODATA_DIMENSION
@@ -215,10 +215,10 @@ namespace AtmoData
 	    Data<T_comp, N, TG_comp>& data_comp,
 	    Function_Base<T_ref, bool>& test)
   {
-    T_ref rms;
+    T_ref rms(0);
 
-    T* data_ref_arr = data_ref.GetData();
-    T0* data_comp_arr = data_comp.GetData();
+    T_ref* data_ref_arr = data_ref.GetData();
+    T_comp* data_comp_arr = data_comp.GetData();
     int NbElements = data_ref.GetNbElements();
 
 #ifdef DEBUG_ATMODATA_DIMENSION
@@ -232,14 +232,15 @@ namespace AtmoData
 #endif
     
     int nb_elt = 0;
-    bias = T_ref(0);
+    T_ref bias(0);
     for (int i=0; i<NbElements; i++)
-      if (test(data_arr_ref(i), data_arr_comp(i)))
+      if (test(data_ref_arr[i], data_comp_arr[i]))
 	{
 	  nb_elt++;
-	  rms += (data_arr[i] - data0_arr[i]) * (data_arr[i] - data0_arr[i]);
+	  rms += (data_ref_arr[i] - data_comp_arr[i])
+	    * (data_ref_arr[i] - data_comp_arr[i]);
 	}
-    rms = rms / T_ref(nb_elt);
+    rms = sqrt(rms / T_ref(nb_elt));
 
     return rms;
   }

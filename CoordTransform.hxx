@@ -50,6 +50,45 @@ namespace AtmoData
   };
 
 
+  //! Coordinate transformation from indices of the MM5 grid
+  //! in Lambert conic conformal to longitude/latitude.
+  template<class T>
+  class MM5LccIndToLonlat
+  {
+  protected:
+    //! Coarse domain grid dimension in North-South direction.
+    const int imx_;
+    //! Coarse domain grid dimension in East-West direction.
+    const int jmx_;
+    //! North-South location in the coarse domain of the South-West corner.
+    const T ix_;
+    //! East-West location in the coarse domain of the South-West corner.
+    const T jx_;
+    //! Coarse domain center latitude (degree).
+    const T phic_;
+    //! Coarse domain center longitude (degree).
+    const T lambdac_;
+    //! True latitude #1 (degree).
+    const T phi1_;
+    //! True latitude #2 (degree).
+    const T phi2_;
+    //! Grid distance (meters) of the current domain.
+    const T ds_;
+    //! Domain grid size ratio with respect to coarse domain.
+    const int ratio_;
+    //! Earth radius.
+    const T Earth_radius_;
+    //! pi.
+    const T pi_;
+
+  public:
+    MM5LccIndToLonlat(int jmx, int imx, T jx, T ix, T phic, T lambdac,
+		      T phi1, T phi2, T ds, int ratio)  throw();
+    void operator() (const T j, const T i,
+		     T& lon, T& lat);
+  };
+
+
 }  // namespace AtmoData.
 
 #define ATMODATA_FILE_COORDTRANSFORM_HXX

@@ -34,6 +34,7 @@ namespace AtmoData
   /*!
     Formula: ZonalWind = ZonalWind / cos(latitude).
     \param ZonalWind zonal wind.
+    \note Coordinates associated with ZonalWind must be in degrees.
   */
   template<class T, class TG>
   void TransformZonalWind(Data<T, 4, TG>& ZonalWind)
@@ -62,6 +63,7 @@ namespace AtmoData
   /*!
     Formula: MeridionalWind = MeridionalWind * cos(latitude).
     \param MeridionalWind meridional wind.
+    \note Coordinates associated with MeridionalWind must be in degrees.
   */
   template<class T, class TG>
   void TransformMeridionalWind(Data<T, 4, TG>& MeridionalWind)
@@ -88,5 +90,5 @@ namespace AtmoData
 
 }  // namespace AtmoData.
 
-#define ATMODATA_FILE_METEOROLOGY_CXX
+#define ATMODATA_FILE_POLAIR_CXX
 #endif

@@ -813,12 +813,12 @@ namespace AtmoData
       }
 
 #ifdef SELDONDATA_DEBUG_CHECK_IO
-	    if (time_step < nb_time_steps)
-	      throw IOError(string("FormatMM5<T>::ReadWholeField(ifstream& FileStream,") +
-			    " string FieldName, Array<float, N>& A)",
-			    string("Data file contains ") + to_str(time_step)
-			    + " steps, but the data array contains " + to_str(nb_time_steps)
-                            + " steps. Both data should be consistant.");
+    if (time_step < nb_time_steps)
+      throw IOError(string("FormatMM5<T>::ReadWholeField(ifstream& FileStream,") +
+		    " string FieldName, Array<float, N>& A)",
+		    string("Data file contains ") + to_str(time_step)
+		    + " steps, but the data array contains " + to_str(nb_time_steps)
+		    + " steps. Both data should be consistant.");
 #endif
 
   }
@@ -850,31 +850,153 @@ namespace AtmoData
 		    " MM5SubHeader& SH, Array<float, N>& A)",
 		    "File is not ready.");
 
-    int nx, ny, nz;
+    string dimensions, location, dimensions_A;
+    int nx, ny, nz, nx_A(0), ny_A(0), nz_A(0);
+    nz = SH.end_index(2) - SH.start_index(2) + 1;
     if (trim(SH.staggering) == "C")
       {
 	nx = SH.end_index(0) - SH.start_index(0);
 	ny = SH.end_index(1) - SH.start_index(1);
+	dimensions = string("(") + to_str(nz) + ", " + to_str(ny) 
+	  + "+1, " + to_str(nx) + "+1)";
+	location = " (located at cross points) ";
       }
     else
       {
 	nx = SH.end_index(0) - SH.start_index(0) + 1;
 	ny = SH.end_index(1) - SH.start_index(1) + 1;
+	dimensions = string("(") + to_str(nz) + ", " + to_str(ny) 
+	  + ", " + to_str(nx) + ")";
+	location = " (located at dot points) ";
       }
-    nz = SH.end_index(2) - SH.start_index(2) + 1;
+    
+    if (N == 1)
+      {
+	nx_A = A.extent(0);
+	dimensions_A = string("(") + to_str(nx_A) + ")";
+      }
+    else if (N == 2)
+      {
+	ny_A = A.extent(0);
+	nx_A = A.extent(1);
+	dimensions_A = string("(") + to_str(ny_A) + ", " + to_str(nx_A) + ")";
+      }
+    else
+      {
+	nz_A = A.extent(0);
+	ny_A = A.extent(1);
+	nx_A = A.extent(2);
+	dimensions_A = string("(") + to_str(nz_A) + ", " + to_str(ny_A)
+	  + ", " + to_str(nx_A) + ")";
+      }
 
-    if (A.extent(0) != nz || A.extent(1) != ny || A.extent(2) != nx)
+    if (max(1, nz_A) != nz || max(1, ny_A) != ny || nx_A != nx)
       throw IOError(string("FormatMM5<T>::ReadField(ifstream& FileStream,") +
 		    " MM5SubHeader& SH, Array<float, N>& A)",
-		    string("Dimensions of the stored field are ")
-		    + "("+ to_str(nx) + ", " + to_str(ny) + ", " + to_str(nz)
-		    + ") but dimensions of the data array are "
-		    + "("+ to_str(A.extent(2)) + ", " + to_str(A.extent(1))
-		    + ", " + to_str(A.extent(0)) + ").");
+		    string("Dimensions of the stored field") + location + "are "
+		    + dimensions + " but dimensions of the data array are "
+		    + dimensions_A + ".");
 #endif
 
     // Puts the field into A.
-    this->ReadField(FileStream, A);
+    this->ReadField(FileStream, trim(SH.staggering) == "C", A);
+
+  }
+
+  //! Reads the field.
+  template <int N>
+  void FormatMM5::ReadField(ifstream& FileStream, bool cross, Array<float, N>& A) const
+  {
+
+    unsigned long data_size = A.numElements() * sizeof(float);
+    float* data = A.data();
+
+#ifdef SELDONDATA_DEBUG_CHECK_IO
+    // Checks if the file is ready.
+    if (!FileStream.good())
+      throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream, bool cross, Array<float, N>&)",
+		    "File is not ready.");
+#endif
+
+    int nx_A(0), ny_A(0), nz_A(0);
+    string dimensions_A;
+    if (N == 1)
+      {
+	nx_A = A.extent(0);
+	dimensions_A = string("(") + to_str(nx_A) + ")";
+      }
+    else if (N == 2)
+      {
+	ny_A = A.extent(0);
+	nx_A = A.extent(1);
+	dimensions_A = string("(") + to_str(ny_A) + ", " + to_str(nx_A) + ")";
+      }
+    else
+      {
+	nz_A = A.extent(0);
+	ny_A = A.extent(1);
+	nx_A = A.extent(2);
+	dimensions_A = string("(") + to_str(nz_A) + ", " + to_str(ny_A)
+	  + ", " + to_str(nx_A) + ")";
+      }
+
+
+    int length;
+    FileStream.read(reinterpret_cast<char*>(&length), 4);
+    swap(length);
+
+    if (!cross)
+      {
+
+#ifdef SELDONDATA_DEBUG_CHECK_IO
+	if (int(data_size) != length)
+	  throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream, bool cross, Array<float, N>& A)",
+			"Size of the stored field (located at dot points) is "
+			+ to_str(length) + " byte(s) long"
+			+ " but the dimensions of the data array are "
+			+ dimensions_A + ".");
+#endif
+
+	FileStream.read(reinterpret_cast<char*>(data), data_size);
+      }
+    else
+      {
+
+	int j, k;
+
+	data_size = nx_A * sizeof(float);
+
+#ifdef SELDONDATA_DEBUG_CHECK_IO
+	if (max(1, nz_A) * (nx_A + 1) * (ny_A + 1) * int(sizeof(float)) != length)
+	  throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream, bool cross, Array<float, N>& A)",
+			"Size of the stored field (located at cross points) is "
+			+ to_str(length) + " byte(s) long" +
+			" but the dimensions of the data array are "
+			+ dimensions_A + ".");
+#endif
+
+	for (k = 0; k < max(1, nz_A); k++)
+	  {
+	    for (j = 0; j < ny_A; j++)
+	      {
+		FileStream.read(reinterpret_cast<char*>(data), data_size);
+		data += nx_A;
+		FileStream.seekg(sizeof(float), ifstream::cur);
+	      }
+	    FileStream.seekg((nx_A + 1) * sizeof(float), ifstream::cur);
+	  }
+      }
+    swap(A);
+
+    FileStream.read(reinterpret_cast<char*>(&length), 4);
+    swap(length);
+
+#ifdef SELDONDATA_DEBUG_CHECK_IO
+    // Checks if all was read.
+    if (!FileStream.good())
+      throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream, bool cross, Array<float, N>&)",
+		    "Unable to read the field.");
+#endif
 
   }
 
@@ -908,11 +1030,13 @@ namespace AtmoData
 
     int length;
     FileStream.read(reinterpret_cast<char*>(&length), 4);
+    swap(length);
 
     FileStream.read(reinterpret_cast<char*>(data), data_size);
     swap(A);
 
     FileStream.read(reinterpret_cast<char*>(&length), 4);
+    swap(length);
 
 #ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if all was read.

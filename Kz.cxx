@@ -113,16 +113,6 @@ namespace AtmoData
 	      /* F(R, z) */
 
 	      if (k==0)
-		derivative = ( log(Tp(h, k+1, j, i)) - log(Tp(h, k, j, i)) )
-		  / ( Nodes(k+1) - Nodes(k) );
-	      else if (k!=Nz-1)
-		derivative = ( log(Tp(h, k, j, i)) - log(Tp(h, k-1, j, i)) )
-		  / ( Nodes(k) - Nodes(k-1) );
-	      else
-		derivative = ( log(Tp(h, k-1, j, i)) - log(Tp(h, k-2, j, i)) )
-		  / ( Nodes(k-1) - Nodes(k-2) );
-
-	      if (k==0)
 		derivative = ( (Tp(h, k+1, j, i)) - (Tp(h, k, j, i)) )
 		  / ( Nodes(k+1) - Nodes(k) ) / Tp(h, k, j, i);
 	      else if (k!=Nz-1)

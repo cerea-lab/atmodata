@@ -34,7 +34,7 @@ namespace AtmoData
     \param U zonal wind.
     \param V meridional wind.
     \param Tp potential temperature.
-    \param Kz vertical diffusion coefficients at the interfaces.
+    \param Kz (output) vertical diffusion coefficients at the interfaces.
     \param L0 scale parameter. Default: 100.
     \param B parameter. Default: 5.
     \param C parameter. Default: 5.

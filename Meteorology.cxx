@@ -214,13 +214,10 @@ namespace AtmoData
 
   //! Computes the surface Richardson number.
   /*!
-    Winds may be provided in two ways. The first option is to provide winds on
-    interfaces (along x for the zonal wind, along y for the meridional wind).
-    The second option is simply to provide winds at nodes (i.e. where the
-    potential temperature and the Richardson number are defined).
+    Computes the surface Richardson number.
     \param WindModule wind module in the first layer.
-    \param PotentialTemperature potential temperature.
     \param SurfacePotentialTemperature surface potential temperature.
+    \param PotentialTemperature potential temperature.
     \param SurfaceRichardson (output) surface Richardson number.
     \param wind_threshold (optional) minimum of the wind shear.
     Default: 0.001.
@@ -261,6 +258,7 @@ namespace AtmoData
 
   //! Computes the surface Richardson number.
   /*!
+    Computes the surface Richardson number.
     \param Roughness roughness height.
     \param WindModule wind module in the first layer.
     \param SurfacePotentialTemperature surface potential temperature.
@@ -809,12 +807,14 @@ namespace AtmoData
     \param CloudFraction cloud fraction.
     \param Pressure pressure (Pa).
     \param GridZ_interf altitudes of interfaces (m).
-    \param LowIndices vertical indices of base and top of low clouds.
-    \param MediumIndices vertical indices of base and top of medium clouds.
-    \param HighIndices vertical indices of base and top of high clouds.
-    \param LowCloudiness low cloudiness.
-    \param MediumCloudiness medium cloudiness.
-    \param HighCloudiness high cloudiness.
+    \param LowIndices (output) vertical indices of base and top of low clouds.
+    \param MediumIndices (output) vertical indices of base and
+    top of medium clouds.
+    \param HighIndices (output) vertical indices of base and
+    top of high clouds.
+    \param LowCloudiness (output) low cloudiness.
+    \param MediumCloudiness (output) medium cloudiness.
+    \param HighCloudiness (output) high cloudiness.
     \param P_0 first pressure limit. Default: 80 000 Pa.
     \param P_1 second pressure limit. Default: 45 000 Pa.
     \note Dimensions of LowIndices, MediumIndices and HighIndices are

@@ -117,8 +117,8 @@ namespace AtmoData
 		     - ZonalWindLevels.Value(h, level-1, j, i));
 		dvdz = (MeridionalWind(h, level, j, i)
 			- MeridionalWind(h, level-1, j, i))
-		      / (MeridionalWindLevels.Value(h, level, j, i)
-			 - MeridionalWindLevels.Value(h, level-1, j, i));
+		  / (MeridionalWindLevels.Value(h, level, j, i)
+		     - MeridionalWindLevels.Value(h, level-1, j, i));
 		dwinddz = max(sqrt(dudz*dudz + dvdz*dvdz), wind_threshold);
 		Richardson(h, k, j, i) =
 		  g * (PotentialTemperature(h, level, j, i)
@@ -133,7 +133,7 @@ namespace AtmoData
   }
 
 
-  //! Computes the surface Richardson number.
+  //! Computes the Richardson number in the first layer.
   /*!
     Winds may be provided in two ways. The first option is to provide winds on
     interfaces (along x for the zonal wind, along y for the meridional wind).
@@ -142,21 +142,21 @@ namespace AtmoData
     \param ZonalWind zonal wind.
     \param MeridionalWind meridional wind.
     \param PotentialTemperature potential temperature.
-    \param SurfaceRichardson (output) surface Richardson number.
+    \param Richardson (output) Richardson number in the first layer.
     \param wind_threshold (optional) minimum of the wind shear. Default: 0.001.
   */
   template<class TU, class TV, class TTp, class T, class TG>
   void ComputeRichardson(Data<TU, 4, TG>& ZonalWind,
 			 Data<TV, 4, TG>& MeridionalWind,
 			 Data<TTp, 4, TG>& PotentialTemperature,
-			 Data<T, 3, TG>& SurfaceRichardson, T wind_threshold)
+			 Data<T, 3, TG>& Richardson, T wind_threshold)
   {
 
     int h, i, j;
 
-    int Nx = SurfaceRichardson.GetLength(2);
-    int Ny = SurfaceRichardson.GetLength(1);
-    int Nt = SurfaceRichardson.GetLength(0);
+    int Nx = Richardson.GetLength(2);
+    int Ny = Richardson.GetLength(1);
+    int Nt = Richardson.GetLength(0);
 
     Grid<TG>& Levels = PotentialTemperature[1];
     Grid<TG>& MeridionalWindLevels = MeridionalWind[1];
@@ -183,7 +183,7 @@ namespace AtmoData
 		 + MeridionalWind(h, 0, j, i)
 		 / MeridionalWindLevels.Value(h, 0, j, i));
 	      dwinddz = max(sqrt(dudz*dudz + dvdz*dvdz), wind_threshold);
-	      SurfaceRichardson(h, j, i) =
+	      Richardson(h, j, i) =
 		g * (PotentialTemperature(h, 1, j, i)
 		     - PotentialTemperature(h, 0, j, i))
 		/ (dwinddz * dwinddz * PotentialTemperature(h, 0, j, i)
@@ -201,13 +201,60 @@ namespace AtmoData
 	      dvdz = MeridionalWind(h, 0, j, i)
 		/ MeridionalWindLevels.Value(h, 0, j, i);
 	      dwinddz = max(sqrt(dudz*dudz + dvdz*dvdz), wind_threshold);
-	      SurfaceRichardson(h, j, i) =
+	      Richardson(h, j, i) =
 		g * (PotentialTemperature(h, 1, j, i)
 		     - PotentialTemperature(h, 0, j, i))
 		/ (dwinddz * dwinddz * PotentialTemperature(h, 0, j, i)
 		   * (Levels.Value(h, 1, j, i) - Levels.Value(h, 0, j, i)));
 
 	    }
+
+  }
+
+
+  //! Computes the surface Richardson number.
+  /*!
+    Winds may be provided in two ways. The first option is to provide winds on
+    interfaces (along x for the zonal wind, along y for the meridional wind).
+    The second option is simply to provide winds at nodes (i.e. where the
+    potential temperature and the Richardson number are defined).
+    \param WindModule wind module in the first layer.
+    \param PotentialTemperature potential temperature.
+    \param SurfacePotentialTemperature surface potential temperature.
+    \param SurfaceRichardson (output) surface Richardson number.
+    \param wind_threshold (optional) minimum of the wind shear.
+    Default: 0.001.
+  */
+  template<class TU, class TTp, class T, class TG>
+  void ComputeRichardson(Data<TU, 3, TG>& WindModule,
+			 Data<TTp, 3, TG>& SurfacePotentialTemperature,
+			 Data<TTp, 4, TG>& PotentialTemperature,
+			 Data<T, 3, TG>& SurfaceRichardson, T wind_threshold)
+  {
+
+    int h, i, j;
+
+    int Nx = SurfaceRichardson.GetLength(2);
+    int Ny = SurfaceRichardson.GetLength(1);
+    int Nt = SurfaceRichardson.GetLength(0);
+
+    Grid<TG>& Levels = PotentialTemperature[1];
+
+    const T g(9.81);
+    T wind;
+
+    for (h = 0; h < Nt; h++)
+      for (j = 0; j < Ny; j++)
+	for (i = 0; i < Nx; i++)
+	  {
+	    wind = max(WindModule(h, j, i), wind_threshold);
+	    SurfaceRichardson(h, j, i) =
+	      2. * g * (PotentialTemperature(h, 0, j, i)
+			- SurfacePotentialTemperature(h, j, i))
+	      * Levels.Value(h, 0, j, i)
+	      / (wind * wind * (PotentialTemperature(h, 0, j, i)
+				+ SurfacePotentialTemperature(h, j, i)));
+	  }
 
   }
 

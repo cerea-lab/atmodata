@@ -41,6 +41,13 @@ namespace AtmoData
 			 Data<T, 3, TG>& SurfaceRichardson,
 			 T wind_threshold = 0.001);
 
+  template<class TU, class TTp, class T, class TG>
+  void ComputeRichardson(Data<TU, 3, TG>& WindModule,
+			 Data<TTp, 3, TG>& SurfacePotentialTemperature,
+			 Data<TTp, 4, TG>& PotentialTemperature,
+			 Data<T, 3, TG>& SurfaceRichardson,
+			 T wind_threshold = 0.001);
+
   template<class TT, class TP, class T, class TG>
   void ComputePotentialTemperature(Data<TT, 4, TG>& Temperature,
 				   Data<TP, 4, TG>& Pressure,

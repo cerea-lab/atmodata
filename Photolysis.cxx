@@ -45,7 +45,7 @@ namespace AtmoData
     \return solar zenith angle (degrees).
   */
   template<class T>
-  T Zenith(T lat, T lon, int idate, T ut)
+  T ZenithAngle(T lat, T lon, int idate, T ut)
   {
 
     T azim, zen;

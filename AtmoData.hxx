@@ -1,4 +1,4 @@
-// Copyright (C) 2003 Vivien Mallet
+// Copyright (C) 2003-2004 Vivien Mallet
 //
 // This file is part of AtmoData library.
 // AtmoData library is a tool for data processing in atmospheric

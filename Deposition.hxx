@@ -1,4 +1,4 @@
-// Copyright (C) 2003-2004 CEREA
+// Copyright (C) 2003-2005 CEREA
 //     Author: Vivien Mallet
 //
 // CEREA (http://www.enpc.fr/cerea) is a joint laboratory of

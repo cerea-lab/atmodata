@@ -74,7 +74,7 @@ namespace AtmoData
     T_comp* data_comp_arr = data_comp.GetData();
     int NbElements = data_ref.GetNbElements();
 
-#ifdef DEBUG_ATMODATA_DIMENSION
+#ifdef SELDONDATA_DEBUG_CHECK_DIMENSIONS
 
     if (NbElements!=data_comp.GetNbElements())
       throw WrongDim("AtmoData::NGE(Data<T_ref, " + to_str(N) +
@@ -148,7 +148,7 @@ namespace AtmoData
     T_comp* data_comp_arr = data_comp.GetData();
     int NbElements = data_ref.GetNbElements();
 
-#ifdef DEBUG_ATMODATA_DIMENSION
+#ifdef SELDONDATA_DEBUG_CHECK_DIMENSIONS
 
     if (NbElements!=data_comp.GetNbElements())
       throw WrongDim("AtmoData::Bias(Data<T_ref, " + to_str(N) +
@@ -221,7 +221,7 @@ namespace AtmoData
     T_comp* data_comp_arr = data_comp.GetData();
     int NbElements = data_ref.GetNbElements();
 
-#ifdef DEBUG_ATMODATA_DIMENSION
+#ifdef SELDONDATA_DEBUG_CHECK_DIMENSIONS
 
     if (NbElements!=data_comp.GetNbElements())
       throw WrongDim("AtmoData::RMS(Data<T_ref, " + to_str(N) +
@@ -294,7 +294,7 @@ namespace AtmoData
     T_comp* data_comp_arr = data_comp.GetData();
     int NbElements = data_ref.GetNbElements();
 
-#ifdef DEBUG_ATMODATA_DIMENSION
+#ifdef SELDONDATA_DEBUG_CHECK_DIMENSIONS
 
     if (NbElements!=data_comp.GetNbElements())
       throw WrongDim("AtmoData::RelativeRMS(Data<T_ref, " + to_str(N) +
@@ -366,7 +366,7 @@ namespace AtmoData
     T_comp* data_comp_arr = data_comp.GetData();
     int NbElements = data_ref.GetNbElements();
 
-#ifdef DEBUG_ATMODATA_DIMENSION
+#ifdef SELDONDATA_DEBUG_CHECK_DIMENSIONS
 
     if (NbElements!=data_comp.GetNbElements())
       throw WrongDim("AtmoData::Corr(Data<T_ref, " + to_str(N) +

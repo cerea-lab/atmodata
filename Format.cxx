@@ -77,7 +77,7 @@ namespace AtmoData
     FileStream.open(FileName.c_str(), ifstream::in);
     FileStream.flags(fstream::skipws);
 
-#ifdef DEBUG_SELDONDATA_IO
+#ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if the file was opened.
     if (!FileStream.is_open())
       throw IOError("FormatCSV::Read(string FileName, Array<TA, N>& A)",
@@ -96,7 +96,7 @@ namespace AtmoData
 		       Data<TS, 1, TGS>& S) const
   {
 
-#ifdef DEBUG_SELDONDATA_IO
+#ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if the file ready.
     if (!FileStream.good())
       throw IOError("FormatCSV::Read(ifstream& FileStream, Array<TA, N>& A)",
@@ -270,7 +270,7 @@ namespace AtmoData
     FileStream.open(FileName.c_str(), ifstream::in);
     FileStream.flags(fstream::skipws);
 
-#ifdef DEBUG_SELDONDATA_IO
+#ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if the file was opened.
     if (!FileStream.is_open())
       throw IOError("FormatECMWF::Read(string FileName, Array<T, N>& A)",
@@ -296,7 +296,7 @@ namespace AtmoData
 
     T* data = A.data();
 
-#ifdef DEBUG_SELDONDATA_IO
+#ifdef SELDONDATA_DEBUG_CHECK_IO
 
     // Checks if the file ready.
     if (!FileStream.good())
@@ -341,7 +341,7 @@ namespace AtmoData
 	i = 1;
       }
     
-#ifdef DEBUG_SELDONDATA_IO
+#ifdef SELDONDATA_DEBUG_CHECK_IO
 
     // Checks if all was read.
     if (!reading)
@@ -401,7 +401,7 @@ namespace AtmoData
     int input_rec_length = length*sizeof(T);
     T* data = new T[length];
 
-#ifdef DEBUG_SELDONDATA_IO
+#ifdef SELDONDATA_DEBUG_CHECK_IO
 
     // Checks if the file ready.
     if (!FileStream.good())
@@ -451,7 +451,7 @@ namespace AtmoData
 	i = 1;
       }
     
-#ifdef DEBUG_SELDONDATA_IO
+#ifdef SELDONDATA_DEBUG_CHECK_IO
 
     // Checks if all was read.
     if (!reading)
@@ -518,7 +518,7 @@ namespace AtmoData
   int FormatMM5::ReadFlag(ifstream& FileStream) const
   {
 
-#ifdef DEBUG_SELDONDATA_IO
+#ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if the file ready.
     if (!FileStream.good())
       throw IOError("FormatMM5<T>::ReadFlag(ifstream& FileStream)",
@@ -531,7 +531,7 @@ namespace AtmoData
     FileStream.read(reinterpret_cast<char*>(&flag), 4);
     FileStream.read(reinterpret_cast<char*>(&length), 4);
 
-#ifdef DEBUG_SELDONDATA_IO
+#ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if the flag was read.
     if (!FileStream.good())
       throw IOError("FormatMM5<T>::ReadFlag(ifstream& FileStream)",
@@ -555,7 +555,7 @@ namespace AtmoData
     ifstream FileStream;
     FileStream.open(FileName.c_str(), ifstream::binary);
 
-#ifdef DEBUG_SELDONDATA_IO
+#ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if the file was opened.
     if (!FileStream.is_open())
       throw IOError("FormatMM5<T>::ReadBigHeader(string FileName, Array<int, 2>&, Array<float, 2>&, Array<string, 2>&, Array<string, 2>&)",
@@ -575,7 +575,7 @@ namespace AtmoData
 				Array<string, 2>& BHIC, Array<string, 2>& BHRC) const
   {
 
-#ifdef DEBUG_SELDONDATA_IO
+#ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if the file is ready.
     if (!FileStream.good())
       throw IOError("FormatMM5<T>::ReadBigHeader(ifstream& FileStream, Array<int, 2>&, Array<float, 2>&, Array<string, 2>&, Array<string, 2>&)",
@@ -617,7 +617,7 @@ namespace AtmoData
 
     FileStream.read(reinterpret_cast<char*>(&length), 4);
 
-#ifdef DEBUG_SELDONDATA_IO
+#ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if all was read.
     if (!FileStream.good())
       throw IOError("FormatMM5<T>::ReadBigHeader(ifstream& FileStream, Array<int, 2>&, Array<float, 2>&, Array<string, 2>&, Array<string, 2>&)",
@@ -643,7 +643,7 @@ namespace AtmoData
   void FormatMM5::ReadSubHeader(ifstream& FileStream, MM5SubHeader& SH) const
   {
 
-#ifdef DEBUG_SELDONDATA_IO
+#ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if the file is ready.
     if (!FileStream.good())
       throw IOError("FormatMM5<T>::ReadSubHeader(ifstream& FileStream, MM5SubHeader& SH)",
@@ -672,7 +672,7 @@ namespace AtmoData
 
     FileStream.read(reinterpret_cast<char*>(&length), 4);
 
-#ifdef DEBUG_SELDONDATA_IO
+#ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if all was read.
     if (!FileStream.good())
       throw IOError("FormatMM5<T>::ReadSubHeader(ifstream& FileStream, MM5SubHeader& SH)",
@@ -709,7 +709,7 @@ namespace AtmoData
     unsigned long data_size = A.numElements() * sizeof(float);
     float* data = A.data();
 
-#ifdef DEBUG_SELDONDATA_IO
+#ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if the file is ready.
     if (!FileStream.good())
       throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream, Array<float, N>&)",
@@ -737,7 +737,7 @@ namespace AtmoData
 
     FileStream.read(reinterpret_cast<char*>(&length), 4);
 
-#ifdef DEBUG_SELDONDATA_IO
+#ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if all was read.
     if (!FileStream.good())
       throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream, Array<float, N>&)",
@@ -750,7 +750,7 @@ namespace AtmoData
   void FormatMM5::ReadField(ifstream& FileStream) const
   {
 
-#ifdef DEBUG_SELDONDATA_IO
+#ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if the file is ready.
     if (!FileStream.good())
       throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream)",
@@ -761,7 +761,7 @@ namespace AtmoData
     FileStream.read(reinterpret_cast<char*>(&data_size), 4);
     swap(data_size);
 
-#ifdef DEBUG_SELDONDATA_IO
+#ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if the file is ready.
     if (!FileStream.good())
       throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream)",
@@ -787,7 +787,7 @@ namespace AtmoData
     FileStream.read(reinterpret_cast<char*>(&length), 4);
     swap(length);
 
-#ifdef DEBUG_SELDONDATA_IO
+#ifdef SELDONDATA_DEBUG_CHECK_IO
     // Checks if all was read.
     if (!FileStream.good())
       throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream)",

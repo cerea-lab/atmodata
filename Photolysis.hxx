@@ -27,11 +27,21 @@ namespace AtmoData
   template<class T>
   T ZenithAngle(T lon, T lat, int idate, T ut);
 
+  template <class TH, class TL, class TMC, class THC, class T, class TG>
+  void ComputeAttenuation_LWC(Data<TH, 4, TG>& Humidity, Data<TH, 4, TG>& CRH,
+			      Data<TL, 4, TG>& LiquidWaterContent,
+			      Data<TMC, 3, TG>& MediumCloudiness,
+			      Data<THC, 3, TG>& HighCloudiness,
+			      int date, Data<T, 4, TG>& Attenuation);
+
   template <class TT, class TP, class TH, class TL,
 	    class TMC, class THC, class T, class TG>
   void ComputeAttenuation_LWC(Data<TT, 4, TG>& Temperature, Data<TP, 4, TG>& Pressure,
 			      Data<TH, 4, TG>& Humidity, Data<TH, 4, TG>& CRH,
 			      Data<TL, 4, TG>& LiquidWaterContent,
+			      Data<int, 4> LowIndices,
+			      Data<int, 4> MediumIndices,
+			      Data<int, 4> HighIndices,
 			      Data<TMC, 3, TG>& MediumCloudiness,
 			      Data<THC, 3, TG>& HighCloudiness,
 			      int date, Data<T, 4, TG>& Attenuation);

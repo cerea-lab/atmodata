@@ -67,10 +67,14 @@ namespace AtmoData
 		     Data<TT, 4, TG>& Temperature,
 		     Grid<T>& Height, T g = 9.80665, T r = 287.0);
 
-  template<class TPS, class TP, class TT, class T, class TG>
-  void ComputeInterfHeight(Data<TPS, 3, TG>& SurfacePressure, Data<TP, 4, TG>& Pressure,
-			   Data<TT, 4, TG>& Temperature,
+  template<class TP, class TT, class T, class TG>
+  void ComputeInterfHeight(Data<TP, 4, TG>& Pressure, Data<TT, 4, TG>& Temperature,
 			   Grid<T>& Height, bool ground_set = false,
+			   T g = 9.80665, T r = 287.0);
+
+  template<class TP, class TT, class T, class TG>
+  void ComputeMiddleHeight(Data<TP, 4, TG>& Pressure, Data<TT, 4, TG>& Temperature,
+			   Grid<T>& InterfHeight, Grid<T>& MiddleHeight,
 			   T g = 9.80665, T r = 287.0);
 
   template <class TT, class TH, class T, class TG>

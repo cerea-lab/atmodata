@@ -486,6 +486,49 @@ namespace AtmoData
   }
 
 
+  //! Computes the altitudes at middle levels from altitudes of interfaces and
+  //! pressure and temperature fields.
+  /*!
+    Level heights are computed according to:
+    Z_k = Z_{k-1/2} + a_k * r / g * T_k
+    where Z is the altitude, T the temperature, k the level index,
+    r the molar gas constant for dry air, g the standard gravity and:
+    a_k = 1 - P_{k+1/2} / (P_{k-1/2} - P_{k+1/2}) * log(P_{k-1/2} / P_{k+1/2})
+    \param Pressure pressure (Pa).
+    \param Temperature temperature (Pa).
+    \param InterfHeight (output) altitudes of interfaces (m).
+    \param MiddleHeight (output) altitudes of middle points (m).
+    \param g (optional) standard gravity. Default: 9.80665.
+    \param r (optional) molar gas constant for dry air. Default: 287.0.
+    \note Temperature is provided at middle points (not interfaces).
+    Pressure is defined at interfaces (including ground-level).
+  */
+  template<class TP, class TT, class T, class TG>
+  void ComputeMiddleHeight(Data<TP, 4, TG>& Pressure, Data<TT, 4, TG>& Temperature,
+			   Grid<T>& InterfHeight, Grid<T>& MiddleHeight,
+			   T g, T r)
+  {
+
+    int h, i, j, k;
+
+    int Nx = MiddleHeight.GetLength(3);
+    int Ny = MiddleHeight.GetLength(2);
+    int Nz = MiddleHeight.GetLength(1);
+    int Nt = MiddleHeight.GetLength(0);
+
+    for (h=0; h<Nt; h++)
+      for (k=0; k<Nz; k++)
+	for (j=0; j<Ny; j++)
+	  for (i=0; i<Nx; i++)
+	    MiddleHeight.Value(h, k, j, i) = InterfHeight.Value(h, k, j, i)
+	      - r / g * Temperature(h, k, j, i)
+	      * (1. - Pressure(h, k+1, j, i)
+		 / (Pressure(h, k, j, i) - Pressure(h, k+1, j, i))
+		 * log(Pressure(h, k, j, i) / Pressure(h, k+1, j, i)));
+
+  }
+
+
   //! Computes the virtual temperature.
   /*!
     The virtual temperature is computed according to: T_v = (1 + c * q) * T

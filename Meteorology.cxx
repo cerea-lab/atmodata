@@ -378,6 +378,68 @@ namespace AtmoData
   }
 
 
+  //! Computes the saturation humidity.
+  /*!
+    \param Temperature temperature (or virtual temperature) (K).
+    \param Pressure pressure (Pa).
+    \param SaturationHumidity (output) saturation humidity (kg/kg).
+  */
+  template<class TT, class TP, class T, class TG>
+  void ComputeSaturationHumidity(Data<TT, 3, TG>& Temperature,
+				 Data<TP, 3, TG>& Pressure,
+				 Data<T, 3, TG>& SaturationHumidity)
+  {
+    int h, j, i;
+
+    int Nt(SaturationHumidity.GetLength(0));
+    int Ny(SaturationHumidity.GetLength(1));
+    int Nx(SaturationHumidity.GetLength(2));
+
+    T P_sat;
+    for (h = 0; h < Nt; h++)
+      for (j = 0; j < Ny; j++)
+	for (i = 0; i < Nx; i++)
+	  {
+	    P_sat = 611.2 * exp(17.67 * (Temperature(h, j, i) - 273.15)
+				/ (Temperature(h, j, i) - 29.65));
+	    SaturationHumidity(h, j, i) = 0.622 * P_sat
+	      / (Pressure(h, j, i) - 0.378 * P_sat);
+	  }
+  }
+
+
+  //! Computes the saturation humidity.
+  /*!
+    \param Temperature temperature (or virtual temperature) (K).
+    \param Pressure pressure (Pa).
+    \param SaturationHumidity (output) saturation humidity (kg/kg).
+  */
+  template<class TT, class TP, class T, class TG>
+  void ComputeSaturationHumidity(Data<TT, 4, TG>& Temperature,
+				 Data<TP, 4, TG>& Pressure,
+				 Data<T, 4, TG>& SaturationHumidity)
+  {
+    int h, k, j, i;
+
+    int Nt(SaturationHumidity.GetLength(0));
+    int Nz(SaturationHumidity.GetLength(1));
+    int Ny(SaturationHumidity.GetLength(2));
+    int Nx(SaturationHumidity.GetLength(3));
+
+    T P_sat;
+    for (h = 0; h < Nt; h++)
+      for (k = 0; k < Nz; k++)
+	for (j = 0; j < Ny; j++)
+	  for (i = 0; i < Nx; i++)
+	    {
+	      P_sat = 611.2 * exp(17.67 * (Temperature(h, k, j, i) - 273.15)
+				  / (Temperature(h, k, j, i) - 29.65));
+	      SaturationHumidity(h, k, j, i) = 0.622 * P_sat
+		/ (Pressure(h, k, j, i) - 0.378 * P_sat);
+	    }
+  }
+
+
   //! Computes the relative humidity from the specific humidity.
   /*!
     \param SpecificHumidity specific humidity (kg/kg).

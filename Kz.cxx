@@ -50,7 +50,7 @@ namespace AtmoData
 
     int Nx = W.GetLength(3);
     int Ny = W.GetLength(2);
-    int Nz = W.GetLength(1);
+    int Nz = W.GetLength(1) - 1;
     int Nt = min( min(U.GetLength(0), V.GetLength(0)), W.GetLength(0) );
 
     T l, R, F, L;
@@ -60,8 +60,10 @@ namespace AtmoData
     Grid<T>& Levels = W[1];
     Grid<T>& Nodes = U[1];
 
+    Kz.SetZero();
+
     for (h=0; h<Nt; h++)
-      for (k=0; k<Nz; k++)
+      for (k=1; k<Nz; k++)
 	for (j=0; j<Ny; j++)
 	  for (i=0; i<Nx; i++)
 	    {
@@ -69,10 +71,7 @@ namespace AtmoData
 	      /*********************/
 	      /* l = Ka * ---- ... */
 	      
-	      if (k==0)
-		L = min( (Levels(1)-Levels(0)) / 2.5, L0 );
-	      else
-		L = min( (Levels(k)-Levels(k-1)) / 2.5, L0 );
+	      L = L0;
 	      
 	      l = Ka * (Levels(k)+z0) / (1.0 + Ka * (Levels(k)+z0) / L);
 	      
@@ -84,43 +83,27 @@ namespace AtmoData
 
 	      // dW/dz.
 	      
-	      if (k==0)
-		derivative = ( W(h, k+1, j, i) - W(h, k, j, i) )
-		  / ( Levels(k+1) - Levels(k) );
-	      else
-		derivative = ( W(h, k, j, i) - W(h, k-1, j, i) )
-		  / ( Levels(k) - Levels(k-1) );
+	      derivative = ( W(h, k+1, j, i) - W(h, k-1, j, i) )
+		/ ( Levels(k+1) - Levels(k) ) * 0.5;
 	    
 	      derivative = derivative * derivative;
 	      dWind_dz = derivative;
 
 	      // dU/dz.
 
-	      if (k==0)
-		derivative = ( U(h, k+1, j, i) - U(h, k, j, i) )
-		  / ( Nodes(k+1) - Nodes(k) );
-	      else if (k!=Nz-1)
-		derivative = ( U(h, k, j, i) - U(h, k-1, j, i) )
-		  / ( Nodes(k) - Nodes(k-1) );
-	      else
-		derivative = ( U(h, k-1, j, i) - U(h, k-2, j, i) )
-		  / ( Nodes(k-1) - Nodes(k-2) );
+	      derivative = ( U(h, k, j, i+1) + U(h, k, j, i)
+			     - U(h, k-1, j, i+1) - U(h, k-1, j, i) )
+		/ ( Nodes(k) - Nodes(k-1) ) * 0.5;
 
 	      derivative = derivative * derivative;
 	      dWind_dz += derivative;
 
 	      // dV/dz.
 
-	      if (k==0)
-		derivative = ( V(h, k+1, j, i) - V(h, k, j, i) )
-		  / ( Nodes(k+1) - Nodes(k) );
-	      else if (k!=Nz-1)
-		derivative = ( V(h, k, j, i) - V(h, k-1, j, i) )
-		  / ( Nodes(k) - Nodes(k-1) );
-	      else
-		derivative = ( V(h, k-1, j, i) - V(h, k-2, j, i) )
-		  / ( Nodes(k-1) - Nodes(k-2) );
-
+	      derivative = ( V(h, k, j+1, i) + V(h, k, j, i)
+			     - V(h, k-1, j+1, i) - V(h, k-1, j, i) )
+		/ ( Nodes(k) - Nodes(k-1) ) * 0.5;
+	      
 	      derivative = derivative * derivative;
 	      dWind_dz += derivative;
 
@@ -132,15 +115,8 @@ namespace AtmoData
 	      /***********/
 	      /* F(R, z) */
 
-	      if (k==0)
-		derivative = ( (Tp(h, k+1, j, i)) - (Tp(h, k, j, i)) )
-		  / ( Nodes(k+1) - Nodes(k) ) / Tp(h, k, j, i);
-	      else if (k!=Nz-1)
-		derivative = ( (Tp(h, k, j, i)) - (Tp(h, k-1, j, i)) )
-		  / ( Nodes(k) - Nodes(k-1) ) / Tp(h, k, j, i);
-	      else
-		derivative = ( (Tp(h, k-1, j, i)) - (Tp(h, k-2, j, i)) )
-		  / ( Nodes(k-1) - Nodes(k-2) ) / Tp(h, k-1, j, i);
+	      derivative = log( (Tp(h, k, j, i)) / (Tp(h, k-1, j, i)) )
+		/ ( Nodes(k) - Nodes(k-1) );
 
 	      R = g * derivative / ( dWind_dz * dWind_dz );
 

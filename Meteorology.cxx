@@ -703,13 +703,17 @@ namespace AtmoData
 	    k_base = 0; k_top = 0;
 	    for (k = 1; k < Nz && Pressure(h, k, j, i) > P_0 && !above; k++)
 	      {
-		below = below && CloudFraction(h, k, j, i) < 0.5 * cloud_max;
+		below = below && ( CloudFraction(h, k, j, i) < 0.5 * cloud_max
+				   || CloudFraction(h, k, j, i) == 0 );
 		above = !below && CloudFraction(h, k, j, i) < 0.5 * cloud_max;
 		if (!below && k_base == 0)
 		  k_base = k;
 		if (above)
 		  k_top = k;
 	      }
+	    if (above)
+	      while (k < Nz && Pressure(h, k, j, i) > P_0)
+		k++;
 	    k_max = k - 1;
 	    // Goes up to P_0.
 	    if (k_base > k_top)
@@ -741,13 +745,17 @@ namespace AtmoData
 	    for (k = k_max + 1; k < Nz && Pressure(h, k, j, i) > P_1
 		   && !above; k++)
 	      {
-		below = below && CloudFraction(h, k, j, i) < 0.5 * cloud_max;
+		below = below && ( CloudFraction(h, k, j, i) < 0.5 * cloud_max
+				   || CloudFraction(h, k, j, i) == 0 );
 		above = !below && CloudFraction(h, k, j, i) < 0.5 * cloud_max;
 		if (!below && k_base == 0)
 		  k_base = k;
 		if (above)
 		  k_top = k;
 	      }
+	    if (above)
+	      while (k < Nz && Pressure(h, k, j, i) > P_1)
+		k++;
 	    k_max = k - 1;
 	    // Goes up to P_1.
 	    if (k_base > k_top)
@@ -778,7 +786,8 @@ namespace AtmoData
 	    k_base = 0; k_top = 0;
 	    for (k = k_max + 1; k < Nz && !above; k++)
 	      {
-		below = below && CloudFraction(h, k, j, i) < 0.5 * cloud_max;
+		below = below && ( CloudFraction(h, k, j, i) < 0.5 * cloud_max
+				   || CloudFraction(h, k, j, i) == 0 );
 		above = !below && CloudFraction(h, k, j, i) < 0.5 * cloud_max;
 		if (!below && k_base == 0)
 		  k_base = k;

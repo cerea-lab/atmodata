@@ -259,6 +259,52 @@ namespace AtmoData
   }
 
 
+  //! Computes the surface Richardson number.
+  /*!
+    \param Roughness roughness height.
+    \param WindModule wind module in the first layer.
+    \param SurfacePotentialTemperature surface potential temperature.
+    \param PotentialTemperature potential temperature.
+    \param SurfaceRichardson (output) surface Richardson number.
+    \param wind_threshold (optional) minimum of the wind module.
+    Default: 0.001.
+  */
+  template<class TR, class TU, class TTp, class T, class TG>
+  void ComputeRichardson(Data<TR, 2, TG>& Roughness,
+			 Data<TU, 3, TG>& WindModule,
+			 Data<TTp, 3, TG>& SurfacePotentialTemperature,
+			 Data<TTp, 4, TG>& PotentialTemperature,
+			 Data<T, 3, TG>& SurfaceRichardson, T wind_threshold)
+  {
+
+    int h, i, j;
+
+    int Nx = SurfaceRichardson.GetLength(2);
+    int Ny = SurfaceRichardson.GetLength(1);
+    int Nt = SurfaceRichardson.GetLength(0);
+
+    Grid<TG>& Levels = PotentialTemperature[1];
+
+    const T g(9.81);
+    T wind;
+
+    for (h = 0; h < Nt; h++)
+      for (j = 0; j < Ny; j++)
+	for (i = 0; i < Nx; i++)
+	  {
+	    wind = max(WindModule(h, j, i), wind_threshold);
+	    SurfaceRichardson(h, j, i) =
+	      2. * g * (PotentialTemperature(h, 0, j, i)
+			- SurfacePotentialTemperature(h, j, i))
+	      * (Levels.Value(h, 0, j, i) - Roughness(j, i))
+	      / (wind * wind * (PotentialTemperature(h, 0, j, i)
+				+ SurfacePotentialTemperature(h, j, i))
+		 * Levels.Value(h, 0, j, i) * Levels.Value(h, 0, j, i));
+	  }
+
+  }
+
+
   //! Computes the potential temperature.
   /*!
     Formula: PotentialTemperature = Temperature * (Pressure / P0)^(-r/cp).

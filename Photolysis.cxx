@@ -160,11 +160,12 @@ namespace AtmoData
   */
   template <class TT, class TP, class TH, class TL,
 	    class TMC, class THC, class T, class TG>
-  void Attenuation_LWC(Data<TT, 4, TG>& Temperature, Data<TP, 4, TG>& Pressure,
-		       Data<TH, 4, TG>& Humidity, Data<TL, 4, TG>& LiquidWaterContent,
-		       Data<TMC, 3, TG>& MediumCloudiness, Data<THC, 3, TG>& HighCloudiness,
-		       T (CriticalRelativeHumidity)(const T&, const T&, const T&),
-		       int date, Data<T, 4, TG>& Attenuation)
+  void ComputeAttenuation_LWC(Data<TT, 4, TG>& Temperature, Data<TP, 4, TG>& Pressure,
+			      Data<TH, 4, TG>& Humidity, Data<TL, 4, TG>& LiquidWaterContent,
+			      Data<TMC, 3, TG>& MediumCloudiness,
+			      Data<THC, 3, TG>& HighCloudiness,
+			      T (CriticalRelativeHumidity)(const T&, const T&, const T&),
+			      int date, Data<T, 4, TG>& Attenuation)
   {
 
     int h, k, j, i;

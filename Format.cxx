@@ -226,7 +226,7 @@ namespace AtmoData
     date_ = date;
   }
 
-  //! Get the date.
+  //! Gets the date.
   /*!
     \return The date.
   */

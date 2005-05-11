@@ -24,6 +24,8 @@
 
 #ifndef ATMODATA_FILE_EMISSIONS_HXX
 
+#include <list>
+
 namespace AtmoData
 {
 
@@ -49,6 +51,35 @@ namespace AtmoData
 				Data<TL, 3, TG>& Isoprene,
 				Data<TL, 3, TG>& Terpenes, 
 				Data<TL, 3, TG>& NO);
+
+  //! Stores an EMEP emission associated with a given country.
+  template <class T>
+  class EmepCountryEmission
+  {
+  public:
+    //! Emission.
+    T emission_;
+    //! EMEP country number.
+    int country_;
+  public:
+    EmepCountryEmission(T emission, int country);
+  };
+
+  //! Provides time zone offset from GMT for a list of countries.
+  class TimeZone
+  {
+
+  public:
+    //! EMEP country number.
+    vector<int> countries_;
+    //! Time zone offset from GMT.
+    vector<int> local_times_;
+
+    TimeZone(int N);
+    void Init(string file_name);
+    int operator () (int i) const;
+  };
+
 
 }  // namespace AtmoData.
 

@@ -30,6 +30,12 @@ namespace AtmoData
 {
 
 
+  //////////////
+  // BIOGENIC //
+  //////////////
+
+
+  //! Computes biogenic emissions rates.
   /*!
     Computes biogenic emission rates according to Simpson et al. (1999).
     \param LUC Land use coverage ([0, 1]).
@@ -156,6 +162,783 @@ namespace AtmoData
 	      NO(h, j, i) += EF_NO(k) * LUC(k, j, i) * exp(0.071*(Ts_NO));
 	    }
 
+  }
+
+
+  ///////////////////
+  // ANTHROPOGENIC //
+  ///////////////////
+
+  
+  //! Constructor.
+  /*!
+    \param emission emission rate.
+    \param country EMEP country code number.
+  */
+  template <class T>
+  EmepCountryEmission<T>::EmepCountryEmission(T emission, int country):
+    emission_(emission), country_(country)
+  {
+  }
+
+
+  //! Constructor.
+  /*!
+    \param N number of countries.
+  */
+  TimeZone::TimeZone(int N): countries_(N), local_times_(N)
+  {
+    for (vector<int>::iterator iter = countries_.begin();
+	 iter != countries_.end(); ++iter)
+      {
+	*iter = iter - countries_.begin();
+	local_times_.at(iter - countries_.begin()) = 1;
+      }
+  }
+
+
+  //! Initializes from an input file.
+  /*!
+    \param file_name input file name.
+  */
+  void TimeZone::Init(string file_name)
+  {
+    int country, time;
+    ExtStream file_stream(file_name);
+    while (!file_stream.IsEmpty())
+      {
+	file_stream.GetElement();
+	file_stream.GetElement(country);
+	file_stream.GetElement(time);
+	if (country < int(local_times_.size()))
+	  local_times_.at(country) = time;
+	file_stream.GetLine();
+      }
+  }
+
+
+  //! Returns the time zone offset for a given country number.
+  /*!
+    \return The time zone offset from GMT.
+  */
+  int TimeZone::operator() (int i) const
+  {
+    return local_times_.at(i);
+  }
+
+
+  //! Reads temporal factors from a file. 
+  /*!  
+    Reads monthly profiles for a given month or daily profiles for a week. In
+    the file, each line first stores the EMEP country code, then the SNAP
+    sector and finally the factors for the 12 months or the 7 weekdays.  If no
+    factor is available for a given country and a given SNAP sector, it is set
+    to 1.
+    \param input_file input file.
+    \param Factors (output) temporal factors.
+  */
+  template <class real>
+  void GetTemporalFactors(string input_file, Data<real, 3>& Factors)
+  {
+  
+    string line;
+    int s, Ncountry;
+
+    Factors.Fill(1.0);
+  
+    ConfigStream input_stream(input_file);
+    if (!input_stream.is_open())
+      throw string("Error in GetTemporalFactors: \"") + input_file
+	+ "\" cannot be opened.";
+  
+    while (input_stream.GetLine(line))
+      {
+	vector<real> factors;
+	split(line, factors);
+
+	if (int(factors.size()) != 2 + Factors.GetLength(2))
+	  throw string("Error in GetTemporalFactors: \"") + input_file
+	    + "\" badly formatted.";
+
+	Ncountry = int(factors[0]);
+	s = int(factors[1]);
+
+	if (s - 1 < Factors.GetLength(1))
+	  for(int i = 0; i < Factors.GetLength(2); i++)
+	    Factors(Ncountry, s - 1, i) = factors[i + 2];
+      }
+  
+  }
+  
+
+  //! Computes speciation/aggregation factors.
+  /*! 
+    Computes the factor for each sector to be applied to inventory species
+    emissions in order to get model species emissions. For NOX, the factor
+    takes into account the fact that NOX emissions are given in NO2 equivalent
+    units. First, One file per inventory species is read for speciation in the
+    speciation directory (format "<species>.dat") and provides percentages to
+    split inventory species emissions into real-species emissions. Then, an
+    aggregation file is read. It contains a matrix that gives molecular
+    weights, reactivities and aggregation coefficients for real (lines) and
+    model (columns) species. VOCs aggregation coefficients are computed
+    according to Middleton et al. (1990) with the integral of [OH] set to 1.0.
+    \param Sp_emis_names inventory species names.
+    \param aggregation_matrix aggregation-matrix file.
+    \param speciation_directory speciation directory.
+    \param Sp_model_names (output) model species names.
+    \param Species_factor (output) species factors indexed by the model
+    species, the inventory species and the sector.
+  */
+  template <class real>
+  void SpeciationAggregation(const vector<string>& Sp_emis_names,
+			     string aggregation_matrix,
+			     string speciation_directory,
+			     vector<string>& Sp_model_names,
+			     Data<real, 3>& Species_factor)
+  {
+
+    int Nsectors = Species_factor[2].GetLength();
+    int Nsp_emis = Species_factor[1].GetLength();
+    int Nsp_model = Species_factor[0].GetLength();
+  
+    string Sp_real_names;
+    vector<real> molecular_weights_model(Nsp_model);
+    vector<real> React_model(Nsp_model);
+  
+    string input_file, line, stmp;
+    string species_names;
+    vector<real> vtmp;
+  
+    /** Reads model species names, molecular weight and reactivity ***/
+
+    ExtStream aggregation_stream(aggregation_matrix);
+    if (!aggregation_stream.is_open())
+      throw string(" File ") + input_file + " doesn't exist.";
+
+    // Species names.
+    aggregation_stream.SkipElements(3);
+    aggregation_stream.GetLine(line);
+    split(line, Sp_model_names);
+    // Molecular weights.
+    aggregation_stream.SkipElements(3);
+    aggregation_stream.GetLine(line);
+    split(line, molecular_weights_model);
+    // Reactivities.
+    aggregation_stream.SkipElements(3);
+    aggregation_stream.GetLine(line);
+    split(line, React_model);
+
+    if ( int(Sp_model_names.size()) != Nsp_model
+	 || int(molecular_weights_model.size()) != Nsp_model
+	 || int(React_model.size()) != Nsp_model )
+      throw "Aggregation file badly formatted.";
+  
+    /*** Reads speciation ***/
+
+    RegularGrid<real> GridSectors(Species_factor[2]);
+    Data<real, 1> Speciation_coeff(GridSectors);
+
+    real Aggregation_coeff;
+    real React_real;
+    real molecular_weights_real;
+
+    const real M_NO2 = 46.0;
+    const real int_OH(1.0);
+
+    Species_factor.Fill(0.0);
+
+    for (int l=0; l<Nsp_emis; l++)
+      {
+	input_file = speciation_directory + Sp_emis_names[l] + ".dat";
+	ExtStream speciation_stream(input_file);
+	if (!speciation_stream.is_open())
+	  throw string("File \"") + input_file + "\" doesn't exist.";
+
+	while (!speciation_stream.IsEmpty())
+	  {
+	    Sp_real_names = speciation_stream.GetElement();
+	    for (int k = 0; k < Nsectors; k++)
+	      speciation_stream >> Speciation_coeff(k);
+	  
+	    ExtStream aggregation_stream(aggregation_matrix);
+	    aggregation_stream.SkipLines(3);
+	    stmp = "";
+	    while (!aggregation_stream.IsEmpty() && Sp_real_names != stmp)
+	      {
+		aggregation_stream >> stmp;
+		line = aggregation_stream.GetLine();
+	      }
+	    if (aggregation_stream.IsEmpty() && Sp_real_names != stmp)
+	      throw string("Species ") + Sp_real_names + " not found.";
+	  
+	    split(line, vtmp);
+	    molecular_weights_real = vtmp[0];
+	    React_real = vtmp[1];
+
+	    // NOX is given in NO2 equivalent units.
+	    if (Sp_emis_names[l] == "NOX")
+	      for (int k=0; k<Nsectors; k++)
+		Speciation_coeff(k) *= molecular_weights_real / M_NO2;
+
+	    for (int m=0; m<Nsp_model; m++)
+	      { 
+		Aggregation_coeff = vtmp[m + 2];
+		for (int k = 0; k < Nsectors; k++)
+		  {
+		    Species_factor(m, l, k) += Speciation_coeff(k) * 0.01
+		      * Aggregation_coeff
+		      * molecular_weights_model[m] / molecular_weights_real
+		      * (1. - exp(-int_OH*React_real) )
+		      / (1. - exp(-int_OH*React_model[m]) );
+		  }
+	      }
+	    if (aggregation_stream.bad())
+	      throw "Aggregation file is badly formatted";
+	  }
+      }
+
+  }
+
+
+  //! Computes vertical distribution factors.
+  /*!
+    Maps the vertical distribution 'vertical_distribution_in' given on the
+    vertical mesh 'GridZ_interf_in' to the output mesh 'GridZ_interf_out'.
+    \param vertical_distribution_in vertical distribution on input grid.
+    \param GridZ_interf_in altitudes of interfaces of input grid(m).
+    \param GridZ_interf_out altitudes of interfaces of output grid(m).
+    \param vertical_distribution_out (output) vertical distribution on output
+    grid.
+    \note The vertical distributions are indexed by the activity sector and
+    the height.
+  */
+  template <class real>
+  void ComputeVerticalDistribution(const Data<real, 2>& vertical_distribution_in,
+				   const RegularGrid<real>& GridZ_interf_in,
+				   const RegularGrid<real>& GridZ_interf_out,
+				   Data<real, 2>& vertical_distribution_out)
+  {
+  
+    int k, s;
+
+    int Nsectors = vertical_distribution_in[0].GetLength();
+
+    // Vertical Grids.
+    int Nz_in = vertical_distribution_in[1].GetLength();
+    int Nz_out = vertical_distribution_out[1].GetLength();
+
+    RegularGrid<real> DeltaZ_in(Nz_in);
+    RegularGrid<real> DeltaZ_out(Nz_out);
+
+    string input_file, line;
+
+    /*** Reads vertical distribution heights ***/
+  
+    // Sets values at nodes.
+    for (k=0; k<Nz_in; k++)
+      DeltaZ_in(k) = GridZ_interf_in(k+1) - GridZ_interf_in(k);
+    for (k=0; k<Nz_out; k++)
+      DeltaZ_out(k) = GridZ_interf_out(k+1) - GridZ_interf_out(k);
+
+    vertical_distribution_out.Fill(0);
+
+    /*** Linear interpolation of the vertical distribution ***/
+
+    int k_in = 0;
+    for (k = 0; k < Nz_out && k_in < Nz_in; k++)
+      {
+	if (GridZ_interf_out(k+1) <= GridZ_interf_in(k_in+1))
+	  for (s=0; s<Nsectors; s++)
+	    vertical_distribution_out(s, k) =
+	      vertical_distribution_in(s, k_in) / DeltaZ_in(k_in)
+	      * DeltaZ_out(k);
+	else
+	  {
+	    for (s=0; s<Nsectors; s++)
+	      vertical_distribution_out(s, k) = 
+		vertical_distribution_in(s, k_in) / DeltaZ_in(k_in)
+		* ( GridZ_interf_in(k_in+1) - GridZ_interf_out(k));
+	    k_in++;
+	    while (k_in < Nz_in 
+		   && GridZ_interf_out(k+1) > GridZ_interf_in(k_in+1))
+	      {
+		for (s=0; s<Nsectors; s++)
+		  vertical_distribution_out(s, k) +=
+		    vertical_distribution_in(s, k_in);
+		k_in++;
+	      }
+	    if (k_in < Nz_in)
+	      for (s=0; s<Nsectors; s++)
+		vertical_distribution_out(s, k) += 
+		  vertical_distribution_in(s, k_in) / DeltaZ_in(k_in)
+		  * ( GridZ_interf_out(k+1) - GridZ_interf_in(k_in));
+	  }
+      }
+  }
+
+
+  //! Divides the vertical distribution by the heights.
+  /*!
+    \param GridZ_interf_out heights of the output grid.
+    \param vertical_distribution_out (output) vertical distribution on the
+    output grid indexed by the activity sector and the height.
+  */
+  template <class real>
+  void DividesByHeights(const RegularGrid<real>& GridZ_interf_out,
+			Data<real, 2>& vertical_distribution_out)
+  {
+  
+    int k, s;
+
+    int Nsectors = vertical_distribution_out[0].GetLength();
+
+    // Vertical Grids.
+    int Nz_out = vertical_distribution_out[1].GetLength();
+
+    RegularGrid<real> DeltaZ_out(Nz_out);
+
+    // Sets values at nodes.
+    for (k=0; k<Nz_out; k++)
+      DeltaZ_out(k) = GridZ_interf_out(k+1) - GridZ_interf_out(k);
+
+    for (s=0; s<Nsectors; s++)
+      for (k=0; k<Nz_out; k++)
+	vertical_distribution_out(s, k) /= DeltaZ_out(k);
+  }
+
+
+  //! Correspondence between Emep and Polair3D grids.
+  /*!
+    Computes (1) the number of urban, water, forest and other types of LUC that
+    are included in each EMEP cell, and (2) the total number of LUC cells
+    included in each Polair3D cell.
+    \param LUC land use coverage on USGS categories.
+    \param Nurb_emep (output) number of urban LUC cells in EMEP cells.
+    \param Nwat_emep (output) number of water LUC cells in EMEP cells.
+    \param Nfor_emep (output) number of forest LUC cells in EMEP cells.
+    \param Noth_emep (output) number of other LUC cells in EMEP cells.
+    \param Ntot_polair (output) total number of LUC cells in each Polair3D
+    cell.
+    \note The arrays are stored in (Y, X) format.
+  */
+  template <class real>
+  void GridCorrespondences(const Data<int, 2, real>& LUC,
+			   Data<int, 2, real>& Nurb_emep,
+			   Data<int, 2, real>& Nwat_emep,
+			   Data<int, 2, real>& Nfor_emep,
+			   Data<int, 2, real>& Noth_emep,
+			   Data<int, 2, real>& Ntot_polair)
+  {
+
+    const real pi = 3.14159265358979323846264;
+
+    const real xpol(8.);
+    const real ypol(110.);
+    const real M = 6370./50. * ( 1. + sin(pi/3.) );
+
+    /*** Coordinates ***/
+
+    int Nx_luc = LUC[1].GetLength();
+    real x_min_center_luc = LUC[1](0);
+    real delta_x_luc = (LUC[1](Nx_luc-1) - LUC[1](0) )/ real(Nx_luc-1);
+    real x_min_luc = x_min_center_luc - delta_x_luc/2.0;
+
+    int Ny_luc = LUC[0].GetLength();
+    real y_min_center_luc = LUC[0](0);
+    real delta_y_luc = (LUC[0](Ny_luc-1) - LUC[0](0)) / real(Ny_luc-1);
+    real y_min_luc = y_min_center_luc - delta_y_luc/2.0;
+
+    int Nx_emep = Nurb_emep[1].GetLength();
+    int Ny_emep = Nurb_emep[0].GetLength();
+
+    int Nx = Ntot_polair[1].GetLength();
+    real x_min_center = Ntot_polair[1](0);
+    real Delta_x = (Ntot_polair[1](Nx-1) - Ntot_polair[1](0)) / real(Nx-1); 
+    real x_min = x_min_center - Delta_x/2.0;
+
+    int Ny = Ntot_polair[0].GetLength();
+    real y_min_center = Ntot_polair[0](0);
+    real Delta_y = (Ntot_polair[0](Ny-1) - Ntot_polair[0](0)) / real(Ny-1);
+    real y_min = y_min_center - Delta_y/2.0;
+
+    /*** Computes output data ***/
+
+    Ntot_polair.Fill(0);
+  
+    Nurb_emep.Fill(0);
+    Nwat_emep.Fill(0);
+    Nfor_emep.Fill(0);
+    Noth_emep.Fill(0);
+    
+    for (int i=0; i<Nx_luc; i++)
+      for (int j=0; j<Ny_luc; j++)
+	{
+	  real lon = (x_min_center_luc + i * delta_x_luc) * pi/180.; // rad
+	  real lat = (y_min_center_luc + j * delta_y_luc) * pi/180.; // rad
+	
+	  int i_emep = int( xpol + M * tan(pi/4. - lat/2.)
+			    * sin(lon + 32. * pi/180.) - 0.5 );
+	  int j_emep = int( ypol - M * tan(pi/4. - lat/2.)
+			    * cos(lon + 32. * pi/180.) - 0.5 );
+
+	  if (i_emep >= 0 && i_emep < Nx_emep && j_emep >= 0 
+	      && j_emep < Ny_emep)
+	    if (LUC(j, i) == 13)
+	      Nurb_emep(j_emep, i_emep) += 1;
+	    else if (LUC(j, i) == 0)
+	      Nwat_emep(j_emep, i_emep) += 1;
+	    else if (LUC(j, i) >= 1 && LUC(j, i) <= 6)
+	      Nfor_emep(j_emep, i_emep) += 1;
+	    else if (LUC(j, i) >= 7 && LUC(j, i) <= 12)
+	      Noth_emep(j_emep, i_emep) += 1;
+	    else
+	      throw "Error in GridCorrespondences: LUC index out of range.";
+	
+	  lon = x_min_luc + i*delta_x_luc; // deg
+	  lat = y_min_luc + j*delta_y_luc; // deg
+	
+	  int i_polair = int((lon - x_min) / Delta_x); 
+	  int j_polair = int((lat - y_min) / Delta_y); 
+	
+	  if (i_polair >= 0 && i_polair < Nx && j_polair >= 0 
+	      && j_polair < Ny)
+	    Ntot_polair(j_polair, i_polair) += 1;
+	}
+  }
+
+
+  //! Reads Emep standard files and applies monthly and daily factors.
+  /*!
+    First reads Emep standard files located in the input directory (format
+    <species>.dat). In these files, the Emep emissions (Tons) correspond to a
+    given year, and are provided for European countries and for each
+    SNAP. Then applies monthly and daily coefficients in order to provide
+    emissions over land and over water for a given day.
+    \param date date.
+    \param Sp_emis_names inventory emission species names.
+    \param input_directory input directory.
+    \param MonthlyFactors monthly factors indexed by the country, the sector
+    and the month.
+    \param DailyFactors daily factors indexed by the country, the sector and
+    the day.
+    \param Emis_land (output) emissions over land (Tons) for a given day.
+    \param Emis_water (output) emissions over water (Tons) for a given day.
+    \note Output data is indexed by the species, Y, X and the sector.
+  */
+  template <class real>
+  void ReadEmep(Date date, const vector<string>& Sp_emis_names,
+		string input_directory, const Data<real, 3>& MonthlyFactors,
+		const Data<real, 3>& DailyFactors,
+		Data<list<EmepCountryEmission<real> >, 4, real>& Emis_land,
+		Data<list<EmepCountryEmission<real> >, 4, real>& Emis_water)
+  {
+
+    int Ncountry, i, j;
+    string country, line;
+    vector<string> v;
+
+    int Nsp_emis = Emis_land[0].GetLength();
+    int Nsectors = Emis_land[3].GetLength();
+    int NsectorsEmep(11);
+    RegularGrid<real> GridSectors(Emis_land[3]);
+    Data<real, 1> Emis_emep(GridSectors);
+
+    // Find the day of the week.
+    int day = date.GetWeekDay();
+
+    for(int l = 0; l < Nsp_emis; l++)
+      {
+	string input_file = input_directory + Sp_emis_names[l] + ".dat";
+	ExtStream EmepEmisStream(input_file);
+	if (!EmepEmisStream.is_open())
+	  throw string("File ") + input_file + " doesn't exist.";
+
+	while ( has_element(EmepEmisStream) )
+	  {
+	    for(int s = 0; s < NsectorsEmep; s++)
+	      {
+		EmepEmisStream.GetLine(line);
+		if (s < Nsectors)
+		  {
+		    v = split(line, ";");
+		    Emis_emep(s) = to_num<float>(v[7]);
+		  }
+	      }
+	    country = v[0];
+	    i = to_num<int>(v[4]);
+	    j = to_num<int>(v[5]);
+
+	    if (i < 1 || j < 1)
+	      continue;
+
+	    ConfigStream CountryNumber("country_numbers.txt");
+	    CountryNumber.PeekValue(country, Ncountry);
+
+	    // In water.
+	    if (Ncountry >= 30 && Ncountry <= 35)
+	      for (int s = 0; s < Nsectors; s++)
+		Emis_water(l, j-1, i-1, s).push_back(EmepCountryEmission<real>(Emis_emep(s)
+									       * MonthlyFactors(Ncountry, s, date.GetMonth()-1)
+									       * DailyFactors(Ncountry, s, day) / 365.,
+									       Ncountry));
+	    // In land.
+	    else
+	      for (int s = 0; s < Nsectors; s++)
+		Emis_land(l, j-1, i-1, s).push_back(EmepCountryEmission<real>(Emis_emep(s)
+									      * MonthlyFactors(Ncountry, s, date.GetMonth()-1)
+									      * DailyFactors(Ncountry, s, day) / 365.,
+									      Ncountry));
+	  }
+	if (EmepEmisStream.bad())
+	  throw string("EMEP emission file \"") + input_file
+	    + "\" is badly formatted.";
+      }
+  }
+
+
+  //! Reads Emep modified files and applies monthly and daily factors.
+  /*!
+    First reads Emep modified files located in the input directory (format
+    <species>.dat). In these files, the Emep emissions (Tons) correspond to a
+    given year, and are provided for European countries and for each
+    SNAP. Then applies monthly and daily coefficients in order to provide
+    emissions over land and over water for a given day.
+    \param date date.
+    \param Sp_emis_names inventory emission species names.
+    \param input_directory input directory.
+    \param MonthlyFactors monthly factors indexed by the country, the sector
+    and the month.
+    \param DailyFactors daily factors indexed by the country, the sector and
+    the day.
+    \param Emis_land (output) emissions over land (Tons) for a given day.
+    \param Emis_water (output) emissions over water (Tons) for a given day.
+    \note Output data is indexed by the species, Y, X and the sector.
+    \warning The input files read by this function are not the standard Emep
+    emission files. This function is therefore deprecated. Please use
+    ReadEmep.
+  */
+  template <class real>
+  void ReadModifiedEmep(Date date, const vector<string>& Sp_emis_names,
+			string input_directory,
+			const Data<real, 3>& MonthlyFactors,
+			const Data<real, 3>& DailyFactors,
+			Data<list<EmepCountryEmission<real> >, 4, real>& Emis_land,
+			Data<list<EmepCountryEmission<real> >, 4, real>& Emis_water)
+  {
+
+    int Ncountry, i, j;
+    string line;
+
+    int Nsp_emis = Emis_land[0].GetLength();
+    int Nsectors = Emis_land[3].GetLength();
+    RegularGrid<real> GridSectors(Emis_land[3]);
+    Data<real, 1> Emis_emep(GridSectors);
+
+    // Find the day of the week.
+    int day = date.GetWeekDay();
+
+    for(int l = 0; l < Nsp_emis; l++)
+      {
+	string input_file = input_directory + Sp_emis_names[l] + ".dat";
+	ExtStream EmepEmisStream(input_file);
+	if (!EmepEmisStream.is_open())
+	  throw string("File ") + input_file + " doesn't exist.";
+
+	while ( has_element(EmepEmisStream) )
+	  {
+	    EmepEmisStream >> Ncountry >> i >> j;
+	    for(int s = 0; s < Nsectors; s++)
+	      EmepEmisStream >> Emis_emep(s);
+	    getline(EmepEmisStream, line);
+	  
+	    // In water.
+	    if ( Ncountry >= 30 && Ncountry <= 35 )
+	      for (int s = 0; s < Nsectors; s++)
+		Emis_water(l, j-1, i-1, s).push_back(EmepCountryEmission<real>(Emis_emep(s)
+									       * MonthlyFactors(Ncountry, s, date.GetMonth()-1)
+									       * DailyFactors(Ncountry, s, day) / 365.,
+									       Ncountry));
+	    // In land.
+	    else
+	      for (int s = 0; s < Nsectors; s++)
+		Emis_land(l, j-1, i-1, s).push_back(EmepCountryEmission<real>(Emis_emep(s)
+									      * MonthlyFactors(Ncountry, s, date.GetMonth()-1)
+									      * DailyFactors(Ncountry, s, day) / 365.,
+									      Ncountry));
+	  }
+	if (EmepEmisStream.bad())
+	  throw string("EMEP emission file \"") + input_file
+	    + "\" is badly formatted.";
+      }
+  }
+
+
+  //! Computes emissions on a latitude-longitude grid.
+  /*!
+    Computes emissions on a latitude-longitude grid (like Polair3D grid) on
+    the basis of EMEP inventory and weights associated with aggregated (in
+    urban, forest and miscellaneous) LUC categories.
+    \param LUC land use coverage.
+    \param Ratio_urb weight of urban cells.
+    \param Ratio_for weight of forest cells.
+    \param Ratio_oth weight of other cells.
+    \param Nurb_emep number of urban LUC cells in EMEP cells.
+    \param Nwat_emep number of water LUC cells in EMEP cells.
+    \param Nfor_emep number of forest LUC cells in EMEP cells.
+    \param Noth_emep number of other LUC cells in EMEP cells.
+    \param Ntot_polair total number of LUC cells in each Polair3D cell.
+    \param Emis_land emissions over land (Tons).
+    \param Emis_water emissions over water (Tons).
+    \param Emis_out (output) output emissions (Tons . m^{-2}) for a given day.
+  */
+  template <class real>
+  void EmepToLatLon(const Data<int, 2, real>& LUC,
+		    const real Ratio_urb,
+		    const real Ratio_for,
+		    const real Ratio_oth,
+		    const Data<int, 2, real>& Nurb_emep,
+		    const Data<int, 2, real>& Nwat_emep,
+		    const Data<int, 2, real>& Nfor_emep,
+		    const Data<int, 2, real>& Noth_emep,
+		    const Data<int, 2, real>& Ntot_polair,
+		    Data<list<EmepCountryEmission<real> >, 4, real>& Emis_land,
+		    Data<list<EmepCountryEmission<real> >, 4, real>& Emis_water,
+		    Data<list<EmepCountryEmission<real> >, 4, real>& Emis_out)
+  {
+    int l, i, j, s;
+    typename list<EmepCountryEmission<real> >::const_iterator iter;
+    typename list<EmepCountryEmission<real> >::iterator iter_out;
+
+    const real pi = 3.14159265358979323846264;
+    const real Earth_radius = 6370997.;
+
+    const real xpol(8.);
+    const real ypol(110.);
+    const real M = 6370./50. * ( 1. + sin(pi/3.) );
+
+    int Nsectors = Emis_land.GetLength(3);
+    int Nsp_emis = Emis_land.GetLength(0);
+
+    int Nx_luc = LUC[1].GetLength();
+    real x_min_center_luc = LUC[1](0);
+    real delta_x_luc = (LUC[1](Nx_luc-1) - LUC[1](0)) / real(Nx_luc-1);
+    real x_min_luc = x_min_center_luc - delta_x_luc/2.0;
+
+    int Ny_luc = LUC[0].GetLength();
+    real y_min_center_luc = LUC[0](0);
+    real delta_y_luc = (LUC[0](Ny_luc-1) - LUC[0](0)) / real(Ny_luc-1);
+    real y_min_luc = y_min_center_luc - delta_y_luc/2.0;
+
+    int Nx_emep = Nurb_emep[1].GetLength();
+    int Ny_emep = Nurb_emep[0].GetLength();
+
+    int Nx = Ntot_polair[1].GetLength();
+    real x_min_center = Ntot_polair[1](0);
+    real Delta_x = (Ntot_polair[1](Nx-1) - Ntot_polair[1](0)) / real(Nx-1); 
+    real x_min = x_min_center - Delta_x/2.0;
+
+    int Ny = Ntot_polair[0].GetLength();
+    real y_min_center = Ntot_polair[0](0);
+    real Delta_y = (Ntot_polair[0](Ny-1) - Ntot_polair[0](0)) / real(Ny-1);
+    real y_min = y_min_center - Delta_y/2.0;
+
+    real Ratio(0.0);
+  
+    for (i=0; i<Nx_luc; i++)
+      for (j=0; j<Ny_luc; j++)
+	{
+	  real lon = (x_min_center_luc + i * delta_x_luc) * pi/180.; // rad
+	  real lat = (y_min_center_luc + j * delta_y_luc) * pi/180.; // rad
+	
+	  int i_emep = int(xpol + M * tan(pi/4. - lat/2.)
+			   * sin(lon + 32. * pi/180.) - 0.5 );
+	  int j_emep = int(ypol - M * tan(pi/4. - lat/2.)
+			   * cos(lon + 32. * pi/180.) - 0.5 );
+
+	  lon = x_min_luc + i * delta_x_luc; // deg
+	  lat = y_min_luc + j * delta_y_luc; // deg
+	
+	  int i_polair = int ((lon - x_min) / Delta_x);
+	  int j_polair = int ((lat - y_min) / Delta_y);
+	
+	  if ( i_emep >= 0 && i_emep < Nx_emep && j_emep >= 0 && j_emep < Ny_emep
+	       && i_polair >= 0 && i_polair < Nx && j_polair >= 0 && j_polair < Ny )
+	    {
+	      if (LUC(j, i) == 0)
+		{
+		  Ratio = 1. / real(Nwat_emep(j_emep, i_emep));
+		  for (l = 0; l < Nsp_emis; l++)
+		    for (s = 0; s < Nsectors; s++)
+		      for (iter = Emis_water(l, j_emep, i_emep, s).begin();
+			   iter != Emis_water(l, j_emep, i_emep, s).end(); ++iter)
+			{
+			  iter_out = Emis_out(l, s, j_polair, i_polair).begin();
+			  while (iter_out != Emis_out(l, s, j_polair, i_polair).end()
+				 && iter_out->country_ != iter->country_)
+			    ++iter_out;
+			  if (iter_out != Emis_out(l, s, j_polair, i_polair).end())
+			    iter_out->emission_ += iter->emission_ * Ratio;
+			  else
+			    Emis_out(l, s, j_polair, i_polair).push_back(EmepCountryEmission<real>(iter->emission_ * Ratio, iter->country_));
+			}
+		}
+	      else
+		{
+		  if (LUC(j, i) == 13)
+		    Ratio = Ratio_urb
+		      / real( Ratio_urb * Nurb_emep(j_emep, i_emep)
+			      + Ratio_for * Nfor_emep(j_emep, i_emep)
+			      + Ratio_oth * Noth_emep(j_emep, i_emep) );
+		
+		  if ( LUC(j, i) >= 1 && LUC(j, i) <= 6 )
+		    Ratio = Ratio_for
+		      / real( Ratio_urb * Nurb_emep(j_emep, i_emep)
+			      + Ratio_for * Nfor_emep(j_emep, i_emep)
+			      + Ratio_oth * Noth_emep(j_emep, i_emep) );
+		
+		  if ( LUC(j, i) >= 7 && LUC(j, i) <= 12 )
+		    Ratio = Ratio_oth
+		      / real( Ratio_urb * Nurb_emep(j_emep, i_emep)
+			      + Ratio_for * Nfor_emep(j_emep, i_emep)
+			      + Ratio_oth * Noth_emep(j_emep, i_emep) );
+		
+		  for (l = 0; l < Nsp_emis; l++)
+		    for (s = 0; s < Nsectors; s++)
+		      for (iter = Emis_land(l, j_emep, i_emep, s).begin();
+			   iter != Emis_land(l, j_emep, i_emep, s).end(); ++iter)
+			{
+			  iter_out = Emis_out(l, s, j_polair, i_polair).begin();
+			  while (iter_out != Emis_out(l, s, j_polair, i_polair).end()
+				 && iter_out->country_ != iter->country_)
+			    ++iter_out;
+			  if (iter_out != Emis_out(l, s, j_polair, i_polair).end())
+			    iter_out->emission_ += iter->emission_ * Ratio;
+			  else
+			    Emis_out(l, s, j_polair, i_polair).push_back(EmepCountryEmission<real>(iter->emission_ * Ratio, iter->country_));
+			}
+		}
+	    }
+	}
+
+    const real ratio_pi = pi / 180.;
+    const real factor = ratio_pi * ratio_pi * Earth_radius * Earth_radius
+      * delta_x_luc * delta_y_luc;;
+    real surface;
+
+    // Divides by the surface. Emissions are then given in Tons/m^2.
+    for (i = 0; i < Nx; i++)
+      for (j = 0; j < Ny; j++)
+	{
+	  surface = Ntot_polair(j, i) * factor 
+	    * cos(Ntot_polair[0](j) * ratio_pi);
+	  for (l = 0; l < Nsp_emis; l++)
+	    for (s = 0 ; s < Nsectors; s++)
+	      for (iter_out = Emis_out(l, s, j, i).begin();
+		   iter_out != Emis_out(l, s, j, i).end(); ++iter_out)
+		iter_out->emission_ /= surface;
+	}
+  
   }
 
 

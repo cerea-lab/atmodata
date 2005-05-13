@@ -61,6 +61,43 @@ namespace AtmoData
 		      T a = T(0.115), T b = T(0.175), T delta_z0 = T(0.01),
 		      T Ka = T(0.4));
 
+  template<class TU, class TTp, class T, class TG>
+  void ComputeLMO(const Data<TU, 3, TG>& FrictionModule,
+		  const Data<TTp, 3, TG>& SurfacePotentialTemperature,
+		  const Data<TTp, 4, TG>& PotentialTemperature,
+		  const Data<T, 3, TG>& SensibleHeat,
+		  const Data<T, 3, TG>& Evaporation,
+		  Data<T, 3, TG>& LMO, T Ka = T(0.4));
+
+  template<class TT, class TTp, class TU, class T, class TG>
+  void ComputePBLH_TM(const Data<TT, 3, TG>& SurfaceTemperature,
+		      const Data<TTp, 3, TG>& SurfacePotentialTemperature,
+		      const Data<TTp, 4, TG>& PotentialTemperature,
+		      const Data<TU, 3, TG>& FrictionModule,
+		      const Data<TU, 4, TG>& WindModule,
+		      const Data<T, 3, TG>& SensibleHeat,
+		      const Data<T, 3, TG>& LMO,
+		      const Grid<TG>& GridZ_interf,
+		      Data<T, 3, TG>& BoundaryHeight, 
+		      T SBL = T(0.1), T Ric = T(0.21), T C = T(6.5), 
+		      T Ka = T(0.4));
+
+  template<class T, class TG>
+  void ComputePBLH_Richardson(const Data<T, 4, TG>& Richardson,
+			      const Grid<TG>& GridZ_interf,
+			      Data<T, 3, TG>& BoundaryHeight, 
+			      T Ric = T(0.21));
+
+  template<class TU, class TT, class T, class TG>
+  void ComputeTM_Kz(const Data<TT, 3, TG>& SurfaceTemperature,
+		    const Data<TU, 3, TG>& FrictionModule,
+		    const Data<T, 3, TG>& SensibleHeat,
+		    const Data<T, 3, TG>& LMO,
+		    const Data<T, 3, TG>& BoundaryHeight, 
+		    Data<T, 4, TG>& Kz,
+		    bool TM_stable = true, T SBL = T(0.1), T p = T(2.0),
+		    T Ka = T(0.4));
+
 }  // namespace AtmoData.
 
 #define ATMODATA_FILE_KZ_HXX

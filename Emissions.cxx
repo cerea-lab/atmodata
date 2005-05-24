@@ -300,15 +300,16 @@ namespace AtmoData
 
     int Nsectors = Species_factor[2].GetLength();
     int Nsp_emis = Species_factor[1].GetLength();
-    int Nsp_model = Species_factor[0].GetLength();
   
     string Sp_real_names;
-    vector<real> molecular_weights_model(Nsp_model);
-    vector<real> React_model(Nsp_model);
   
     string input_file, line, stmp;
     string species_names;
+
     vector<real> vtmp;
+    vector<string> Sp_model_names_tmp;
+    vector<real> molecular_weights_model;
+    vector<real> React_model;
   
     /** Reads model species names, molecular weight and reactivity ***/
 
@@ -316,24 +317,6 @@ namespace AtmoData
     if (!aggregation_stream.is_open())
       throw string(" File ") + input_file + " doesn't exist.";
 
-    // Species names.
-    aggregation_stream.SkipElements(3);
-    aggregation_stream.GetLine(line);
-    split(line, Sp_model_names);
-    // Molecular weights.
-    aggregation_stream.SkipElements(3);
-    aggregation_stream.GetLine(line);
-    split(line, molecular_weights_model);
-    // Reactivities.
-    aggregation_stream.SkipElements(3);
-    aggregation_stream.GetLine(line);
-    split(line, React_model);
-
-    if ( int(Sp_model_names.size()) != Nsp_model
-	 || int(molecular_weights_model.size()) != Nsp_model
-	 || int(React_model.size()) != Nsp_model )
-      throw "Aggregation file badly formatted.";
-  
     /*** Reads speciation ***/
 
     RegularGrid<real> GridSectors(Species_factor[2]);
@@ -348,6 +331,7 @@ namespace AtmoData
 
     Species_factor.Fill(0.0);
 
+    int mm = 0;
     for (int l=0; l<Nsp_emis; l++)
       {
 	input_file = speciation_directory + Sp_emis_names[l] + ".dat";
@@ -358,46 +342,72 @@ namespace AtmoData
 	while (!speciation_stream.IsEmpty())
 	  {
 	    Sp_real_names = speciation_stream.GetElement();
+	    speciation_stream >> molecular_weights_real;
 	    for (int k = 0; k < Nsectors; k++)
 	      speciation_stream >> Speciation_coeff(k);
-	  
-	    ExtStream aggregation_stream(aggregation_matrix);
-	    aggregation_stream.SkipLines(3);
-	    stmp = "";
-	    while (!aggregation_stream.IsEmpty() && Sp_real_names != stmp)
-	      {
-		aggregation_stream >> stmp;
-		line = aggregation_stream.GetLine();
-	      }
-	    if (aggregation_stream.IsEmpty() && Sp_real_names != stmp)
-	      throw string("Species ") + Sp_real_names + " not found.";
-	  
-	    split(line, vtmp);
-	    molecular_weights_real = vtmp[0];
-	    React_real = vtmp[1];
 
 	    // NOX is given in NO2 equivalent units.
 	    if (Sp_emis_names[l] == "NOX")
 	      for (int k=0; k<Nsectors; k++)
 		Speciation_coeff(k) *= molecular_weights_real / M_NO2;
-
-	    for (int m=0; m<Nsp_model; m++)
-	      { 
-		Aggregation_coeff = vtmp[m + 2];
+	    
+	    if (Sp_emis_names[l] != "NMVOC")
+	      {
+		Sp_model_names[mm] = Sp_real_names;
 		for (int k = 0; k < Nsectors; k++)
-		  {
-		    Species_factor(m, l, k) += Speciation_coeff(k) * 0.01
-		      * Aggregation_coeff
-		      * molecular_weights_model[m] / molecular_weights_real
-		      * (1. - exp(-int_OH*React_real) )
-		      / (1. - exp(-int_OH*React_model[m]) );
-		  }
+		  Species_factor(mm, l, k) = Speciation_coeff(k) * 0.01;
+		mm++;
 	      }
-	    if (aggregation_stream.bad())
-	      throw "Aggregation file is badly formatted";
+	    else
+	      {
+		ExtStream aggregation_stream(aggregation_matrix);
+
+		// Species names.
+		aggregation_stream.SkipElements(3);
+		aggregation_stream.GetLine(line);
+		split(line, Sp_model_names_tmp);
+		for (int m=0; m<int(Sp_model_names_tmp.size()); m++)
+		  Sp_model_names[mm+m] = Sp_model_names_tmp[m];
+		// Molecular weights.
+		aggregation_stream.SkipElements(3);
+		aggregation_stream.GetLine(line);
+		split(line, molecular_weights_model);
+		// Reactivities.
+		aggregation_stream.SkipElements(3);
+		aggregation_stream.GetLine(line);
+		split(line, React_model);
+		
+		stmp = "";
+		while (!aggregation_stream.IsEmpty() && Sp_real_names != stmp)
+		  {
+		    aggregation_stream >> stmp;
+		    line = aggregation_stream.GetLine();
+		  }
+		if (aggregation_stream.IsEmpty() && Sp_real_names != stmp)
+		  throw string("Species ") + Sp_real_names + " not found.";
+		
+		split(line, vtmp);
+		molecular_weights_real = vtmp[0];
+		React_real = vtmp[1];
+		
+		for (int m=0; m<int(Sp_model_names_tmp.size()); m++)
+		  { 
+		    Aggregation_coeff = vtmp[m + 2];
+		    for (int k = 0; k < Nsectors; k++)
+		      {
+			Species_factor(m+mm, l, k) += Speciation_coeff(k) * 0.01
+			  * Aggregation_coeff
+			  * molecular_weights_model[m] / molecular_weights_real
+			  * (1. - exp(-int_OH*React_real) )
+			  / (1. - exp(-int_OH*React_model[m]) );
+		      }
+		  }
+		if (aggregation_stream.bad())
+		  throw "Aggregation file is badly formatted";
+	      }
 	  }
       }
-
+    
   }
 
 

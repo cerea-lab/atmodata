@@ -628,6 +628,7 @@ namespace AtmoData
     \param date date.
     \param Sp_emis_names inventory emission species names.
     \param input_directory input directory.
+    \param input_file input file.
     \param MonthlyFactors monthly factors indexed by the country, the sector
     and the month.
     \param DailyFactors daily factors indexed by the country, the sector and
@@ -638,7 +639,8 @@ namespace AtmoData
   */
   template <class real>
   void ReadEmep(Date date, const vector<string>& Sp_emis_names,
-		string input_directory, const Data<real, 3>& MonthlyFactors,
+		string input_directory, string input_file,
+		const Data<real, 3>& MonthlyFactors,
 		const Data<real, 3>& DailyFactors,
 		Data<list<EmepCountryEmission<real> >, 4, real>& Emis_land,
 		Data<list<EmepCountryEmission<real> >, 4, real>& Emis_water)
@@ -654,15 +656,17 @@ namespace AtmoData
     RegularGrid<real> GridSectors(Emis_land[3]);
     Data<real, 1> Emis_emep(GridSectors);
 
+    ConfigStream CountryNumber(input_file);
+
     // Find the day of the week.
     int day = date.GetWeekDay();
 
     for(int l = 0; l < Nsp_emis; l++)
       {
-	string input_file = input_directory + Sp_emis_names[l] + ".dat";
-	ExtStream EmepEmisStream(input_file);
+	string emis_file = input_directory + Sp_emis_names[l] + ".dat";
+	ExtStream EmepEmisStream(emis_file);
 	if (!EmepEmisStream.is_open())
-	  throw string("File ") + input_file + " doesn't exist.";
+	  throw string("File ") + emis_file + " doesn't exist.";
 
 	while ( has_element(EmepEmisStream) )
 	  {
@@ -672,7 +676,7 @@ namespace AtmoData
 		if (s < Nsectors)
 		  {
 		    v = split(line, ";");
-		    Emis_emep(s) = to_num<float>(v[7]);
+		    Emis_emep(s) = to_num<real>(v[7]);
 		  }
 	      }
 	    country = v[0];
@@ -682,7 +686,6 @@ namespace AtmoData
 	    if (i < 1 || j < 1)
 	      continue;
 
-	    ConfigStream CountryNumber("country_numbers.txt");
 	    CountryNumber.PeekValue(country, Ncountry);
 
 	    // In water.
@@ -701,7 +704,7 @@ namespace AtmoData
 									      Ncountry));
 	  }
 	if (EmepEmisStream.bad())
-	  throw string("EMEP emission file \"") + input_file
+	  throw string("EMEP emission file \"") + emis_file
 	    + "\" is badly formatted.";
       }
   }

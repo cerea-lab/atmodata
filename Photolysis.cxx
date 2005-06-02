@@ -477,6 +477,60 @@ namespace AtmoData
   }
 
 
+  //! Computes the cloud attenuation for photolysis rates, following the
+  // parameterization of the ESQUIF project (2001).
+  /*!
+    Formula : Attenuation = (1 - a * HighCloudiness) *
+    (1 - b * MediumCloudiness) * exp(-c * B)
+    \param MediumCloudiness medium cloudiness (in [0, 1]).
+    \param HighCloudiness high cloudiness (in [0, 1]).
+    \param RelativeHumidity relative humidity (kg/kg).
+    \param Attenuation (output) cloud attenuation coefficient.
+    \param a coefficient (see the formula). Default : 0.1.
+    \param b coefficient (see the formula). Default : 0.3.
+    \param c coefficient (see the formula). Default : 1.5.
+  */
+  template <class TMC, class THC, class TG, class TH, class T>
+  void ComputeAttenuation_ESQUIF(Data<TMC, 3, TG>& MediumCloudiness,
+				 Data<THC, 3, TG>& HighCloudiness,
+				 Data<TH, 4, TG>& RelativeHumidity,
+				 Data<T, 4, TG>& Attenuation,
+				 T a, T b, T c)
+  {
+    int Nt(Attenuation.GetLength(0));
+    int Nz(Attenuation.GetLength(1));
+    int Ny(Attenuation.GetLength(2));
+    int Nx(Attenuation.GetLength(3));
+    int h, k, j, i;
+    float dz;
+
+    T B(0.), norm(0.);
+
+    for (h = 0 ; h < Nt ; h++)
+      for (j = 0 ; j < Ny ; j++)
+	for (i = 0 ; i < Nx ; i++)
+	  {
+	    // Calculation of B.
+	    for (k = 0 ; k < Nz && RelativeHumidity[1].Value(h, k, j, i) < 1500 ; k++)
+	      {
+		dz = RelativeHumidity[1].Value(h, k + 1, j, i)
+		  - RelativeHumidity[1].Value(h, k, j, i);
+
+		if (RelativeHumidity(h, k, j, i) > 0.7)
+		  B += (RelativeHumidity(h, k, j, i) - 0.7) * dz;
+
+		norm += (1. - 0.7) * dz;
+	      }
+	    // Normalization.
+	    B /= norm;
+
+	    for (k = 0 ; k < Nz ; k++)
+	      Attenuation (h, k, j, i) = (1. - a * HighCloudiness(h, j, i))
+		* (1. - b * MediumCloudiness(h, j, i))
+		* exp(-c * B);
+	  }
+  }
+
 }  // namespace AtmoData.
 
 #define ATMODATA_FILE_PHOTOLYSIS_CXX

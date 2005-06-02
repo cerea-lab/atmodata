@@ -46,6 +46,13 @@ namespace AtmoData
 			      Data<THC, 3, TG>& HighCloudiness,
 			      int date, Data<T, 4, TG>& Attenuation);
 
+  template <class TMC, class THC, class TG, class TH, class T>
+  void ComputeAttenuation_ESQUIF(Data<TMC, 3, TG>& MediumCloudiness,
+				 Data<THC, 3, TG>& HighCloudiness,
+				 Data<TH, 4, TG>& RelativeHumidity,
+				 Data<T, 4, TG>& Attenuation,
+				 T a = 0.1, T b = 0.3, T c = 1.5);
+
 }  // namespace AtmoData.
 
 #define ATMODATA_FILE_PHOTOLYSIS_HXX

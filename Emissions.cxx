@@ -656,9 +656,20 @@ namespace AtmoData
     RegularGrid<real> GridSectors(Emis_land[3]);
     Data<real, 1> Emis_emep(GridSectors);
 
-    ConfigStream CountryNumber(input_file);
-
-    // Find the day of the week.
+    // Reads the country codes and country numbers.
+    ExtStream file_stream(input_file);
+    vector<string> CountryCode;
+    vector<int> CountryNumber;
+    while (!file_stream.IsEmpty())
+      {
+	file_stream.GetElement(country);
+	CountryCode.push_back(country);
+	file_stream.GetElement(Ncountry);
+	CountryNumber.push_back(Ncountry);
+	file_stream.GetLine();
+      }
+    
+    // Finds the day of the week.
     int day = date.GetWeekDay();
 
     for(int l = 0; l < Nsp_emis; l++)
@@ -686,8 +697,15 @@ namespace AtmoData
 	    if (i < 1 || j < 1)
 	      continue;
 
-	    CountryNumber.PeekValue(country, Ncountry);
-
+	    int n = 0;
+	    while (CountryCode[n] != country)
+	      {
+		n++;
+		if (n > int(CountryCode.size()))
+		  throw string ("Error in ReadEmep: country code not found in \"") + input_file + "\".";
+	      }
+	    Ncountry = CountryNumber[n];
+	    
 	    // In water.
 	    if (Ncountry >= 30 && Ncountry <= 35)
 	      for (int s = 0; s < Nsectors; s++)
@@ -748,7 +766,7 @@ namespace AtmoData
     RegularGrid<real> GridSectors(Emis_land[3]);
     Data<real, 1> Emis_emep(GridSectors);
 
-    // Find the day of the week.
+    // Finds the day of the week.
     int day = date.GetWeekDay();
 
     for(int l = 0; l < Nsp_emis; l++)

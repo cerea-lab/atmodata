@@ -825,7 +825,7 @@ namespace AtmoData
 	    this->ReadSubHeader(FileStream, sub_header);
 
 	    // If the field matches the requested one.
-	    if (sub_header.name == fill(FieldName, 9))
+	    if (trim(sub_header.name) == trim(FieldName))
 	      {
 		// Creates a subarray of A, one dimension less,
 		// with data corresponding to the current time step.

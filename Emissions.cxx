@@ -633,6 +633,7 @@ namespace AtmoData
     and the month.
     \param DailyFactors daily factors indexed by the country, the sector and
     the day.
+    \param deposition_factor_nh3 local deposition factor for NH3 (range 0-1).
     \param Emis_land (output) emissions over land (Tons) for a given day.
     \param Emis_water (output) emissions over water (Tons) for a given day.
     \note Output data is indexed by the species, Y, X and the sector.
@@ -642,6 +643,7 @@ namespace AtmoData
 		string input_directory, string input_file,
 		const Data<real, 3>& MonthlyFactors,
 		const Data<real, 3>& DailyFactors,
+		const real& deposition_factor_nh3,
 		Data<list<EmepCountryEmission<real> >, 4, real>& Emis_land,
 		Data<list<EmepCountryEmission<real> >, 4, real>& Emis_water)
   {
@@ -653,6 +655,7 @@ namespace AtmoData
     int Nsp_emis = Emis_land[0].GetLength();
     int Nsectors = Emis_land[3].GetLength();
     int NsectorsEmep(11);
+    int AgriculturalSector = 10;
     RegularGrid<real> GridSectors(Emis_land[3]);
     Data<real, 1> Emis_emep(GridSectors);
 
@@ -690,6 +693,11 @@ namespace AtmoData
 		    Emis_emep(s) = to_num<real>(v[7]);
 		  }
 	      }
+
+	    // NH3 local deposition
+	    if (Sp_emis_names[l] == "NH3")
+	      Emis_emep(AgriculturalSector-1) *= (1. - deposition_factor_nh3);
+	    
 	    country = v[0];
 	    i = to_num<int>(v[4]);
 	    j = to_num<int>(v[5]);
@@ -742,6 +750,7 @@ namespace AtmoData
     and the month.
     \param DailyFactors daily factors indexed by the country, the sector and
     the day.
+    \param deposition_factor_nh3 local deposition factor for NH3 (range 0-1).
     \param Emis_land (output) emissions over land (Tons) for a given day.
     \param Emis_water (output) emissions over water (Tons) for a given day.
     \note Output data is indexed by the species, Y, X and the sector.
@@ -754,6 +763,7 @@ namespace AtmoData
 			string input_directory,
 			const Data<real, 3>& MonthlyFactors,
 			const Data<real, 3>& DailyFactors,
+			const real& deposition_factor_nh3,
 			Data<list<EmepCountryEmission<real> >, 4, real>& Emis_land,
 			Data<list<EmepCountryEmission<real> >, 4, real>& Emis_water)
   {
@@ -765,6 +775,8 @@ namespace AtmoData
     int Nsectors = Emis_land[3].GetLength();
     RegularGrid<real> GridSectors(Emis_land[3]);
     Data<real, 1> Emis_emep(GridSectors);
+
+    int AgriculturalSector = 10;
 
     // Finds the day of the week.
     int day = date.GetWeekDay();
@@ -782,7 +794,11 @@ namespace AtmoData
 	    for(int s = 0; s < Nsectors; s++)
 	      EmepEmisStream >> Emis_emep(s);
 	    getline(EmepEmisStream, line);
-	  
+	    
+	    // NH3 local deposition
+	    if (Sp_emis_names[l] == "NH3")
+	      Emis_emep(AgriculturalSector-1) *= (1. - deposition_factor_nh3);
+
 	    // In water.
 	    if ( Ncountry >= 30 && Ncountry <= 35 )
 	      for (int s = 0; s < Nsectors; s++)

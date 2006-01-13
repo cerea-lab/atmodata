@@ -28,7 +28,8 @@ namespace AtmoData
 {
 
   //! Returns the minimum of two elements.
-  /*! \param x first number.
+  /*! 
+    \param x first number.
     \param y second number.
     \return The minimum of {x, y}.
   */
@@ -41,7 +42,8 @@ namespace AtmoData
   }
 
   //! Returns the maximum of two elements.
-  /*! \param x first number.
+  /*! 
+    \param x first number.
     \param y second number.
     \return The maximum of {x, y}.
   */

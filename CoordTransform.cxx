@@ -493,10 +493,6 @@ namespace AtmoData
     double auxsig;
     double psi1;
     double auxc, yc;
-    double x, y, R;
-    double auxl;
-    double auxtan;
-    double lambdaprima;
     double aux, Rs;
     double auxij;
 

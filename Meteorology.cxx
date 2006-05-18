@@ -1095,7 +1095,7 @@ namespace AtmoData
   /*!
     \param Temperature temperature (K).
     \param Pressure pressure (Pa).
-    \param Humidity relative humidity (kg/kg).
+    \param RelativeHumidity relative humidity (kg/kg).
     \param CriticalRelativeHumidity function that returns the critical
     relative humidity as function of the altitude, the pressure
     and reference pressure.
@@ -1168,7 +1168,7 @@ namespace AtmoData
 
     int h, k, j, i;
     int Nt(CloudHeight.GetLength(0));
-    int Nz(Humidity.GetLength(1));
+    int Nz(RelativeHumidity.GetLength(1));
     int Ny(CloudHeight.GetLength(1));
     int Nx(CloudHeight.GetLength(2));
 

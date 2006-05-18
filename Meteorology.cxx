@@ -521,7 +521,7 @@ namespace AtmoData
 	    SurfaceHumidity(h, j, i) = LUC(sea_index, j, i) * q_sat
 	      + (1.0 - LUC(sea_index, j, i))
 	      * ( alpha * q_sat + veg * (1. - alpha)
-		  * min(q_sat, Humidity(h, 0, j, i)) );
+		  * min(q_sat, SpecificHumidity(h, 0, j, i)) );
 	  }
   }
 
@@ -1104,7 +1104,7 @@ namespace AtmoData
   template <class TP, class TH,
 	    class T, class TG>
   void ComputeCloudHeight(Data<TP, 4, TG>& Pressure,
-			  Data<TH, 4, TG>& Humidity,
+			  Data<TH, 4, TG>& RelativeHumidity,
 			  T (CriticalRelativeHumidity)(const T&, const T&,
 						       const T&),
 			  Data<T, 3, TG>& CloudHeight)
@@ -1127,13 +1127,13 @@ namespace AtmoData
 	for (i=0; i<Nx; i++)
 	  {
 
-	    rh0 = Humidity(h, Nz-1, j, i);
+	    rh0 = RelativeHumidity(h, Nz-1, j, i);
 	    
 	    k = 0;
 	    while ( (k<Nz) && (CloudHeight(h, j, i) == max_height) )
 	      {
 
-		rh1 = Humidity(h, k, j, i);
+		rh1 = RelativeHumidity(h, k, j, i);
 
 		// Critical relative humidity.
 		rhc = CriticalRelativeHumidity(Pressure[1].Value(h, k, j, i),
@@ -1156,12 +1156,12 @@ namespace AtmoData
 
   //! Computes the height of cloud basis.
   /*!
-    \param Humidity relative humidity (kg/kg).
+    \param RelativeHumidity relative humidity (kg/kg).
     \param CriticalRelativeHumidity critical relative humidity.
     \param CloudHeight (output) altitudes of cloud basis.
   */
   template <class TH, class TCRH, class T, class TG>
-  void ComputeCloudHeight(Data<TH, 4, TG>& Humidity,
+  void ComputeCloudHeight(Data<TH, 4, TG>& RelativeHumidity,
 			  Data<TCRH, 4, TG>& CriticalRelativeHumidity,
 			  Data<T, 3, TG>& CloudHeight)
   {
@@ -1175,7 +1175,7 @@ namespace AtmoData
     // Index "0" and "1" refer to two contiguous levels.
     T rh0, rh1, rhc;
 
-    T max_height = 2. * Humidity[1].Value(0, Nz-1, 0, 0);
+    T max_height = 2. * RelativeHumidity[1].Value(0, Nz-1, 0, 0);
     CloudHeight.Fill(max_height);
 
     for (h=0; h<Nt; h++)
@@ -1183,19 +1183,19 @@ namespace AtmoData
 	for (i=0; i<Nx; i++)
 	  {
 
-	    rh0 = Humidity(h, Nz-1, j, i);
+	    rh0 = RelativeHumidity(h, Nz-1, j, i);
 	    
 	    k = 0;
 	    while ( (k<Nz) && (CloudHeight(h, j, i) == max_height) )
 	      {
 
-		rh1 = Humidity(h, k, j, i);
+		rh1 = RelativeHumidity(h, k, j, i);
 
 		// Critical relative humidity.
 		rhc = CriticalRelativeHumidity(h, k, j, i);
 
 		if (rh1 >= rhc)  // Above a cloud.
-		  CloudHeight(h, j, i) = Humidity[1].Value(h, k, j, i);
+		  CloudHeight(h, j, i) = RelativeHumidity[1].Value(h, k, j, i);
 
 		// For the next level.
 		rh0 = rh1;

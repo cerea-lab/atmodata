@@ -7,12 +7,12 @@
 // This file is part of AtmoData library.
 // AtmoData library is a tool for data processing in atmospheric
 // sciences.
-// 
+//
 // AtmoData is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // AtmoData is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -85,7 +85,7 @@ namespace AtmoData
 			       Data<T, 4, TG>& RelativeHumidity);
 
   template<class TH, class TS, class TW, class TL, class T, class TG>
-  void ComputeSurfaceHumidity_diag(Data<TH, 4, TG>& Humidity,
+  void ComputeSurfaceHumidity_diag(Data<TH, 4, TG>& SpecificHumidity,
 				   Data<TS, 3, TG>& SaturationHumidity,
 				   Data<TW, 3, TG>& SoilWater,
 				   Data<TL, 3, TG>& LUC, int sea_index,

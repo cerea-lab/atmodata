@@ -7,12 +7,12 @@
 // This file is part of AtmoData library.
 // AtmoData library is a tool for data processing in atmospheric
 // sciences.
-// 
+//
 // AtmoData is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // AtmoData is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -477,7 +477,7 @@ namespace AtmoData
 
   //! Computes the surface specific humidity.
   /*!
-    \param Humidity specific humidity (kg/kg).
+    \param SpecificHumidity specific humidity (kg/kg).
     \param SaturationHumidity saturation humidity (kg/kg).
     \param SoilWater volumetric soil water content (m^3/m^3).
     \param LUC land use coverage in format Nc x Ny x Nx where Nc is the
@@ -491,7 +491,7 @@ namespace AtmoData
     Default: 0.323 m^3/m^3.
   */
   template<class TH, class TS, class TW, class TL, class T, class TG>
-  void ComputeSurfaceHumidity_diag(Data<TH, 4, TG>& Humidity,
+  void ComputeSurfaceHumidity_diag(Data<TH, 4, TG>& SpecificHumidity,
 				   Data<TS, 3, TG>& SaturationHumidity,
 				   Data<TW, 3, TG>& SoilWater,
 				   Data<TL, 3, TG>& LUC, int sea_index,
@@ -1114,7 +1114,7 @@ namespace AtmoData
     int Nt(CloudHeight.GetLength(0));
     int Nz(Pressure.GetLength(1));
     int Ny(CloudHeight.GetLength(1));
-    int Nx(CloudHeight.GetLength(2));    
+    int Nx(CloudHeight.GetLength(2));
 
     // Index "0" and "1" refer to two contiguous levels.
     T rh0, rh1, rhc;
@@ -1170,7 +1170,7 @@ namespace AtmoData
     int Nt(CloudHeight.GetLength(0));
     int Nz(Humidity.GetLength(1));
     int Ny(CloudHeight.GetLength(1));
-    int Nx(CloudHeight.GetLength(2));    
+    int Nx(CloudHeight.GetLength(2));
 
     // Index "0" and "1" refer to two contiguous levels.
     T rh0, rh1, rhc;

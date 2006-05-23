@@ -475,6 +475,39 @@ namespace AtmoData
   }
 
 
+  //! Computes the relative humidity from the specific humidity.
+  /*!
+    \param SpecificHumidity specific humidity (kg/kg).
+    \param Temperature temperature (or virtual temperature) (K).
+    \param Pressure pressure (Pa).
+    \param RelativeHumidity (output) relative humidity.
+  */
+  template<class TS, class TT, class TP, class T, class TG>
+  void ComputeRelativeHumidity(Data<TS, 3, TG>& SpecificHumidity,
+			       Data<TT, 3, TG>& Temperature,
+			       Data<TP, 3, TG>& Pressure,
+			       Data<T, 3, TG>& RelativeHumidity)
+  {
+    int k, j, i;
+    int Nz(RelativeHumidity.GetLength(0));
+    int Ny(RelativeHumidity.GetLength(1));
+    int Nx(RelativeHumidity.GetLength(2));
+
+    T P_sat;
+    for (k = 0; k < Nz; k++)
+      for (j = 0; j < Ny; j++)
+	for (i = 0; i < Nx; i++)
+	  {
+	    P_sat = 611.2 * exp(17.67 * (Temperature(k, j, i) - 273.15)
+				/ (Temperature(k, j, i) - 29.65));
+	    RelativeHumidity(k, j, i) = SpecificHumidity(k, j, i)
+	      * Pressure(k, j, i)
+	      / ( (0.62197 * (1.0 - SpecificHumidity(k, j, i))
+		   + SpecificHumidity(k, j, i) ) * P_sat);
+	  }
+  }
+
+
   //! Computes the surface specific humidity.
   /*!
     \param SpecificHumidity specific humidity (kg/kg).

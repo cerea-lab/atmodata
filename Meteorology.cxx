@@ -1483,7 +1483,8 @@ namespace AtmoData
 	for (j=0; j<Ny; j++)
 	  for (i=0; i<Nx; i++)
 	    VirtualTemperature(h, k, j, i) = Temperature(h, k, j, i)
-	      * (1 + c * SpecificHumidity(h, k, j, i));
+	      * (1 + c * SpecificHumidity(h, k, j, i)
+		 / (1. - SpecificHumidity(h, k, j, i)));
 
   }
 

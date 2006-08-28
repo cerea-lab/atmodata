@@ -218,5 +218,19 @@ namespace AtmoData
 
 }  // namespace AtmoData.
 
+
+// Fortran functions.
+#if defined(__GNUG__) && __GNUG__ < 4 && !defined (__INTEL_COMPILER)
+#define _compute_relative_humidity compute_relative_humidity__
+#else
+#define _compute_relative_humidity compute_relative_humidity_
+#endif
+
+extern "C"
+{
+  void _compute_relative_humidity(double*, double*, double*, double*);
+}
+
+
 #define ATMODATA_FILE_METEOROLOGY_HXX
 #endif

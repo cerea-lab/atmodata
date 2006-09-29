@@ -185,7 +185,7 @@ c     wet_diameter - Aerosol wet diameter (micrometer).
 c
 c     Returns:
 c     rate - Condensation/evaporation transfer rate (m^3/s). The
-c     condensation growth rate is then given by "rate * (c^g - c^s)"
+c     condensation growth rate is then given by "rate * (c^g -- c^s)"
 c     where c^g is the gaseous concentration and c^s is the
 c     concentration at the aerosol surface.
       subroutine compute_condensation_transfer_rate(diffusivity,

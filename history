@@ -3,6 +3,32 @@ o------------------o
 o------------------o
 
 
+Version 1.1 (2006-09-29)
+-----------
+
+** Improvements:
+
+- All functions related to anthropogenic emissions (previously part of
+  Polyphemus preprocessing) are now in AtmoData.
+- Added functions related to Troen & Mahrt parameterization for vertical 
+  diffusion coefficients ('ComputeLMO', 'ComputePBLH_TM', 'ComputePBLH_Richardson' 
+  and 'ComputeTM_Kz').
+- Added ESQUIF parameterization for attenuation.
+- Improved 'ReadEmep' (less CPU time consuming).
+- Only a part of the emissions of NH3 are now taken into account due to the 
+  local deposition.
+- Added "Aerosol.f" and "Meteorology.f" in AtmoData.
+- Aggregation matrix is now limited to NMVOC in function 
+'SpeciationAggregation'.
+
+** Bug fixes:
+
+- Virtual temperature was badly computed.
+- Fixed a bug in 'ComputeCloudFraction': when both the relative humidity and the 
+  critical relative humidity reached 1.0, a division by zero occurred (and the 
+  cloud fraction was then set to NaN).
+
+
 Version 1.0 (2004-10-13)
 -----------
 

@@ -93,7 +93,7 @@ c     The last factor (2.d-2) converts back to a diameter in
 c     micrometers.
       wet_diameter =
      $     (0.4989352162271429d0 * dry_radius**0.3026183900844475d1
-     $     / (correction * dry_radius**-0.1371059101078550d1
+     $     / (correction * dry_radius**(-0.1371059101078550d1)
      $     - dlog(relative_humidity)) + dry_radius * dry_radius
      $     * dry_radius) ** 0.3333333333333d0 * 2.d4
 
@@ -313,6 +313,6 @@ c     coefficient - Kelvin effect coefficient.
       double precision coefficient
 
       coefficient = dexp(4.d3 * surface_tension * weight
-     $     / (8.314 * temperature * density * wet_diameter))
+     $     / (8.314d0 * temperature * density * wet_diameter))
 
       end

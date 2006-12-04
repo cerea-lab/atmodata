@@ -709,8 +709,9 @@ namespace AtmoData
 	    while (CountryCode[n] != country)
 	      {
 		n++;
-		if (n > int(CountryCode.size()))
-		  throw string ("Error in ReadEmep: country code not found in \"") + input_file + "\".";
+		if (n >= int(CountryCode.size()))
+		  throw string("Error in ReadEmep: country code \"") + country 
+		    + string("\" not found in \"") + input_file + "\".";
 	      }
 	    Ncountry = CountryNumber[n];
 	    

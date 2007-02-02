@@ -28,14 +28,15 @@ namespace AtmoData
 {
 
   template<class T>
-  T ZenithAngle(T lon, T lat, int idate, T ut);
+  T ZenithAngle(T lon, T lat, Date date, T ut);
 
   template <class TH, class TL, class TMC, class THC, class T, class TG>
   void ComputeAttenuation_LWC(Data<TH, 4, TG>& Humidity, Data<TH, 4, TG>& CRH,
 			      Data<TL, 4, TG>& LiquidWaterContent,
 			      Data<TMC, 3, TG>& MediumCloudiness,
 			      Data<THC, 3, TG>& HighCloudiness,
-			      int date, Data<T, 4, TG>& Attenuation);
+			      Date date_beg, T Delta_t, 
+			      Data<T, 4, TG>& Attenuation);
 
   template <class TL, class TMC, class THC, class T, class TG>
   void ComputeAttenuation_LWC(Data<TL, 4, TG>& LiquidWaterContent,
@@ -44,7 +45,8 @@ namespace AtmoData
 			      Data<int, 4> HighIndices,
 			      Data<TMC, 3, TG>& MediumCloudiness,
 			      Data<THC, 3, TG>& HighCloudiness,
-			      int date, Data<T, 4, TG>& Attenuation);
+			      Date date_beg, T Delta_t, 
+			      Data<T, 4, TG>& Attenuation);
 
   template <class TMC, class THC, class TG, class TH, class T>
   void ComputeAttenuation_ESQUIF(Data<TMC, 3, TG>& MediumCloudiness,

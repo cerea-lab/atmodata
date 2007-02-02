@@ -26,6 +26,9 @@
 
 #include "Photolysis.hxx"
 
+#include "Talos.hxx"
+using namespace Talos;
+
 namespace AtmoData
 {
 
@@ -52,23 +55,17 @@ namespace AtmoData
     \return solar zenith angle (degrees).
   */
   template<class T>
-  T ZenithAngle(T lon, T lat, int idate, T ut)
+  T ZenithAngle(T lon, T lat, Date date, T ut)
   {
 
     T zen;
     // T azim, caz, raz;
 
-    T lbut,lzut;
+    T lbut, lzut;
     T rlt;
     T d, tz, rdecl, eqr, eqh, zpt;
     T csz, zr;
     T sintz, costz, sin2tz, cos2tz, sin3tz, cos3tz;
-
-    int iiiiyear, imth, iday, ijd;
-    int imn[] = {31, 28, 31, 30, 31, 30,
-		 31, 31, 30, 31, 30, 31};
-  
-    int i;
 
     const T pi = 3.1415926535898;
     const T dr = double(pi) / double(180.);
@@ -76,23 +73,8 @@ namespace AtmoData
     // Converts to radians.
     rlt = lat*dr;
 
-    // Parse date.
-    iiiiyear = idate / 10000;
-    imth = (idate - iiiiyear * 10000) / 100;
-    iday = idate - iiiiyear * 10000 - imth * 100;
-
-    // Identifies and corrects leap years.
-    if ( ( (iiiiyear % 4 == 0) && (iiiiyear % 100 != 0) )
-	 || ( iiiiyear % 400 == 0) )
-      imn[1] = 29;
-    else
-      imn[1] = 28;
-
     // Computes current (Julian) day of year IJD = 1 to 365.
-    ijd = 0;
-    for (i=0; i<imth-1; i++)
-      ijd += imn[i];
-    ijd += iday;
+    int ijd = date.GetNumberOfDays() + 1;
 
     // Calculates decimal Julian day from start of year.
     d = T(ijd - 1) + ut / 24.;
@@ -168,7 +150,8 @@ namespace AtmoData
 			      Data<TL, 4, TG>& LiquidWaterContent,
 			      Data<TMC, 3, TG>& MediumCloudiness,
 			      Data<THC, 3, TG>& HighCloudiness,
-			      int date, Data<T, 4, TG>& Attenuation)
+			      Date date_beg, T Delta_t, 
+			      Data<T, 4, TG>& Attenuation)
   {
     int h, k, j, i;
     int Nt(Attenuation.GetLength(0));
@@ -176,25 +159,25 @@ namespace AtmoData
     int Ny(Attenuation.GetLength(2));
     int Nx(Attenuation.GetLength(3));
     
+    Date current_date = date_beg;
+    
     // Index "0" and "1" refer to two contiguous levels.
     T rh0, rh1, rhc, dz, delta_z,
       lwc0, lwc1, lw, w, tau, tr;
 
-    for (h=0; h<Nt; h++)
-      for (j=0; j<Ny; j++)
-	for (i=0; i<Nx; i++)
+    for (h = 0; h < Nt; h++)
+      for (j = 0; j < Ny; j++)
+	for (i = 0; i <Nx; i++)
 	  {
-
 	    rh0 = Humidity(h, Nz-1, j, i);
 	    // kg/m^3 to g/m^3.
 	    lwc0 = 1000. * LiquidWaterContent(h, Nz-1, j, i);
 
 	    w = 0;
 	    
-	    for (k=Nz-1; k>=0; k--)
+	    for (k = Nz-1; k >= 0; k--)
 	      {
-
-		if (k==Nz-1)
+		if (k == Nz-1)
 		  dz = Attenuation[1].Value(h, Nz-1, j, i)
 		    - Attenuation[1].Value(h, Nz-2, j, i);
 		else
@@ -248,10 +231,11 @@ namespace AtmoData
 		// Zenith angle.
 		T cos_zenith_angle;
 		cos_zenith_angle =
-		  cos( ZenithAngle(Attenuation[3].Value(h, k, j, i),
-				   Attenuation[2].Value(h, k, j, i),
-				   date, Attenuation[0].Value(h, k, j, i))
-		       * 0.0174532925199433 );
+		  cos(ZenithAngle(Attenuation[3].Value(h, k, j, i),
+				  Attenuation[2].Value(h, k, j, i),
+				  current_date, 
+				  Attenuation[0].Value(h, k, j, i))
+		      * 0.0174532925199433 );
 		cos_zenith_angle = abs(cos_zenith_angle);
 
 		// Computes the attenuation coefficient.
@@ -265,9 +249,8 @@ namespace AtmoData
 		    + (min(1.0, MediumCloudiness(h, j, i)
 			   + HighCloudiness(h, j, i)))
 		    * ( (1.-tr) * cos_zenith_angle );
-
 	      }
-
+	    current_date.AddHours(int(Delta_t));
 	  }
   }
 
@@ -298,14 +281,17 @@ namespace AtmoData
 			      Data<int, 4> HighIndices,
 			      Data<TMC, 3, TG>& MediumCloudiness,
 			      Data<THC, 3, TG>& HighCloudiness,
-			      int date, Data<T, 4, TG>& Attenuation)
+			      Date date_beg, T Delta_t, 
+			      Data<T, 4, TG>& Attenuation)
   {
     int h, k, j, i;
     int Nt(Attenuation.GetLength(0));
     int Nz(Attenuation.GetLength(1));
     int Ny(Attenuation.GetLength(2));
     int Nx(Attenuation.GetLength(3));
-    
+
+    Date current_date = date_beg; 
+ 
     Attenuation.Fill(1.);
 
     // Indices "0" and "1" refer to two contiguous levels.
@@ -315,11 +301,11 @@ namespace AtmoData
     int lb, lt, mb, mt, hb, ht, lower, upper;
     T cos_zenith_angle, alpha;
 
-    for (h=0; h<Nt; h++)
-      for (j=0; j<Ny; j++)
-	for (i=0; i<Nx; i++)
+    for (h = 0; h < Nt; h++)
+      for (j = 0; j < Ny; j++)
+	for (i = 0; i < Nx; i++)
 	  {
-
+	    
 	    // Low clouds are between lb and lt.
 	    lb = LowIndices(h, j, i, 0);
 	    lt = LowIndices(h, j, i, 1);
@@ -347,9 +333,9 @@ namespace AtmoData
 	    w = 0;
 
 	    // Starting from the top.
-	    for (k=Nz-1; k>=0; k--)
+	    for (k = Nz-1; k >= 0; k--)
 	      {
-		if (k==Nz-1)
+		if (k == Nz-1)
 		  dz = Attenuation[1].Value(h, Nz-1, j, i)
 		    - Attenuation[1].Value(h, Nz-2, j, i);
 		else
@@ -384,10 +370,11 @@ namespace AtmoData
 	      {
 		// Zenith angle.
 		cos_zenith_angle =
-		  cos( ZenithAngle(Attenuation[3].Value(h, k, j, i),
-				   Attenuation[2].Value(h, k, j, i),
-				   date, Attenuation[0].Value(h, k, j, i))
-		       * 0.0174532925199433 );
+		  cos(ZenithAngle(Attenuation[3].Value(h, k, j, i),
+				  Attenuation[2].Value(h, k, j, i), 
+				  current_date, 
+				  Attenuation[0].Value(h, k, j, i))
+		      * 0.0174532925199433 );
 		cos_zenith_angle = abs(cos_zenith_angle);
 
 		// Computes the attenuation coefficient.
@@ -402,10 +389,11 @@ namespace AtmoData
 	      {
 		// Zenith angle.
 		cos_zenith_angle =
-		  cos( ZenithAngle(Attenuation[3].Value(h, k, j, i),
-				   Attenuation[2].Value(h, k, j, i),
-				   date, Attenuation[0].Value(h, k, j, i))
-		       * 0.0174532925199433 );
+		  cos(ZenithAngle(Attenuation[3].Value(h, k, j, i),
+				  Attenuation[2].Value(h, k, j, i),
+				  current_date, 
+				  Attenuation[0].Value(h, k, j, i))
+		      * 0.0174532925199433 );
 		cos_zenith_angle = abs(cos_zenith_angle);
 
 		// Computes the attenuation coefficient.
@@ -433,9 +421,10 @@ namespace AtmoData
 		up_att = 1.;
 		// Zenith angle.
 		cos_zenith_angle =
-		  cos( ZenithAngle(Attenuation[3].Value(h, 0, j, i),
-				   Attenuation[2].Value(h, 0, j, i),
-				   date, Attenuation[0].Value(h, 0, j, i))
+		  cos(ZenithAngle(Attenuation[3].Value(h, 0, j, i),
+				  Attenuation[2].Value(h, 0, j, i),
+				  current_date, 
+				  Attenuation[0].Value(h, 0, j, i))
 		       * 0.0174532925199433 );
 		cos_zenith_angle = abs(cos_zenith_angle);
 		// Computes the attenuation coefficient.
@@ -456,10 +445,11 @@ namespace AtmoData
 		up_att = Attenuation(h, upper, j, i);
 		// Zenith angle.
 		cos_zenith_angle =
-		  cos( ZenithAngle(Attenuation[3].Value(h, 0, j, i),
-				   Attenuation[2].Value(h, 0, j, i),
-				   date, Attenuation[0].Value(h, 0, j, i))
-		       * 0.0174532925199433 );
+		  cos(ZenithAngle(Attenuation[3].Value(h, 0, j, i),
+				  Attenuation[2].Value(h, 0, j, i),
+				  current_date, 
+				  Attenuation[0].Value(h, 0, j, i))
+		      * 0.0174532925199433 );
 		cos_zenith_angle = abs(cos_zenith_angle);
 		// Computes the attenuation coefficient.
 		low_att = 1.0 + MediumCloudiness(h, j, i)
@@ -473,6 +463,7 @@ namespace AtmoData
 		Attenuation(h, k, j, i) = alpha * up_att
 		  + (1. - alpha) * low_att;
 	      }
+	    current_date.AddHours(int(Delta_t));
 	  }
   }
 
@@ -506,12 +497,13 @@ namespace AtmoData
 
     T B(0.), norm(0.);
 
-    for (h = 0 ; h < Nt ; h++)
-      for (j = 0 ; j < Ny ; j++)
-	for (i = 0 ; i < Nx ; i++)
+    for (h = 0; h < Nt ; h++)
+      for (j = 0; j < Ny ; j++)
+	for (i = 0; i < Nx ; i++)
 	  {
 	    // Calculation of B.
-	    for (k = 0 ; k < Nz && RelativeHumidity[1].Value(h, k, j, i) < 1500 ; k++)
+	    for (k = 0 ; k < Nz && RelativeHumidity[1].Value(h, k, j, i) 
+		   < 1500 ; k++)
 	      {
 		dz = RelativeHumidity[1].Value(h, k + 1, j, i)
 		  - RelativeHumidity[1].Value(h, k, j, i);

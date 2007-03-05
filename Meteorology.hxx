@@ -186,6 +186,21 @@ namespace AtmoData
 			  Grid<TG>& GridZ_interf,
 			  Data<T, 3, TG>& CloudHeight);
 
+  template<class T, class TLC, class TC>
+  void ComputeTotalCloudiness(Data<TLC, 3, T>& LowCloudiness,
+			      Data<TLC, 3, T>& MediumCloudiness,
+			      Data<TLC, 3, T>& HighCloudiness,
+			      Data<TC, 3, T>& Cloudiness);
+
+  template <class TLC, class TC>
+  TC ComputeTotalCloudiness(TLC low_cloudiness, TLC medium_cloudiness,
+			    TLC high_cloudiness);
+
+  template <class T>
+  string ComputePasquillStabilityClass(T surface_wind, T solar_radiation,
+				       T cloudiness, bool isday);
+
+
   template <class Ta, class Tb, class TSP,
 	    class T, class TG>
   void ComputePressure(Data<Ta, 1, TG>& alpha, Data<Tb, 1, TG>& beta,

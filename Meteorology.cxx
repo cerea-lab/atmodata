@@ -1283,6 +1283,105 @@ namespace AtmoData
   }
 
 
+  //! Computes the total cloudiness.
+  /*!
+    \param LowCloudiness low cloudiness in [0, 1].
+    \param MediumCloudiness medium cloudiness in [0, 1].
+    \param HighCloudiness high cloudiness in [0, 1].
+    \param Cloudiness (output) total cloudiness in [0, 1].
+    \return the total cloudiness in [0, 1].
+  */
+  template<class T, class TLC, class TC>
+  void ComputeTotalCloudiness(Data<TLC, 3, T>& LowCloudiness,
+			      Data<TLC, 3, T>& MediumCloudiness,
+			      Data<TLC, 3, T>& HighCloudiness,
+			      Data<TC, 3, T>& Cloudiness)
+  {
+    int h, j, i;
+    int Nt(Cloudiness.GetLength(0));
+    int Ny(Cloudiness.GetLength(2));
+    int Nx(Cloudiness.GetLength(3));
+
+    for (h = 0; h < Nt; h++)
+      for (j = 0; j < Ny; j++)
+	for (i = 0; i < Nx; i++)
+	  Cloudiness(h, j, i) = 1. - (1. - LowCloudiness(h, j, i))
+	    * (1. - MediumCloudiness(h, j, i))
+	    * (1. - HighCloudiness(h, j, i));
+  }
+
+
+  //! Computes the total cloudiness at a given point.
+  /*!
+    \param low_cloudiness low cloudiness in [0, 1].
+    \param medium_cloudiness medium cloudiness in [0, 1].
+    \param high_cloudiness high cloudiness in [0, 1].
+    \return the total cloudiness in [0, 1].
+  */
+  template<class TLC, class TC>
+  inline TC ComputeTotalCloudiness(TLC low_cloudiness, TLC medium_cloudiness,
+				   TLC high_cloudiness)
+  {
+    return 1. - (1. - low_cloudiness) * (1. - medium_cloudiness)
+      * (1. - high_cloudiness);
+  }
+
+
+  //! Computes the Pasquill stability class (source: Turner 1969).
+  /*!
+    \param surface_wind wind speed at 10 meters (m/s).
+    \param solar_radiation solar radiation (W.m^{-2}).
+    \param cloudiness cloudiness in [0, 1].
+    \param isday Boolean equal to true if it is daytime, false otherwise.
+    \return the Pasquill stability class (A, B, C, D, E or F).
+    \note the conditions of dual stability classes like A-B, B-C or C-D are
+    considered as B, C and D respectively.
+  */
+  template<class T>
+  string ComputePasquillStabilityClass(T surface_wind, T solar_radiation,
+				       T cloudiness, bool isday)
+  {
+    if (isday)
+      if (surface_wind < 2.)
+	if (solar_radiation > 700.)
+	  return "A";
+	else
+	  return "B";
+      else if (surface_wind < 3.)
+	if (solar_radiation >= 350.)
+	  return "B";
+	else
+	  return "C";
+      else if (surface_wind < 5.)
+	if (solar_radiation > 700.)
+	  return "B";
+	else
+	  return "C";
+      else if (surface_wind < 6.)
+	if (solar_radiation > 700.)
+	  return "C";
+	else
+	  return "D";
+      else
+	  return "D";
+    else
+      if (surface_wind < 2.)
+	return "F";
+      else if (surface_wind < 3.)
+	if (cloudiness > 0.5)
+	  return "E";
+	else
+	  return "F";
+      else if (surface_wind < 5.)
+	if (cloudiness > 0.5)
+	  return "D";
+	else
+	  return "E";
+      else
+	return "D";
+  }
+
+
   //! Computes the pressure from the surface pressure.
   /*!
     Formula: Pressure_k = alpha_k * P0 + beta_k * SurfacePressure,

@@ -63,9 +63,8 @@ namespace AtmoData
 
     T lbut, lzut;
     T rlt;
-    T d, tz, rdecl, eqr, eqh, zpt;
+    T rdecl, eqr, eqh, zpt;
     T csz, zr;
-    T sintz, costz, sin2tz, cos2tz, sin3tz, cos3tz;
 
     const T pi = 3.1415926535898;
     const T dr = double(pi) / double(180.);
@@ -73,42 +72,8 @@ namespace AtmoData
     // Converts latitude to radians.
     rlt = lat*dr;
 
-    // Computes current (Julian) day of year IJD = 1 to 365.
-    int ijd = date.GetNumberOfDays() + 1;
-
-    // Calculates decimal Julian day from start of year.
-    d = T(ijd - 1) + ut / 24.;
-
-    // Equation 3.8 for "day-angle".
-    tz = 2.* pi * d / 365.;
-
-    // Calculates sine and cosine from addition theoremes for 
-    // better performance;  the computation of sin2tz,
-    // sin3tz, cos2tz and cos3tz is about 5-6 times faster
-    // than the evaluation of the intrinsic functions.
-    //
-    // It is sin(x+y) = sin(x)*cos(y)+cos(x)*sin(y)
-    // and   cos(x+y) = cos(x)*cos(y)-sin(x)*sin(y)
-    //
-    // sintz  = sin(tz)      costz  = cos(tz)
-    // sin2tz = sin(2.*tz)   cos2tz = sin(2.*tz)
-    // sin3tz = sin(3.*tz)   cos3tz = cos(3.*tz)
-
-    sintz = sin(tz);
-    costz = cos(tz);
-    sin2tz = 2. * sintz * costz;
-    cos2tz = costz * costz - sintz * sintz;
-    sin3tz = sintz * cos2tz + costz * sin2tz;
-    cos3tz = costz * cos2tz - sintz * sin2tz;
-
-    // Equation 3.7 for declination in radians.
-    rdecl = 0.006918 - 0.399912 * costz  + 0.070257 * sintz
-      - 0.006758 * cos2tz + 0.000907 * sin2tz
-      - 0.002697 * cos3tz + 0.001480 * sin3tz;
-
-    // Equation 3.11 for Equation of time in radians.
-    eqr   = 0.000075 + 0.001868 * costz  - 0.032077 * sintz
-      - 0.014615 * cos2tz - 0.040849 * sin2tz;
+    //Computes solar declination and equation of time (radians).
+    ComputeDeclination(date, ut, rdecl, eqr);
 
     // Converts equation of time to hours.
     eqh = eqr * 24. / (2. * pi);

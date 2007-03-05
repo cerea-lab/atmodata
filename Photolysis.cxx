@@ -49,7 +49,7 @@ namespace AtmoData
     to year.
     \param lon longitude of location (degrees).
     \param lat latitude of location (degrees).
-    \param idate date in the form YYYYMMDD.
+    \param date date in the form YYYYMMDD.
     \param ut local time in decimal UT (e.g., 16.25 means 15 minutes
     after 4 pm).
     \return solar zenith angle (degrees).
@@ -70,7 +70,7 @@ namespace AtmoData
     const T pi = 3.1415926535898;
     const T dr = double(pi) / double(180.);
 
-    // Converts to radians.
+    // Converts latitude to radians.
     rlt = lat*dr;
 
     // Computes current (Julian) day of year IJD = 1 to 365.
@@ -114,7 +114,7 @@ namespace AtmoData
     eqh = eqr * 24. / (2. * pi);
 
     // Calculates local hour angle (hours).
-    lbut = 12. - eqh - lon* 24. / 360.;
+    lbut = 12. - eqh - lon * 24. / 360.;
 
     // Converts to angle from UT.
     lzut = 15. * (ut - lbut);

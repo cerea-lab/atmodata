@@ -132,7 +132,7 @@ namespace AtmoData
     const T pi = 3.1415926535898;
 
     // Computes solar declination and equation of time (radians).
-    ComputeDeclination(idate, 0., declination, time_equation);
+    ComputeDeclination(idate, T(0.), declination, time_equation);
 
     // Converts equation of time to hours.
     eqh = time_equation * 24. / (2. * pi);
@@ -229,8 +229,8 @@ namespace AtmoData
   template<class T>
   bool IsDay(T lon, T lat, Date date)
   {
-    int idate, hr, mn, sc;
-    T ut;
+    int idate, hr, mn;
+    T sc, ut;
 
     // Gets current date in format YYYYMMDD.
     idate = date.GetDate();

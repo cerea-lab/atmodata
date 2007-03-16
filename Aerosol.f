@@ -16,7 +16,7 @@ c     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 c     General Public License (file "LICENSE") for more details.
 c     
 c     For more information, please see the AtmoData home page:
-c     http://spacetown.free.fr/lib/atmodata
+c     http://www.enpc.fr/cerea/atmodata/
 
 
 c     Function: compute_gas_diffusivity

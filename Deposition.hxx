@@ -19,7 +19,7 @@
 // GNU General Public License (file "license") for more details.
 //
 // For more information, please see the AtmoData home page:
-//     http://spacetown.free.fr/lib/atmodata
+//     http://www.enpc.fr/cerea/atmodata/
 
 
 #ifndef ATMODATA_FILE_DEPOSITION_HXX

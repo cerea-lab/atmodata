@@ -174,6 +174,7 @@ namespace AtmoData
 
     void Init();
     MM5SubHeader& operator=(MM5SubHeader&);
+    string GetCurrentDate();
 
   };
 

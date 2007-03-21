@@ -849,7 +849,7 @@ namespace AtmoData
 		    string("Data file contains ") + to_str(time_step)
 		    + string(" steps, but the data array contains ")
 		    + to_str(nb_time_steps)
-		    + " steps. Both data should be consistant.");
+		    + " steps. Both data should be consistent.");
 #endif
 
   }
@@ -1209,6 +1209,12 @@ namespace AtmoData
 
     return *this;
   }
+
+  string MM5SubHeader::GetCurrentDate()
+  {
+    return current_date;
+  }
+
 
 }  // namespace AtmoData.
 

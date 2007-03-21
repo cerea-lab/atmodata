@@ -523,7 +523,7 @@ namespace AtmoData
     Computes (1) the number of urban, water, forest and other types of LUC that
     are included in each EMEP cell, and (2) the total number of LUC cells
     included in each Polair3D cell.
-    \param LUC land use coverage on USGS categories.
+    \param LUC land use coverage on GLCF categories.
     \param Nurb_emep (output) number of urban LUC cells in EMEP cells.
     \param Nwat_emep (output) number of water LUC cells in EMEP cells.
     \param Nfor_emep (output) number of forest LUC cells in EMEP cells.

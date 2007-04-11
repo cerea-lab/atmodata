@@ -648,14 +648,13 @@ namespace AtmoData
 		Data<list<EmepCountryEmission<real> >, 4, real>& Emis_water)
   {
 
-    int Ncountry, i, j;
-    string country, line;
+    int Ncountry, i, j, s;
+    string country, line, sector;
     vector<string> v;
+    real quantity, monthly, daily;
 
     int Nsp_emis = Emis_land[0].GetLength();
-    int Nsectors = Emis_land[3].GetLength();
-    int NsectorsEmep(11);
-    int AgriculturalSector = 10;
+  
     RegularGrid<real> GridSectors(Emis_land[3]);
     Data<real, 1> Emis_emep(GridSectors);
 
@@ -682,25 +681,22 @@ namespace AtmoData
 	if (!EmepEmisStream.is_open())
 	  throw string("File ") + emis_file + " doesn't exist.";
 
-	while ( has_element(EmepEmisStream) )
+	while (has_element(EmepEmisStream))
 	  {
-	    for(int s = 0; s < NsectorsEmep; s++)
-	      {
-		EmepEmisStream.GetLine(line);
-		if (s < Nsectors)
-		  {
-		    v = split(line, ";");
-		    Emis_emep(s) = to_num<real>(v[7]);
-		  }
-	      }
-
-	    // NH3 local deposition
-	    if (Sp_emis_names[l] == "NH3")
-	      Emis_emep(AgriculturalSector-1) *= (1. - deposition_factor_nh3);
-	    
+	    EmepEmisStream.GetLine(line);
+	    v = split(line, ";");
 	    country = v[0];
+	    sector = v[2];
+	    s = to_num<int>(sector.erase(0, 1)) - 1;
 	    i = to_num<int>(v[4]);
-	    j = to_num<int>(v[5]);
+	    j = to_num<int>(v[5]); 
+
+	    quantity = to_num<real>(v[7]);
+
+	    // NH3 local deposition.
+	    // 9 is agricultural sector.
+	    if (Sp_emis_names[l] == "NH3" && s == 9)
+	      quantity *= (1. - deposition_factor_nh3);
 
 	    if (i < 1 || j < 1)
 	      continue;
@@ -714,22 +710,28 @@ namespace AtmoData
 		    + string("\" not found in \"") + input_file + "\".";
 	      }
 	    Ncountry = CountryNumber[n];
+	   
+	    if (s < 10)
+	      {
+		monthly = MonthlyFactors(Ncountry, s, date.GetMonth() - 1);
+		daily = DailyFactors(Ncountry, s, day); 
 	    
-	    // In water.
-	    if (Ncountry >= 30 && Ncountry <= 35)
-	      for (int s = 0; s < Nsectors; s++)
-		Emis_water(l, j-1, i-1, s).push_back(EmepCountryEmission<real>(Emis_emep(s)
-									       * MonthlyFactors(Ncountry, s, date.GetMonth()-1)
-									       * DailyFactors(Ncountry, s, day) / 365.,
-									       Ncountry));
-	    // In land.
-	    else
-	      for (int s = 0; s < Nsectors; s++)
-		Emis_land(l, j-1, i-1, s).push_back(EmepCountryEmission<real>(Emis_emep(s)
-									      * MonthlyFactors(Ncountry, s, date.GetMonth()-1)
-									      * DailyFactors(Ncountry, s, day) / 365.,
-									      Ncountry));
+		// In water.
+		if ((Ncountry >= 30 && Ncountry <= 35) || Ncountry == 70)
+		  Emis_water(l, j-1, i-1, s).
+		    push_back(EmepCountryEmission<real>(quantity * 
+							monthly * daily / 
+							365, Ncountry));
+		
+		// In land.
+		else
+		  Emis_land(l, j-1, i-1, s).
+		    push_back(EmepCountryEmission<real>(quantity * 
+							monthly * daily / 
+							365, Ncountry));
+	      }
 	  }
+
 	if (EmepEmisStream.bad())
 	  throw string("EMEP emission file \"") + emis_file
 	    + "\" is badly formatted.";

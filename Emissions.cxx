@@ -648,6 +648,7 @@ namespace AtmoData
 		Data<list<EmepCountryEmission<real> >, 4, real>& Emis_water)
   {
 
+    int Ncountry_max = MonthlyFactors.GetLength(0);
     int Ncountry, i, j, s;
     string country, line, sector;
     vector<string> v;
@@ -710,6 +711,13 @@ namespace AtmoData
 		    + string("\" not found in \"") + input_file + "\".";
 	      }
 	    Ncountry = CountryNumber[n];
+
+	    if (Ncountry >= Ncountry_max)
+	      throw string("Country code number ") + to_str(Ncountry)
+		+ string(" (country \"")
+		+ country + string("\") is greater than ")
+		+ string("or equal to the maximum number of countries (")
+		+ to_str(Ncountry_max) + ").";
 	   
 	    if (s < 10)
 	      {

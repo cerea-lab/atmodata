@@ -7,12 +7,12 @@
 // This file is part of AtmoData library.
 // AtmoData library is a tool for data processing in atmospheric
 // sciences.
-// 
+//
 // AtmoData is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // AtmoData is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -53,7 +53,7 @@ namespace AtmoData
 			    Data<TEFT, 1, TG>& EF_terpenes,
 			    Data<TEFN, 1, TG>& EF_NO,
 			    Data<TI, 2, TG>& Isoprene,
-			    Data<TT, 2, TG>& Terpenes, 
+			    Data<TT, 2, TG>& Terpenes,
 			    Data<TN, 2, TG>& NO)
   {
 
@@ -102,7 +102,7 @@ namespace AtmoData
 				Data<TEFT, 1, TG>& EF_terpenes,
 				Data<TEFN, 1, TG>& EF_NO,
 				Data<TI, 3, TG>& Isoprene,
-				Data<TT, 3, TG>& Terpenes, 
+				Data<TT, 3, TG>& Terpenes,
 				Data<TN, 3, TG>& NO)
   {
 
@@ -227,8 +227,8 @@ namespace AtmoData
   }
 
 
-  //! Reads temporal factors from a file. 
-  /*!  
+  //! Reads temporal factors from a file.
+  /*!
     Reads monthly profiles for a given month or daily profiles for a week. In
     the file, each line first stores the EMEP country code, then the SNAP
     sector and finally the factors for the 12 months or the 7 weekdays.  If no
@@ -272,7 +272,7 @@ namespace AtmoData
   
 
   //! Computes speciation/aggregation factors.
-  /*! 
+  /*!
     Computes the factor for each sector to be applied to inventory species
     emissions in order to get model species emissions. For NOX, the factor
     takes into account the fact that NOX emissions are given in NO2 equivalent
@@ -391,7 +391,7 @@ namespace AtmoData
 		React_real = vtmp[1];
 		
 		for (int m=0; m<int(Sp_model_names_tmp.size()); m++)
-		  { 
+		  {
 		    Aggregation_coeff = vtmp[m + 2];
 		    for (int k = 0; k < Nsectors; k++)
 		      {
@@ -466,11 +466,11 @@ namespace AtmoData
 	else
 	  {
 	    for (s=0; s<Nsectors; s++)
-	      vertical_distribution_out(s, k) = 
+	      vertical_distribution_out(s, k) =
 		vertical_distribution_in(s, k_in) / DeltaZ_in(k_in)
 		* ( GridZ_interf_in(k_in+1) - GridZ_interf_out(k));
 	    k_in++;
-	    while (k_in < Nz_in 
+	    while (k_in < Nz_in
 		   && GridZ_interf_out(k+1) > GridZ_interf_in(k_in+1))
 	      {
 		for (s=0; s<Nsectors; s++)
@@ -480,7 +480,7 @@ namespace AtmoData
 	      }
 	    if (k_in < Nz_in)
 	      for (s=0; s<Nsectors; s++)
-		vertical_distribution_out(s, k) += 
+		vertical_distribution_out(s, k) +=
 		  vertical_distribution_in(s, k_in) / DeltaZ_in(k_in)
 		  * ( GridZ_interf_out(k+1) - GridZ_interf_in(k_in));
 	  }
@@ -564,7 +564,7 @@ namespace AtmoData
 
     int Nx = Ntot_polair[1].GetLength();
     real x_min_center = Ntot_polair[1](0);
-    real Delta_x = (Ntot_polair[1](Nx-1) - Ntot_polair[1](0)) / real(Nx-1); 
+    real Delta_x = (Ntot_polair[1](Nx-1) - Ntot_polair[1](0)) / real(Nx-1);
     real x_min = x_min_center - Delta_x/2.0;
 
     int Ny = Ntot_polair[0].GetLength();
@@ -592,7 +592,7 @@ namespace AtmoData
 	  int j_emep = int( ypol - M * tan(pi/4. - lat/2.)
 			    * cos(lon + 32. * pi/180.) - 0.5 );
 
-	  if (i_emep >= 0 && i_emep < Nx_emep && j_emep >= 0 
+	  if (i_emep >= 0 && i_emep < Nx_emep && j_emep >= 0
 	      && j_emep < Ny_emep)
 	    if (LUC(j, i) == 13)
 	      Nurb_emep(j_emep, i_emep) += 1;
@@ -608,10 +608,10 @@ namespace AtmoData
 	  lon = x_min_luc + i*delta_x_luc; // deg
 	  lat = y_min_luc + j*delta_y_luc; // deg
 	
-	  int i_polair = int((lon - x_min) / Delta_x); 
-	  int j_polair = int((lat - y_min) / Delta_y); 
+	  int i_polair = int((lon - x_min) / Delta_x);
+	  int j_polair = int((lat - y_min) / Delta_y);
 	
-	  if (i_polair >= 0 && i_polair < Nx && j_polair >= 0 
+	  if (i_polair >= 0 && i_polair < Nx && j_polair >= 0
 	      && j_polair < Ny)
 	    Ntot_polair(j_polair, i_polair) += 1;
 	}
@@ -689,7 +689,7 @@ namespace AtmoData
 	    sector = v[2];
 	    s = to_num<int>(sector.erase(0, 1)) - 1;
 	    i = to_num<int>(v[4]);
-	    j = to_num<int>(v[5]); 
+	    j = to_num<int>(v[5]);
 
 	    quantity = to_num<real>(v[7]);
 
@@ -706,7 +706,7 @@ namespace AtmoData
 	      {
 		n++;
 		if (n >= int(CountryCode.size()))
-		  throw string("Error in ReadEmep: country code \"") + country 
+		  throw string("Error in ReadEmep: country code \"") + country
 		    + string("\" not found in \"") + input_file + "\".";
 	      }
 	    Ncountry = CountryNumber[n];
@@ -714,20 +714,20 @@ namespace AtmoData
 	    if (s < 10)
 	      {
 		monthly = MonthlyFactors(Ncountry, s, date.GetMonth() - 1);
-		daily = DailyFactors(Ncountry, s, day); 
+		daily = DailyFactors(Ncountry, s, day);
 	    
 		// In water.
 		if ((Ncountry >= 30 && Ncountry <= 35) || Ncountry == 70)
 		  Emis_water(l, j-1, i-1, s).
-		    push_back(EmepCountryEmission<real>(quantity * 
-							monthly * daily / 
+		    push_back(EmepCountryEmission<real>(quantity *
+							monthly * daily /
 							365, Ncountry));
 		
 		// In land.
 		else
 		  Emis_land(l, j-1, i-1, s).
-		    push_back(EmepCountryEmission<real>(quantity * 
-							monthly * daily / 
+		    push_back(EmepCountryEmission<real>(quantity *
+							monthly * daily /
 							365, Ncountry));
 	      }
 	  }
@@ -885,7 +885,7 @@ namespace AtmoData
 
     int Nx = Ntot_polair[1].GetLength();
     real x_min_center = Ntot_polair[1](0);
-    real Delta_x = (Ntot_polair[1](Nx-1) - Ntot_polair[1](0)) / real(Nx-1); 
+    real Delta_x = (Ntot_polair[1](Nx-1) - Ntot_polair[1](0)) / real(Nx-1);
     real x_min = x_min_center - Delta_x/2.0;
 
     int Ny = Ntot_polair[0].GetLength();
@@ -980,7 +980,7 @@ namespace AtmoData
     for (i = 0; i < Nx; i++)
       for (j = 0; j < Ny; j++)
 	{
-	  surface = Ntot_polair(j, i) * factor 
+	  surface = Ntot_polair(j, i) * factor
 	    * cos(Ntot_polair[0](j) * ratio_pi);
 	  for (l = 0; l < Nsp_emis; l++)
 	    for (s = 0 ; s < Nsectors; s++)

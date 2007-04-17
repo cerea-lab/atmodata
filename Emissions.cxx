@@ -39,12 +39,13 @@ namespace AtmoData
   /*!
     Computes biogenic emission rates according to Simpson et al. (1999).
     \param LUC Land use coverage ([0, 1]).
+    \param Density densities of the land categories.
     \param EF_isoprene isoprene emission factors (\mu g . m^{-2} . s^{-1}).
     \param EF_terpenes terpenes emission factors (\mu g . m^{-2} . s^{-1}).
     \param EF_NO NO emission factors (\mu g . m^{-2} . s^{-1}).
-    \param Isoprene isoprene emission rates (\mu g . m^{-2} . s^{-1}).
-    \param Terpenes terpenes emission rates (\mu g . m^{-2} . s^{-1}).
-    \param NO NO emission rates (\mu g . m^{-2} . s^{-1}).
+    \param Isoprene (output) isoprene emission rates (\mu g . m^{-2} . s^{-1}).
+    \param Terpenes (output) terpenes emission rates (\mu g . m^{-2} . s^{-1}).
+    \param NO (output) NO emission rates (\mu g . m^{-2} . s^{-1}).
   */
   template <class TL, class TD, class TEFI, class TEFT,
 	    class TEFN, class TI, class TT, class TN, class TG>
@@ -67,9 +68,9 @@ namespace AtmoData
     Terpenes.SetZero();
     NO.SetZero();
 
-    for (k=0; k<Nc; k++)
-      for (j=0; j<Ny; j++)
-	for (i=0; i<Nx; i++)
+    for (k = 0; k < Nc; k++)
+      for (j = 0; j < Ny; j++)
+	for (i = 0; i < Nx; i++)
 	  {
 	    Isoprene(j, i) += Density(k) * EF_isoprene(k) * LUC(k, j, i);
 	    Terpenes(j, i) += Density(k) * EF_terpenes(k) * LUC(k, j, i);
@@ -85,12 +86,13 @@ namespace AtmoData
     \param Temperature soil or leaf temperature.
     \param PAR Photosynthetically active radiation.
     \param LUC Land use coverage.
+    \param Density densities of the land categories.
     \param EF_isoprene isoprene emission factors (\mu g . m^{-2} . s^{-1}).
     \param EF_terpenes terpenes emission factors (\mu g . m^{-2} . s^{-1}).
     \param EF_NO NO emission factors (\mu g . m^{-2} . s^{-1}).
-    \param Isoprene isoprene emissions (\mu g . m^{-2} . s^{-1}).
-    \param Terpenes terpenes emissions (\mu g . m^{-2} . s^{-1}).
-    \param NO NO emissions (\mu g . m^{-2} . s^{-1}).
+    \param Isoprene (output) isoprene emissions (\mu g . m^{-2} . s^{-1}).
+    \param Terpenes (output) terpenes emissions (\mu g . m^{-2} . s^{-1}).
+    \param NO (output) NO emissions (\mu g . m^{-2} . s^{-1}).
   */
   template <class TTemp, class TP, class TL, class TD, class TEFI, class TEFT,
 	    class TEFN, class TI, class TT, class TN, class TG>
@@ -127,10 +129,10 @@ namespace AtmoData
     Terpenes.SetZero();
     NO.SetZero();
 
-    for (h=0; h<Nt; h++)
-      for (i=0; i<Nx; i++)
-	for (j=0; j<Ny; j++)
-	  for (k=0; k<Nc; k++)
+    for (h = 0; h < Nt; h++)
+      for (i = 0; i < Nx; i++)
+	for (j = 0; j < Ny; j++)
+	  for (k = 0; k < Nc; k++)
 	    {
 	      // Temperature.
 	      T = Temperature(h, j, i);
@@ -219,6 +221,7 @@ namespace AtmoData
 
   //! Returns the time zone offset for a given country number.
   /*!
+    \param i country number.
     \return The time zone offset from GMT.
   */
   int TimeZone::operator() (int i) const
@@ -332,7 +335,7 @@ namespace AtmoData
     Species_factor.Fill(0.0);
 
     int mm = 0;
-    for (int l=0; l<Nsp_emis; l++)
+    for (int l = 0; l < Nsp_emis; l++)
       {
 	input_file = speciation_directory + Sp_emis_names[l] + ".dat";
 	ExtStream speciation_stream(input_file);
@@ -348,7 +351,7 @@ namespace AtmoData
 
 	    // NOX is given in NO2 equivalent units.
 	    if (Sp_emis_names[l] == "NOX")
-	      for (int k=0; k<Nsectors; k++)
+	      for (int k = 0; k < Nsectors; k++)
 		Speciation_coeff(k) *= molecular_weights_real / M_NO2;
 	    
 	    if (Sp_emis_names[l] != "NMVOC")
@@ -366,7 +369,7 @@ namespace AtmoData
 		aggregation_stream.SkipElements(3);
 		aggregation_stream.GetLine(line);
 		split(line, Sp_model_names_tmp);
-		for (int m=0; m<int(Sp_model_names_tmp.size()); m++)
+		for (int m = 0; m < int(Sp_model_names_tmp.size()); m++)
 		  Sp_model_names[mm+m] = Sp_model_names_tmp[m];
 		// Molecular weights.
 		aggregation_stream.SkipElements(3);
@@ -390,7 +393,7 @@ namespace AtmoData
 		molecular_weights_real = vtmp[0];
 		React_real = vtmp[1];
 		
-		for (int m=0; m<int(Sp_model_names_tmp.size()); m++)
+		for (int m = 0; m < int(Sp_model_names_tmp.size()); m++)
 		  {
 		    Aggregation_coeff = vtmp[m + 2];
 		    for (int k = 0; k < Nsectors; k++)
@@ -416,8 +419,8 @@ namespace AtmoData
     Maps the vertical distribution 'vertical_distribution_in' given on the
     vertical mesh 'GridZ_interf_in' to the output mesh 'GridZ_interf_out'.
     \param vertical_distribution_in vertical distribution on input grid.
-    \param GridZ_interf_in altitudes of interfaces of input grid(m).
-    \param GridZ_interf_out altitudes of interfaces of output grid(m).
+    \param GridZ_interf_in altitudes of interfaces of input grid (m).
+    \param GridZ_interf_out altitudes of interfaces of output grid (m).
     \param vertical_distribution_out (output) vertical distribution on output
     grid.
     \note The vertical distributions are indexed by the activity sector and
@@ -446,9 +449,9 @@ namespace AtmoData
     /*** Reads vertical distribution heights ***/
   
     // Sets values at nodes.
-    for (k=0; k<Nz_in; k++)
+    for (k = 0; k < Nz_in; k++)
       DeltaZ_in(k) = GridZ_interf_in(k+1) - GridZ_interf_in(k);
-    for (k=0; k<Nz_out; k++)
+    for (k = 0; k < Nz_out; k++)
       DeltaZ_out(k) = GridZ_interf_out(k+1) - GridZ_interf_out(k);
 
     vertical_distribution_out.Fill(0);
@@ -459,13 +462,13 @@ namespace AtmoData
     for (k = 0; k < Nz_out && k_in < Nz_in; k++)
       {
 	if (GridZ_interf_out(k+1) <= GridZ_interf_in(k_in+1))
-	  for (s=0; s<Nsectors; s++)
+	  for (s = 0; s < Nsectors; s++)
 	    vertical_distribution_out(s, k) =
 	      vertical_distribution_in(s, k_in) / DeltaZ_in(k_in)
 	      * DeltaZ_out(k);
 	else
 	  {
-	    for (s=0; s<Nsectors; s++)
+	    for (s = 0; s < Nsectors; s++)
 	      vertical_distribution_out(s, k) =
 		vertical_distribution_in(s, k_in) / DeltaZ_in(k_in)
 		* ( GridZ_interf_in(k_in+1) - GridZ_interf_out(k));
@@ -473,13 +476,13 @@ namespace AtmoData
 	    while (k_in < Nz_in
 		   && GridZ_interf_out(k+1) > GridZ_interf_in(k_in+1))
 	      {
-		for (s=0; s<Nsectors; s++)
+		for (s = 0; s < Nsectors; s++)
 		  vertical_distribution_out(s, k) +=
 		    vertical_distribution_in(s, k_in);
 		k_in++;
 	      }
 	    if (k_in < Nz_in)
-	      for (s=0; s<Nsectors; s++)
+	      for (s = 0; s < Nsectors; s++)
 		vertical_distribution_out(s, k) +=
 		  vertical_distribution_in(s, k_in) / DeltaZ_in(k_in)
 		  * ( GridZ_interf_out(k+1) - GridZ_interf_in(k_in));
@@ -509,11 +512,11 @@ namespace AtmoData
     RegularGrid<real> DeltaZ_out(Nz_out);
 
     // Sets values at nodes.
-    for (k=0; k<Nz_out; k++)
+    for (k = 0; k < Nz_out; k++)
       DeltaZ_out(k) = GridZ_interf_out(k+1) - GridZ_interf_out(k);
 
-    for (s=0; s<Nsectors; s++)
-      for (k=0; k<Nz_out; k++)
+    for (s = 0; s < Nsectors; s++)
+      for (k = 0; k < Nz_out; k++)
 	vertical_distribution_out(s, k) /= DeltaZ_out(k);
   }
 
@@ -581,8 +584,8 @@ namespace AtmoData
     Nfor_emep.Fill(0);
     Noth_emep.Fill(0);
     
-    for (int i=0; i<Nx_luc; i++)
-      for (int j=0; j<Ny_luc; j++)
+    for (int i = 0; i < Nx_luc; i++)
+      for (int j = 0; j < Ny_luc; j++)
 	{
 	  real lon = (x_min_center_luc + i * delta_x_luc) * pi/180.; // rad
 	  real lat = (y_min_center_luc + j * delta_y_luc) * pi/180.; // rad
@@ -903,8 +906,8 @@ namespace AtmoData
 
     real Ratio(0.0);
   
-    for (i=0; i<Nx_luc; i++)
-      for (j=0; j<Ny_luc; j++)
+    for (i = 0; i < Nx_luc; i++)
+      for (j = 0; j < Ny_luc; j++)
 	{
 	  real lon = (x_min_center_luc + i * delta_x_luc) * pi/180.; // rad
 	  real lat = (y_min_center_luc + j * delta_y_luc) * pi/180.; // rad

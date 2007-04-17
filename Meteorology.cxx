@@ -1126,7 +1126,6 @@ namespace AtmoData
 
   //! Computes the height of cloud basis.
   /*!
-    \param Temperature temperature (K).
     \param Pressure pressure (Pa).
     \param RelativeHumidity relative humidity (kg/kg).
     \param CriticalRelativeHumidity function that returns the critical
@@ -1246,6 +1245,7 @@ namespace AtmoData
     \param LowIndices vertical indices of base and top of low clouds.
     \param MediumIndices vertical indices of base and top of medium clouds.
     \param HighIndices vertical indices of base and top of high clouds.
+    \param GridZ_interf altitudes of interfaces (m).
     \param CloudHeight (output) altitudes of cloud basis.
     \note Dimensions of LowIndices, MediumIndices and HighIndices are
     Nt x Ny x Nx x 2. Along the last dimension, those arrays store the index
@@ -1427,6 +1427,7 @@ namespace AtmoData
     where PS is the surface pressure.
     \param SurfacePressure surface pressure (Pa).
     \param Pressure pressure (Pa).
+    \param Temperature temperature (K).
     \param Height (output) altitudes (m).
     \param g (optional) standard gravity. Default: 9.80665.
     \param r (optional) molar gas constant for dry air. Default: 287.0.
@@ -1470,6 +1471,7 @@ namespace AtmoData
     k the level index, r the molar gas constant for dry air
     and g the standard gravity.
     \param Pressure pressure (Pa).
+    \param Temperature temperature (K).
     \param Height (output) altitudes (m).
     \param g (optional) standard gravity. Default: 9.80665.
     \param r (optional) molar gas constant for dry air. Default: 287.0.

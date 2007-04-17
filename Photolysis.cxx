@@ -7,12 +7,12 @@
 // This file is part of AtmoData library.
 // AtmoData library is a tool for data processing in atmospheric
 // sciences.
-// 
+//
 // AtmoData is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // AtmoData is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -90,7 +90,7 @@ namespace AtmoData
     zr = acos(csz);
     zen = zr / dr;
 
-    // Calculates local solar azimuth.  
+    // Calculates local solar azimuth.
     // caz = (sin(rdecl) - sin(rlt) * cos(zr)) / (cos(rlt) * sin(zr));
     // raz = acos(caz);
     // azim = raz / dr;
@@ -107,7 +107,8 @@ namespace AtmoData
     \param LiquidWaterContent liquid water content (kg/m^3).
     \param MediumCloudiness medium cloudiness (in [0, 1]).
     \param HighCloudiness high cloudiness (in [0, 1]).
-    \param date date in the form YYYYMMDD.
+    \param date_beg beginning date for the computation of attenuation.
+    \param Delta_t time step for the computation of attenuation.
     \param Attenuation (output) cloud attenuation coefficient.
   */
   template <class TH, class TL, class TMC, class THC, class T, class TG>
@@ -115,7 +116,7 @@ namespace AtmoData
 			      Data<TL, 4, TG>& LiquidWaterContent,
 			      Data<TMC, 3, TG>& MediumCloudiness,
 			      Data<THC, 3, TG>& HighCloudiness,
-			      Date date_beg, T Delta_t, 
+			      Date date_beg, T Delta_t,
 			      Data<T, 4, TG>& Attenuation)
   {
     int h, k, j, i;
@@ -198,7 +199,7 @@ namespace AtmoData
 		cos_zenith_angle =
 		  cos(ZenithAngle(Attenuation[3].Value(h, k, j, i),
 				  Attenuation[2].Value(h, k, j, i),
-				  current_date, 
+				  current_date,
 				  Attenuation[0].Value(h, k, j, i))
 		      * 0.0174532925199433 );
 		cos_zenith_angle = abs(cos_zenith_angle);
@@ -230,7 +231,8 @@ namespace AtmoData
     \param HighCloudiness high cloudiness (in [0, 1]).
     relative humidity as function of the altitude, the pressure and
     reference pressure.
-    \param date date in the form YYYYMMDD.
+    \param date_beg beginning date for the computation of attenuation.
+    \param Delta_t time step for the computation of attenuation.
     \param Attenuation (output) cloud attenuation coefficient.
     \note Dimensions of LowIndices, MediumIndices and HighIndices are
     Nt x Ny x Nx x 2. Along the last dimension, those arrays store the index
@@ -246,7 +248,7 @@ namespace AtmoData
 			      Data<int, 4> HighIndices,
 			      Data<TMC, 3, TG>& MediumCloudiness,
 			      Data<THC, 3, TG>& HighCloudiness,
-			      Date date_beg, T Delta_t, 
+			      Date date_beg, T Delta_t,
 			      Data<T, 4, TG>& Attenuation)
   {
     int h, k, j, i;
@@ -255,7 +257,7 @@ namespace AtmoData
     int Ny(Attenuation.GetLength(2));
     int Nx(Attenuation.GetLength(3));
 
-    Date current_date = date_beg; 
+    Date current_date = date_beg;
  
     Attenuation.Fill(1.);
 
@@ -336,8 +338,8 @@ namespace AtmoData
 		// Zenith angle.
 		cos_zenith_angle =
 		  cos(ZenithAngle(Attenuation[3].Value(h, k, j, i),
-				  Attenuation[2].Value(h, k, j, i), 
-				  current_date, 
+				  Attenuation[2].Value(h, k, j, i),
+				  current_date,
 				  Attenuation[0].Value(h, k, j, i))
 		      * 0.0174532925199433 );
 		cos_zenith_angle = abs(cos_zenith_angle);
@@ -356,7 +358,7 @@ namespace AtmoData
 		cos_zenith_angle =
 		  cos(ZenithAngle(Attenuation[3].Value(h, k, j, i),
 				  Attenuation[2].Value(h, k, j, i),
-				  current_date, 
+				  current_date,
 				  Attenuation[0].Value(h, k, j, i))
 		      * 0.0174532925199433 );
 		cos_zenith_angle = abs(cos_zenith_angle);
@@ -388,7 +390,7 @@ namespace AtmoData
 		cos_zenith_angle =
 		  cos(ZenithAngle(Attenuation[3].Value(h, 0, j, i),
 				  Attenuation[2].Value(h, 0, j, i),
-				  current_date, 
+				  current_date,
 				  Attenuation[0].Value(h, 0, j, i))
 		       * 0.0174532925199433 );
 		cos_zenith_angle = abs(cos_zenith_angle);
@@ -412,7 +414,7 @@ namespace AtmoData
 		cos_zenith_angle =
 		  cos(ZenithAngle(Attenuation[3].Value(h, 0, j, i),
 				  Attenuation[2].Value(h, 0, j, i),
-				  current_date, 
+				  current_date,
 				  Attenuation[0].Value(h, 0, j, i))
 		      * 0.0174532925199433 );
 		cos_zenith_angle = abs(cos_zenith_angle);
@@ -467,7 +469,7 @@ namespace AtmoData
 	for (i = 0; i < Nx ; i++)
 	  {
 	    // Calculation of B.
-	    for (k = 0 ; k < Nz && RelativeHumidity[1].Value(h, k, j, i) 
+	    for (k = 0 ; k < Nz && RelativeHumidity[1].Value(h, k, j, i)
 		   < 1500 ; k++)
 	      {
 		dz = RelativeHumidity[1].Value(h, k + 1, j, i)

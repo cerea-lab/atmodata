@@ -7,12 +7,12 @@
 // This file is part of AtmoData library.
 // AtmoData library is a tool for data processing in atmospheric
 // sciences.
-// 
+//
 // AtmoData is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // AtmoData is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -339,9 +339,9 @@ namespace AtmoData
     \param SensibleHeat sensible heat.
     \param LMO Monin-Obukhov length.
     \param BoundaryHeight boundary layer height.
-    \param GridZ_interf altitudes of interfaces (m).
     \param Kz (output) vertical diffusion coefficients at the interfaces.
-    \param TM_stable.
+    \param TM_stable if set to 'false', Troen and Mahrt parameterization only
+    applied in unstable boundary layer. Default: true.
     \param SBL Ratio between the SBL and the PBL. Default: 0.1.
     \param p Troen & Mahrt coefficient. Default: 2.0.
     \param Ka Von Karman constant. Default: 0.4.
@@ -352,7 +352,7 @@ namespace AtmoData
 		    const Data<TU, 3, TG>& FrictionModule,
 		    const Data<T, 3, TG>& SensibleHeat,
 		    const Data<T, 3, TG>& LMO,
-		    const Data<T, 3, TG>& BoundaryHeight, 
+		    const Data<T, 3, TG>& BoundaryHeight,
 		    Data<T, 4, TG>& Kz,
 		    bool TM_stable, T SBL, T p, T Ka)
   {

@@ -7,12 +7,12 @@
 // This file is part of AtmoData library.
 // AtmoData library is a tool for data processing in atmospheric
 // sciences.
-// 
+//
 // AtmoData is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // AtmoData is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -59,7 +59,7 @@ namespace AtmoData
     void Read(ifstream& FileStream, Array<TA, N>& A,
 	      Data<TS, 1, TGS>& S) const;
 
-  };  
+  };
 
   //! Input/ouput class to read files in binary format at ECMWF.
   template<class T>
@@ -67,6 +67,7 @@ namespace AtmoData
   {
 
   protected:
+    //! date.
     int date_;
 
   public:
@@ -93,7 +94,7 @@ namespace AtmoData
     template<class TA, int N>
     void Read(ifstream& FileStream, Array<TA, N>& A) const;
 
-  };  
+  };
 
   // For MM5 sub-headers.
   class MM5SubHeader;
@@ -126,16 +127,16 @@ namespace AtmoData
 
     // Field.
     template <int N, class TG>
-    void ReadWholeField(string FileName, string FieldName, 
+    void ReadWholeField(string FileName, string FieldName,
 			Data<float, N, TG>& A) const;
     template <int N>
-    void ReadWholeField(string FileName, string FieldName, 
+    void ReadWholeField(string FileName, string FieldName,
 			Array<float, N>& A) const;
     template <int N, class TG>
-    void ReadWholeField(ifstream& FileStream, string FieldName, 
+    void ReadWholeField(ifstream& FileStream, string FieldName,
 			Data<float, N, TG>& A) const;
     template <int N>
-    void ReadWholeField(ifstream& FileStream, string FieldName, 
+    void ReadWholeField(ifstream& FileStream, string FieldName,
 			Array<float, N>& A) const;
     template <int N>
     void ReadField(ifstream& FileStream, bool cross,

@@ -28,7 +28,7 @@
 namespace AtmoData
 {
   template<class T>
-  void ComputeDeclination(Date date, T& declination, T& time_equation);
+  void ComputeDeclination(Date date, T ut, T& declination, T& time_equation);
 
   template<class T>
   void ComputeDeclination(int idate, T ut, T& declination, T& time_equation);
@@ -44,7 +44,7 @@ namespace AtmoData
   T ComputeSunsetHour(T lon, T lat, int idate);
 
   template<class T>
-  bool IsDay(T lon, T lat, int date, T ut);
+  bool IsDay(T lon, T lat, int idate, T ut);
 
   template<class T>
   bool IsDay(T lon, T lat, Date date);

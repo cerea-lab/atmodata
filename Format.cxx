@@ -1210,6 +1210,10 @@ namespace AtmoData
     return *this;
   }
 
+  //! Gives the current date.
+  /*
+    \return The current date.
+   */
   string MM5SubHeader::GetCurrentDate()
   {
     return current_date;

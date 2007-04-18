@@ -67,7 +67,7 @@ namespace AtmoData
   {
 
   protected:
-    //! date.
+    //! Date.
     int date_;
 
   public:
@@ -157,15 +157,25 @@ namespace AtmoData
   {
 
   public:
+    //! Dimension of the field.
     int ndim;
+    //! Starting indices of the field array.
     Array<int, 1> start_index;
+    //! Endiing indices of the field array.
     Array<int, 1> end_index;
+    //! Integration or forecast time for the field.
     float xtime;
+    //! Field at dot or cross point (character C or D).
     string staggering;
+    //! Order of the field array dimension.
     string ordering;
+    //! Current date.
     string current_date;
+    //! Name of the field.
     string name;
+    //! Unit of the field.
     string unit;
+    //! Field description.
     string description;
 
   public:

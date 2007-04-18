@@ -24,8 +24,14 @@
 
 #ifndef ATMODATA_FILE_AEROSOL_HXX
 
-// Fortran functions.
-#if defined(__GNUG__) && __GNUG__ < 4 && !defined (__INTEL_COMPILER)
+#ifdef POLYPHEMUS_SINGLE_UNDERSCORE
+#undef POLYPHEMUS_DOUBLE_UNDERSCORE
+#elif defined(__GNUG__) && __GNUG__ < 4 && !defined(__INTEL_COMPILER)
+#undef POLYPHEMUS_DOUBLE_UNDERSCORE
+#define POLYPHEMUS_DOUBLE_UNDERSCORE
+#endif
+
+#ifdef POLYPHEMUS_DOUBLE_UNDERSCORE
 
 #define _compute_gas_diffusivity compute_gas_diffusivity__
 #define _gerber_wet_diameter gerber_wet_diameter__

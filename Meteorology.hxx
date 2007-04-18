@@ -230,7 +230,14 @@ namespace AtmoData
 
 
 // Fortran functions.
-#if defined(__GNUG__) && __GNUG__ < 4 && !defined (__INTEL_COMPILER)
+#ifdef POLYPHEMUS_SINGLE_UNDERSCORE
+#undef POLYPHEMUS_DOUBLE_UNDERSCORE
+#elif defined(__GNUG__) && __GNUG__ < 4 && !defined(__INTEL_COMPILER)
+#undef POLYPHEMUS_DOUBLE_UNDERSCORE
+#define POLYPHEMUS_DOUBLE_UNDERSCORE
+#endif
+
+#ifdef POLYPHEMUS_DOUBLE_UNDERSCORE
 #define _compute_relative_humidity compute_relative_humidity__
 #else
 #define _compute_relative_humidity compute_relative_humidity_

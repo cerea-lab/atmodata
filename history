@@ -3,6 +3,32 @@ o------------------o
 o------------------o
 
 
+Version 1.2 (2007-04-24)
+-----------
+
+** Improvements:
+
+- Added functions which compute nucleation and coagulation kernels for
+  aerosols.
+- Added functions to compute stability class with Pasquill formula in
+  "Meteorology.cxx".
+- Improved computation of anthropogenic emissions: an error message is thrown
+  if there is an unknown country code in the emission inventory, and 
+  inventories for 10 or 11 sectors can now be used.
+- Added files "TimeDiagnosis.hxx" and "TimeDiagnosis.cxx". They contain 
+  functions to compute the sun declination, hours of sunrise and sunset, and
+  to diagnose whether it is night or day at a given time and place.
+- Improved the management of the second underscore appended to given Fortran
+  external identifiers; introduced 'POLYPHEMUS_SINGLE_UNDERSCORE' and 
+  'POLYPHEMUS_DOUBLE_UNDERSCORE'.
+
+** Bug fixes:
+
+- A segmentation fault occurred when a country code was unknown.
+- An error occurred when a country number was higher than a maximum number of
+  countries.
+
+
 Version 1.1 (2006-09-29)
 -----------
 
@@ -16,7 +42,7 @@ Version 1.1 (2006-09-29)
 - Added ESQUIF parameterization for attenuation.
 - Improved 'ReadEmep' (less CPU time consuming).
 - Only a part of the emissions of NH3 are now taken into account due to the 
-  local deposition.
+  local deposition. 
 - Added "Aerosol.f" and "Meteorology.f" in AtmoData.
 - Aggregation matrix is now limited to NMVOC in function 
 'SpeciationAggregation'.

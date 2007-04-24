@@ -18,6 +18,7 @@ c
 c     For more information, please see the AtmoData home page:
 c     http://www.enpc.fr/cerea/atmodata/
 
+c     File: Aerosol.f
 
 c     Function: compute_gas_diffusivity
 c

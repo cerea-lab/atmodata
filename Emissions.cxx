@@ -330,6 +330,7 @@ namespace AtmoData
     real molecular_weights_real;
 
     const real M_NO2 = 46.0;
+    const real M_SO2 = 64.0;
     const real int_OH(1.0);
 
     Species_factor.Fill(0.0);
@@ -353,6 +354,11 @@ namespace AtmoData
 	    if (Sp_emis_names[l] == "NOX")
 	      for (int k = 0; k < Nsectors; k++)
 		Speciation_coeff(k) *= molecular_weights_real / M_NO2;
+
+	    // SOX is given in SO2 equivalent units.
+	    if (Sp_emis_names[l] == "SOX")
+	      for (int k = 0; k < Nsectors; k++)
+		Speciation_coeff(k) *= molecular_weights_real / M_SO2;
 	    
 	    if (Sp_emis_names[l] != "NMVOC")
 	      {

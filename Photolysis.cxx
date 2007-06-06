@@ -132,6 +132,7 @@ namespace AtmoData
       lwc0, lwc1, lw, w, tau, tr;
 
     for (h = 0; h < Nt; h++)
+      {
       for (j = 0; j < Ny; j++)
 	for (i = 0; i <Nx; i++)
 	  {
@@ -216,8 +217,9 @@ namespace AtmoData
 			   + HighCloudiness(h, j, i)))
 		    * ( (1.-tr) * cos_zenith_angle );
 	      }
-	    current_date.AddHours(int(Delta_t));
 	  }
+	  current_date.AddHours(int(Delta_t));
+      }
   }
 
 
@@ -269,6 +271,7 @@ namespace AtmoData
     T cos_zenith_angle, alpha;
 
     for (h = 0; h < Nt; h++)
+      {
       for (j = 0; j < Ny; j++)
 	for (i = 0; i < Nx; i++)
 	  {
@@ -430,8 +433,9 @@ namespace AtmoData
 		Attenuation(h, k, j, i) = alpha * up_att
 		  + (1. - alpha) * low_att;
 	      }
-	    current_date.AddHours(int(Delta_t));
-	  }
+         }
+	 current_date.AddHours(int(Delta_t));
+      }
   }
 
 

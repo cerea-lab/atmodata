@@ -96,7 +96,7 @@ c     micrometers.
      $     (0.4989352162271429d0 * dry_radius**0.3026183900844475d1
      $     / (correction * dry_radius**(-0.1371059101078550d1)
      $     - dlog(relative_humidity)) + dry_radius * dry_radius
-     $     * dry_radius) ** 0.3333333333333d0 * 2.d4
+     $     * dry_radius) ** 0.3333333333333333333d0 * 2.d4
 
       end
 

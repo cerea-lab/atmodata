@@ -990,7 +990,7 @@ namespace AtmoData
 
     const real ratio_pi = pi / 180.;
     const real factor = ratio_pi * ratio_pi * Earth_radius * Earth_radius
-      * delta_x_luc * delta_y_luc;;
+      * delta_x_luc * delta_y_luc;
     real surface;
 
     // Divides by the surface. Emissions are then given in Tons/m^2.

@@ -7,12 +7,12 @@
 // This file is part of AtmoData library.
 // AtmoData library is a tool for data processing in atmospheric
 // sciences.
-// 
+//
 // AtmoData is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // AtmoData is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -1106,7 +1106,7 @@ namespace AtmoData
 		    "File is not ready.");
 #endif
 
-    unsigned long data_size;
+    unsigned int data_size;
     FileStream.read(reinterpret_cast<char*>(&data_size), 4);
     swap(data_size);
 
@@ -1120,7 +1120,7 @@ namespace AtmoData
     streampos position;
     position = FileStream.tellg();
     FileStream.seekg(0, ios::end);
-    unsigned long file_size = FileStream.tellg() - position;
+    unsigned int file_size = FileStream.tellg() - position;
 
     if (data_size + 4 > file_size)
       throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream)",
@@ -1133,7 +1133,7 @@ namespace AtmoData
 
     FileStream.seekg(data_size, ios::cur);
 
-    unsigned long length;
+    unsigned int length;
     FileStream.read(reinterpret_cast<char*>(&length), 4);
     swap(length);
 
@@ -1213,7 +1213,7 @@ namespace AtmoData
   //! Gives the current date.
   /*
     \return The current date.
-   */
+  */
   string MM5SubHeader::GetCurrentDate()
   {
     return current_date;

@@ -7,12 +7,12 @@
 // This file is part of AtmoData library.
 // AtmoData library is a tool for data processing in atmospheric
 // sciences.
-// 
+//
 // AtmoData is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // AtmoData is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -40,6 +40,11 @@ namespace AtmoData
     return (*(unsigned *)&x = SWAP_4(*(unsigned *)&x));
   }
   
+  inline unsigned int swap(unsigned int& x)
+  {
+    return (*(unsigned *)&x = SWAP_4(*(unsigned *)&x));
+  }
+
   inline unsigned long swap(unsigned long& x)
   {
     return (*(unsigned *)&x = SWAP_4(*(unsigned *)&x));
@@ -51,7 +56,7 @@ namespace AtmoData
     for (int i=0; i<A.size(); i++)
       swap(A.data()[i]);
   }
-  
+
 }  // namespace AtmoData.
 
 

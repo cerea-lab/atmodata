@@ -1,22 +1,26 @@
-c     Copyright (C) 2006 CEREA (ENPC)
-c
-c     Authors: Vivien Mallet, Edouard Debry
-c
-c     This file is part of AtmoData library. AtmoData library is a tool
-c     for data processing in atmospheric sciences.
-c
-c     AtmoData is free software; you can redistribute it and/or modify
-c     it under the terms of the GNU General Public License as published
-c     by the Free Software Foundation; either version 2 of the License,
-c     or (at your option) any later version.
-c
-c     AtmoData is distributed in the hope that it will be useful, but
-c     WITHOUT ANY WARRANTY; without even the implied warranty of
-c     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-c     General Public License (file "LICENSE") for more details.
-c
-c     For more information, please see the AtmoData home page:
-c     http://spacetown.free.fr/lib/atmodata
+C-----------------------------------------------------------------------
+C     Copyright (C) 2006-2007, ENPC - INRIA - EDF R&D
+C     Author(s): Vivien Mallet, Edouard Debry
+C     
+C     This file is part of AtmoData library, a tool for data processing
+C     in atmospheric sciences.
+C    
+C     AtmoData is developed in the INRIA - ENPC joint project-team CLIME
+C     and in the ENPC - EDF R&D joint laboratory CEREA.
+C    
+C     AtmoData is free software; you can redistribute it and/or modify
+C     it under the terms of the GNU General Public License as published
+C     by the Free Software Foundation; either version 2 of the License,
+C     or (at your option) any later version.
+C     
+C     AtmoData is distributed in the hope that it will be useful, but
+C     WITHOUT ANY WARRANTY; without even the implied warranty of
+C     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+C     General Public License for more details.
+C     
+C     For more information, visit the AtmoData home page:
+C          http://cerea.enpc.fr/polyphemus/atmodata.html
+C-----------------------------------------------------------------------
 
 
 c     Function: compute_bidisperse_coagulation_kernel

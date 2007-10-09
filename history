@@ -2,6 +2,22 @@ o------------------o
 | ATMODATA HISTORY |
 o------------------o
 
+Version 1.3 (2007-10-09)
+-----------
+
+** Improvements:
+
+- Added a potential speciation for SOX.
+- Improved 64-bit portability of 'FormatMM5::ReadField(ifstream& FileStream)'. 
+
+
+Version 1.2.1 (2007-06-22)
+-------------
+
+** Bug fixes:
+
+- The current date was badly updated inside time loops.
+
 
 Version 1.2 (2007-04-24)
 -----------

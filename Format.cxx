@@ -1119,7 +1119,7 @@ namespace AtmoData
     streampos position;
     position = FileStream.tellg();
     FileStream.seekg(0, ios::end);
-    unsigned int file_size = FileStream.tellg() - position;
+    unsigned long file_size = FileStream.tellg() - position;
 
     if (data_size + 4 > file_size)
       throw IOError("FormatMM5<T>::ReadField(ifstream& FileStream)",

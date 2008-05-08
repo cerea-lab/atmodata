@@ -1298,8 +1298,8 @@ namespace AtmoData
   {
     int h, j, i;
     int Nt(Cloudiness.GetLength(0));
-    int Ny(Cloudiness.GetLength(2));
-    int Nx(Cloudiness.GetLength(3));
+    int Ny(Cloudiness.GetLength(1));
+    int Nx(Cloudiness.GetLength(2));
 
     for (h = 0; h < Nt; h++)
       for (j = 0; j < Ny; j++)

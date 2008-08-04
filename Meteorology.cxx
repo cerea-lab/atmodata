@@ -1362,7 +1362,7 @@ namespace AtmoData
 	else
 	  return "D";
       else
-	  return "D";
+	return "D";
     else
       if (surface_wind < 2.)
 	return "F";

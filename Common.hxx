@@ -26,8 +26,8 @@
 namespace AtmoData
 {
 
-#define SWAP_4(a) ((a >> 24) & 0xFF) | ((a >> 8) & 0xFF00) | \
-      ((a << 8) & 0x00FF0000) | ((a << 24) & 0xFF000000)
+#define SWAP_4(a) ((a >> 24) & 0xFF) | ((a >> 8) & 0xFF00) |	\
+  ((a << 8) & 0x00FF0000) | ((a << 24) & 0xFF000000)
   
   inline float swap(float& x)
   {

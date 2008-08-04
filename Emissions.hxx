@@ -35,7 +35,7 @@ namespace AtmoData
 			    Data<TEFT, 1, TG>& EF_terpenes,
 			    Data<TEFN, 1, TG>& EF_NO,
 			    Data<TL, 3, TG>& Isoprene,
-			    Data<TL, 3, TG>& Terpenes, 
+			    Data<TL, 3, TG>& Terpenes,
 			    Data<TL, 3, TG>& NO);
 
   template <class TTemp, class TP, class TL, class TD, class TEFI, class TEFT,
@@ -48,7 +48,7 @@ namespace AtmoData
 				Data<TEFT, 1, TG>& EF_terpenes,
 				Data<TEFN, 1, TG>& EF_NO,
 				Data<TL, 3, TG>& Isoprene,
-				Data<TL, 3, TG>& Terpenes, 
+				Data<TL, 3, TG>& Terpenes,
 				Data<TL, 3, TG>& NO);
 
   //! Stores an EMEP emission associated with a given country.

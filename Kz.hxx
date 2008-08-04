@@ -27,7 +27,7 @@ namespace AtmoData
 {
 
   //! Returns the minimum of two elements.
-  /*! 
+  /*!
     \param x first number.
     \param y second number.
     \return The minimum of {x, y}.
@@ -41,7 +41,7 @@ namespace AtmoData
   }
 
   //! Returns the maximum of two elements.
-  /*! 
+  /*!
     \param x first number.
     \param y second number.
     \return The maximum of {x, y}.
@@ -79,14 +79,14 @@ namespace AtmoData
 		      const Data<T, 3, TG>& SensibleHeat,
 		      const Data<T, 3, TG>& LMO,
 		      const Grid<TG>& GridZ_interf,
-		      Data<T, 3, TG>& BoundaryHeight, 
-		      T SBL = T(0.1), T Ric = T(0.21), T C = T(6.5), 
+		      Data<T, 3, TG>& BoundaryHeight,
+		      T SBL = T(0.1), T Ric = T(0.21), T C = T(6.5),
 		      T Ka = T(0.4));
 
   template<class T, class TG>
   void ComputePBLH_Richardson(const Data<T, 4, TG>& Richardson,
 			      const Grid<TG>& GridZ_interf,
-			      Data<T, 3, TG>& BoundaryHeight, 
+			      Data<T, 3, TG>& BoundaryHeight,
 			      T Ric = T(0.21));
 
   template<class TU, class TT, class T, class TG>
@@ -94,7 +94,7 @@ namespace AtmoData
 		    const Data<TU, 3, TG>& FrictionModule,
 		    const Data<T, 3, TG>& SensibleHeat,
 		    const Data<T, 3, TG>& LMO,
-		    const Data<T, 3, TG>& BoundaryHeight, 
+		    const Data<T, 3, TG>& BoundaryHeight,
 		    Data<T, 4, TG>& Kz,
 		    bool TM_stable = true, T SBL = T(0.1), T p = T(2.0),
 		    T Ka = T(0.4));

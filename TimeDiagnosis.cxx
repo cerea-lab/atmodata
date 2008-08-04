@@ -45,7 +45,7 @@ namespace AtmoData
     \param declination (output) sun declination (radians).
     \param time_equation (output) equation of time (radians).
   */
-   template<class T>
+  template<class T>
   void ComputeDeclination(Date date, T ut, T& declination, T& time_equation)
   {
     T d, tz, sintz, costz, sin2tz, cos2tz, sin3tz, cos3tz;
@@ -105,7 +105,7 @@ namespace AtmoData
     \param declination (output) sun declination (radians).
     \param time_equation (output) equation of time (radians).
   */
-   template<class T>
+  template<class T>
   void ComputeDeclination(int idate, T ut, T& declination, T& time_equation)
   {
     ComputeDeclination(Date(idate), ut, declination, time_equation);
@@ -144,11 +144,11 @@ namespace AtmoData
 	sunset_hour = 0.;
       }
     else if (csh < -1.)
-       {
+      {
 	sunrise_hour = 1.;
 	sunset_hour = 1.;
       }
-   else
+    else
       {
 	// Computes the hour angle in hours.
 	h = acos(csh) * 24. / (2. * pi);

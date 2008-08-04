@@ -31,7 +31,8 @@ namespace AtmoData
 
   //! Decumulates data.
   /*!
-    'data' stores values cumulated in time, where the time is the first dimension.
+    'data' stores values cumulated in time, where the time is the first
+    dimension.
     \param data data to be decumulated.
     \param length number of time steps over which data is cumulated.
     \param start (optional) index of the first complete cycle. Default: 0.

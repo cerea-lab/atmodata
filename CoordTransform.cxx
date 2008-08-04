@@ -32,7 +32,7 @@ namespace AtmoData
   //! Default constructor.
   template <class T>
   LaeaToLonlat<T>::LaeaToLonlat(T lon_origin, T lat_origin)  throw():
-    Earth_radius_(6370997.),    
+    Earth_radius_(6370997.),
     pi_(3.14159265358979323846264),
     limit_(1.e-15),
     lat_origin_(lat_origin / 180. * pi_),

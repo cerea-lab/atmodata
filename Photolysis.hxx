@@ -34,7 +34,7 @@ namespace AtmoData
 			      Data<TL, 4, TG>& LiquidWaterContent,
 			      Data<TMC, 3, TG>& MediumCloudiness,
 			      Data<THC, 3, TG>& HighCloudiness,
-			      Date date_beg, T Delta_t, 
+			      Date date_beg, T Delta_t,
 			      Data<T, 4, TG>& Attenuation);
 
   template <class TL, class TMC, class THC, class T, class TG>
@@ -44,7 +44,7 @@ namespace AtmoData
 			      Data<int, 4> HighIndices,
 			      Data<TMC, 3, TG>& MediumCloudiness,
 			      Data<THC, 3, TG>& HighCloudiness,
-			      Date date_beg, T Delta_t, 
+			      Date date_beg, T Delta_t,
 			      Data<T, 4, TG>& Attenuation);
 
   template <class TMC, class THC, class TG, class TH, class T>

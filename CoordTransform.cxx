@@ -135,8 +135,8 @@ namespace AtmoData
     jc0 = (jmx_ + 1.0) / 2.0;
 
 
-    ic = (ic0 - ix_) * ratio_ + 0.5;
-    jc = (jc0 - jx_) * ratio_ + 0.5;
+    ic = (ic0 - ix_) * ratio_;
+    jc = (jc0 - jx_) * ratio_;
 
     conv = 360.0 / (2.0 * pi_);
 
@@ -223,9 +223,6 @@ namespace AtmoData
     ic0 = (imx_ + 1.0) / 2.0;
     jc0 = (jmx_ + 1.0) / 2.0;
 
-    ic = (ic0 - ix_) * ratio_ + 0.5;
-    jc = (jc0 - jx_) * ratio_ + 0.5;
-
     conv = 360.0 / (2.0 * pi_);
 
     aux1 = (45.0 - abs(phi1_) / 2.0) / conv;
@@ -246,9 +243,9 @@ namespace AtmoData
       * pow(tan(aux) / tan(psi1/2.0), kappa);
 
     auxij = kappa * (lon - lambdac_) / conv;
-    i = ( ic0 - ( yc/ds0_ + Rs*cos(auxij)/ds0_ ) - ix_ ) * ratio_ - 0.5;
+    i = ( ic0 - ( yc/ds0_ + Rs*cos(auxij)/ds0_ ) - ix_ ) * ratio_;
 
-    j = ( jc0 + auxsig * Rs * sin(auxij)/ds0_ - jx_ ) * ratio_ - 0.5;
+    j = ( jc0 + auxsig * Rs * sin(auxij)/ds0_ - jx_ ) * ratio_;
 
   }
 
@@ -292,8 +289,8 @@ namespace AtmoData
     ic0 = (imx_ + 1.0) / 2.0;
     jc0 = (jmx_ + 1.0) / 2.0;
 
-    ic = (ic0 - ix_) * ratio_ + 0.5;
-    jc = (jc0 - jx_) * ratio_ + 0.5;
+    ic = (ic0 - ix_) * ratio_;
+    jc = (jc0 - jx_) * ratio_;
 
     conv = 180. / pi_;
 
@@ -349,9 +346,6 @@ namespace AtmoData
     ic0 = (imx_ + 1.0) / 2.0;
     jc0 = (jmx_ + 1.0) / 2.0;
 
-    ic = (ic0 - ix_) * ratio_ + 0.5;
-    jc = (jc0 - jx_) * ratio_ + 0.5;
-
     conv = 180. / pi_;
 
     c2 = Earth_radius_ * cos(phi1_/conv);
@@ -362,8 +356,8 @@ namespace AtmoData
     aux = lat / conv;
     y = c2 * log((1.0 + sin(aux)) / cos(aux));
 
-    i = (ic0 + (y-yc)/ds0_ - ix_) * ratio_ - 0.5;
-    j = (jc0 + x/ds0_ - jx_) * ratio_ - 0.5;
+    i = (ic0 + (y-yc)/ds0_ - ix_) * ratio_;
+    j = (jc0 + x/ds0_ - jx_) * ratio_;
 
   }
 
@@ -415,8 +409,8 @@ namespace AtmoData
     ic0 = (imx_ + 1.0) / 2.0;
     jc0 = (jmx_ + 1.0) / 2.0;
 
-    ic = (ic0 - ix_) * ratio_ + 0.5;
-    jc = (jc0 - jx_) * ratio_ + 0.5;
+    ic = (ic0 - ix_) * ratio_;
+    jc = (jc0 - jx_) * ratio_;
 
     conv = 180. / pi_;
 
@@ -499,9 +493,6 @@ namespace AtmoData
     ic0 = (imx_ + 1.0) / 2.0;
     jc0 = (jmx_ + 1.0) / 2.0;
 
-    ic = (ic0 - ix_) * ratio_ + 0.5;
-    jc = (jc0 - jx_) * ratio_ + 0.5;
-
     conv = 180. / pi_;
 
     kappa = 1.0;
@@ -518,8 +509,8 @@ namespace AtmoData
     Rs = Earth_radius_ * sin(aux) * ((1.0 + cos(psi1)) / (1.0 + cos(aux)));
 
     auxij = kappa * (lon - lambdac_) / conv;
-    i = (ic0 - (yc / ds0_ + Rs * cos(auxij) / ds0_) - ix_) * ratio_ - 0.5;
-    j = (jc0 + auxsig * Rs * sin(auxij) / ds0_ - jx_) * ratio_ - 0.5;
+    i = (ic0 - (yc / ds0_ + Rs * cos(auxij) / ds0_) - ix_) * ratio_;
+    j = (jc0 + auxsig * Rs * sin(auxij) / ds0_ - jx_) * ratio_;
 
   }
 

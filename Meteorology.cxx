@@ -39,7 +39,7 @@ namespace AtmoData
     \param MeridionalWind meridional wind.
     \param PotentialTemperature potential temperature.
     \param Richardson (output) Richardson number.
-    \param wind_threshold (optional) minimum of the wind shear. Default: 0.001.
+    \param wind_threshold (optional) minimum of the wind shear. Default:0.001.
   */
   template<class TU, class TV, class TTp, class T, class TG>
   void ComputeRichardson(Data<TU, 4, TG>& ZonalWind,
@@ -142,7 +142,7 @@ namespace AtmoData
     \param MeridionalWind meridional wind.
     \param PotentialTemperature potential temperature.
     \param Richardson (output) Richardson number in the first layer.
-    \param wind_threshold (optional) minimum of the wind shear. Default: 0.001.
+    \param wind_threshold (optional) minimum of the wind shear. Default:0.001.
   */
   template<class TU, class TV, class TTp, class T, class TG>
   void ComputeRichardson(Data<TU, 4, TG>& ZonalWind,
@@ -376,6 +376,81 @@ namespace AtmoData
     
   }
 
+  
+  //! Computes the temperature.
+  /*!
+    Formula: Temperature = PotentialTemperature * (Pressure / P0)^(r/cp).
+    \param PotentialTemperature potential temperature.
+    \param Pressure pressure.
+    \param Temperature (output) temperature (or virtual temperature).
+    \param P0 (optional) standard pressure. Default: 101325 Pa.
+    \param cp (optional) specific heat of dry air at constant pressure.
+    Default: 1005 J.kg^{-1}.K^{-1}.
+    \param r (optional) molar gas constant for air.
+    Default: 287.0 J.kg^{-1}.K^{-1}.
+  */
+  template<class TT, class TP, class T, class TG>
+  void ComputeTemperature(Data<TT, 4, TG>& PotentialTemperature,
+			  Data<TP, 4, TG>& Pressure,
+			  Data<T, 4, TG>& Temperature,
+			  T P0, T cp, T r)
+  {
+
+    int h, i, j, k;
+
+    int Nx = Temperature.GetLength(3);
+    int Ny = Temperature.GetLength(2);
+    int Nz = Temperature.GetLength(1);
+    int Nt = Temperature.GetLength(0);
+
+    T ratio = r / cp;
+
+    for (h=0; h<Nt; h++)
+      for (k=0; k<Nz; k++)
+	for (j=0; j<Ny; j++)
+	  for (i=0; i<Nx; i++)
+	    Temperature(h, k, j, i) =
+	      PotentialTemperature(h, k, j, i)
+	      * pow(Pressure(h, k, j, i) / P0, ratio);
+    
+  }
+
+
+  //! Computes the temperature.
+  /*!
+    Formula: Temperature = PotentialTemperature * (Pressure / P0)^(r/cp).
+    \param PotentialTemperature potential temperature.
+    \param Pressure pressure.
+    \param Temperature (output) temperature (or virtual temperature).
+    \param P0 (optional) standard pressure. Default: 101325 Pa.
+    \param cp (optional) specific heat of dry air at constant pressure.
+    Default: 1005 J.kg^{-1}.K^{-1}.
+    \param r (optional) molar gas constant for air.
+    Default: 287.0 J.kg^{-1}.K^{-1}.
+  */
+  template<class TT, class TP, class T, class TG>
+  void ComputeTemperature(Data<TT, 3, TG>& PotentialTemperature,
+			  Data<TP, 3, TG>& Pressure,
+			  Data<T, 3, TG>& Temperature,
+			  T P0, T cp, T r)
+  {
+
+    int h, i, j;
+
+    int Nx = Temperature.GetLength(2);
+    int Ny = Temperature.GetLength(1);
+    int Nt = Temperature.GetLength(0);
+
+    T ratio = r / cp;
+
+    for (h=0; h<Nt; h++)
+      for (j=0; j<Ny; j++)
+	for (i=0; i<Nx; i++)
+	  Temperature(h, j, i) = PotentialTemperature(h, j, i)
+	    * pow(Pressure(h, j, i) / P0, ratio);
+    
+  }
+
 
   //! Computes the saturation humidity.
   /*!
@@ -472,7 +547,7 @@ namespace AtmoData
 		     + SpecificHumidity(h, k, j, i) ) * P_sat);
 	    }
   }
-
+  
 
   //! Computes the relative humidity from the specific humidity.
   /*!
@@ -849,7 +924,7 @@ namespace AtmoData
 		v = V(h, k, j, i);
 		Module(h, k, j, i) = sqrt(u*u + v*v);
 	      }
-
+	
   }
 
 
@@ -1498,7 +1573,7 @@ namespace AtmoData
 	for (j=0; j<Ny; j++)
 	  for (i=0; i<Nx; i++)
 	    Height.Value(h, 0, j, i) = T(0);
-
+	
     for (h=0; h<Nt; h++)
       for (k=0; k<Nz; k++)
 	for (j=0; j<Ny; j++)
@@ -1506,7 +1581,7 @@ namespace AtmoData
 	    Height.Value(h, k+1, j, i) = Height.Value(h, k, j, i)
 	      - r / g * Temperature(h, k, j, i)
 	      * log(Pressure(h, k+1, j, i) / Pressure(h, k, j, i));
-
+	
   }
 
 

@@ -27,8 +27,8 @@
 
 namespace AtmoData
 {
-
-
+  
+  
   //! Default constructor.
   template <class T>
   LaeaToLonlat<T>::LaeaToLonlat(T lon_origin, T lat_origin)  throw():
@@ -38,10 +38,10 @@ namespace AtmoData
     lat_origin_(lat_origin / 180. * pi_),
     lon_origin_(lon_origin / 180. * pi_)
   {
-
+	
   }
-
-
+  
+  
   //! Convertion operator.
   /*!
     \param x_ abscissa in Lambert azimuthal equal area.
@@ -52,26 +52,26 @@ namespace AtmoData
   template <class T>
   void LaeaToLonlat<T>::operator() (const T x_, const T y_, T& lon, T& lat)
   {
-
+	
     T rho, z, cos_z, sin_z;
     T x(x_/Earth_radius_), y(y_/Earth_radius_);
-
+	
     rho = sqrt(x * x + y * y);
     z = 2.0 * asin(rho / 2.0);
     cos_z = cos(z);
     sin_z = sin(z);
-
+	
     if ((rho = hypot(x, y)) < limit_)
       {
 	lon = lon_origin_;
 	lat = lat_origin_;
 	return;
       }
-
+	
     x *= sin_z;
     T ab = cos_z * sin(lat_origin_) + y * sin_z * cos(lat_origin_) / rho;
     y = rho * cos(lat_origin_) * cos_z - y * sin(lat_origin_) * sin_z;
-
+	
     lon = atan2(x, y);
     lat = asin(ab);
     lon += lon_origin_;
@@ -81,13 +81,13 @@ namespace AtmoData
 	lon -= 2.0 * pi_ * floor(lon / (2.0*pi_));
 	lon -= pi_;
       }
-
+	
     lat = lat/pi_*180.;
     lon = lon/pi_*180.;
-
+	
   }
-
-
+  
+  
   //! Default constructor.
   template <class T>
   MM5LccIndToLonlat<T>::MM5LccIndToLonlat(int jmx, int imx,
@@ -116,7 +116,7 @@ namespace AtmoData
   void MM5LccIndToLonlat<T>::operator() (const T j, const T i,
 					 T& lon, T& lat)
   {
-
+	
     double ic0, jc0;
     double ic, jc;
     double conv;
@@ -137,31 +137,31 @@ namespace AtmoData
 
     ic = (ic0 - ix_) * ratio_;
     jc = (jc0 - jx_) * ratio_;
-
+	
     conv = 360.0 / (2.0 * pi_);
-
+	
     aux1 = (45.0 - abs(phi1_) / 2.0) / conv;
     aux2 = (45.0 - abs(phi2_) / 2.0) / conv;
     kappa = ( log10(cos(phi1_/conv)) - log10(cos(phi2_/conv)) )
       / ( log10(tan(aux1)) - log10(tan(aux2)) );
-
+	
     auxsig = phic_>0 ? 1.0 : -1.0;
     
     psi1 = auxsig * ( pi_ / 2.0 - abs(phi1_) / conv );
-
+	
     auxc = (auxsig * 90.0 - phic_) / conv / 2.0;
     yc = - (Earth_radius_ / kappa) * sin(psi1)
       * pow(tan(auxc) / tan(psi1/2.0), kappa);
-
+	
     x = (jc - j - 1) * ds_;
     y = (i + 1 - ic) * ds_ + yc;
     R = sqrt(x*x + y*y);
-
+	
     auxl = tan(psi1/2.0)
       * pow(auxsig * R * kappa / (Earth_radius_*sin(psi1)),
 	    1.0/kappa);
     lat = auxsig * 90.0 - 2.0 * conv * atan(auxl);
-
+	
     if (y == 0.0)
       {
 	auxtan = x<0.0 ? (-pi_/2.0) : (pi_/2);
@@ -169,7 +169,7 @@ namespace AtmoData
       }
     else
       lambdaprima = lambdac_ + conv / kappa * atan(x / (auxsig*y));
-
+	
     if (lambdaprima < 180.0)
       lon = lambdaprima + 360.0;
     if ((-180.0 <= lambdaprima) && (lambdaprima <= 180.0))
@@ -511,6 +511,195 @@ namespace AtmoData
     auxij = kappa * (lon - lambdac_) / conv;
     i = (ic0 - (yc / ds0_ + Rs * cos(auxij) / ds0_) - ix_) * ratio_;
     j = (jc0 + auxsig * Rs * sin(auxij) / ds0_ - jx_) * ratio_;
+
+  }
+  
+
+  //! Default constructor.
+  template <class T>
+  LonlatToWRFLccInd<T>::LonlatToWRFLccInd(int imx, int jmx,
+					  double lambdar, double phir,
+					  double lambda0, double lambda1,
+					  double max_phi0, double max_phi1,
+					  double phi1, double phi2,
+					  double dsi0, double dsj0)  throw():
+    imx_(imx), jmx_(jmx), lambdar_(lambdar), phir_(phir),
+    lambda0_(lambda0), lambda1_(lambda1),
+    max_phi0_(max_phi0), max_phi1_(max_phi1),
+    phi1_(phi1), phi2_(phi2), dsi0_(dsi0), dsj0_(dsj0),
+    Earth_radius_(6370997.), pi_(3.14159265358979323846264)
+  {
+    
+  }
+
+
+  //! Convertion operator.
+  /*!
+    \param lon longitude.
+    \param lat latitude.
+    \param i index of the WRF grid along the East-West direction.
+    \param j index of the WRF grid along the North-South direction.
+    \warning Indices order (in WRF) is NOT confusing: j and i are NOT
+    swapped with respect to the natural order. This is a big difference
+    with MM5.
+  */
+  template <class T>
+  void LonlatToWRFLccInd<T>::operator() (const T lon, const T lat,
+					 T& i, T& j)
+  {
+
+    double conv;
+    double aux1, aux2, kappa;
+    double auxsig;
+    double psi1;
+    double auxr, yr;
+    double aux, Rs;
+    double auxij;
+
+    conv = 360.0 / (2.0 * pi_);
+
+    aux1 = (45.0 - abs(phi1_) / 2.0) / conv;
+    aux2 = (45.0 - abs(phi2_) / 2.0) / conv;
+    kappa = ( log10(cos(phi1_/conv)) - log10(cos(phi2_/conv)) )
+      / ( log10(tan(aux1)) - log10(tan(aux2)) );
+
+    auxsig = phir_ > 0 ? 1.0 : -1.0;
+    
+    psi1 = auxsig * ( pi_ / 2.0 - abs(phi1_) / conv );
+
+    auxr = (auxsig * 90.0 - phir_) / conv / 2.0;
+    yr = - (Earth_radius_ / kappa) * sin(psi1)
+      * pow(tan(auxr) / tan(psi1/2.0), kappa);
+
+    aux = (auxsig * 90.0 - lat) / (2.0 * conv);
+    Rs = (Earth_radius_ / kappa) * sin(psi1)
+      * pow(tan(aux) / tan(psi1/2.0), kappa);
+
+    auxij = kappa * (lon - lambdar_) / conv;
+
+    i = imx_ * (lambdar_ - lambda0_) / (lambda1_ - lambda0_)
+      + auxsig * Rs * sin(auxij) / dsi0_;
+    j = jmx_ * (phir_ - max_phi0_) / (max_phi1_ - max_phi0_)
+      - yr / dsj0_ - Rs * cos(auxij) / dsi0_;
+
+  }
+
+
+  //! Default constructor.
+  template <class T>
+  LonlatToWRFMercInd<T>::LonlatToWRFMercInd(int imx,
+					    int jmx,
+					    double lambdac,
+					    double phic,
+					    double phi1,
+					    double dsi0,
+					    double dsj0) throw():
+    imx_(imx), jmx_(jmx), lambdac_(lambdac), phic_(phic),
+    phi1_(phi1), dsi0_(dsi0), dsj0_(dsj0),
+    Earth_radius_(6370997.),
+    pi_(3.14159265358979323846264)
+  {
+    
+  }
+
+
+  //! Convertion operator.
+  /*!
+    \param lon longitude.
+    \param lat latitude.
+    \param i index of the WRF grid along the East-West direction.
+    \param j index of the WRF grid along the North-South direction.
+    \warning Indices order (in WRF) is NOT confusing: j and i are NOT
+    swapped with respect to the natural order. This is a BIG difference
+    with MM5.
+  */
+  template <class T>
+  void LonlatToWRFMercInd<T>::operator() (const T lon, const T lat,
+					  T& i, T& j)
+  {
+
+    double c2;
+    double yc;
+    double conv;
+    double aux;
+    double x, y;
+
+    conv = 180. / pi_;
+
+    c2 = Earth_radius_ * cos(phi1_/conv);
+    aux = phic_ / conv;
+    yc = c2 * log((1.0 + sin(aux)) / cos(aux));
+
+    x = c2 * (lon - lambdac_) / conv;
+    aux = lat / conv;
+    y = c2 * log((1.0 + sin(aux)) / cos(aux));
+
+    i = imx_ / 2.0 + x/dsi0_ - 1.;
+    j = jmx_ / 2.0 + (y-yc)/dsj0_ - 1.;
+
+  }
+
+
+  //! Default constructor.
+  template <class T>
+  LonlatToWRFStereInd<T>::LonlatToWRFStereInd(int imx,
+					      int jmx,
+					      double lambdac,
+					      double phic,
+					      double phi1,
+					      double dsi0,
+					      double dsj0) throw():
+    imx_(imx), jmx_(jmx), lambdac_(lambdac), phic_(phic),
+    phi1_(phi1), dsi0_(dsi0), dsj0_(dsj0),
+    Earth_radius_(6370997.),
+    pi_(3.14159265358979323846264)
+  {
+    
+  }
+
+
+  //! Convertion operator.
+  /*!
+    \param lon longitude.
+    \param lat latitude.
+    \param i index of the WRF grid along the East-West direction.
+    \param j index of the WRF grid along the North-South direction.
+    \warning Indices order (in WRF) is NOT confusing: j and i are NOT
+    swapped with respect to the natural order. This is a BIG difference
+    with MM5.
+  */
+  template <class T>
+  void LonlatToWRFStereInd<T>::operator() (const T lon, const T lat,
+					   T& i, T& j)
+  {
+
+    double conv;
+    double kappa;
+    double auxsig;
+    double psi1;
+    double auxc, yc;
+    double aux, Rs;
+    double auxij;
+
+    conv = 180. / pi_;
+
+    kappa = 1.0;
+
+    auxsig = phic_< 0? -1.0 : 1.0;
+
+    psi1 = auxsig * (pi_/2.0 - abs(phi1_)/conv);
+
+    auxc = (auxsig * 90.0 - phic_) / conv;
+    yc = - Earth_radius_ * sin(auxc)
+      * ((1.0 + cos(psi1)) / (1.0 + cos(auxc)));
+
+    aux = (auxsig * 90.0 - lat) / conv;
+    Rs = Earth_radius_ * sin(aux) * ((1.0 + cos(psi1)) / (1.0 + cos(aux)));
+
+    auxij = kappa * (lon - lambdac_) / conv;
+	
+    i = imx_ / 2.0 + auxsig * Rs * sin(auxij) / dsi0_ - 1.;
+    j = jmx_ / 2.0 - yc / dsj0_ - Rs * cos(auxij) / dsi0_ - 1.;
 
   }
 

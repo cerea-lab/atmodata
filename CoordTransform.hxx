@@ -92,7 +92,7 @@ namespace AtmoData
     void operator() (const T j, const T i,
 		     T& lon, T& lat);
   };
-
+  
 
   //! Coordinate transformation from longitude/latitude to
   //! indices of the MM5 grid in Lambert conic conformal.
@@ -282,6 +282,123 @@ namespace AtmoData
     LonlatToMM5StereInd(int jmx, int imx, double jx, double ix,
 			double phic, double lambdac,
 			double phi1, double ds0, int ratio)  throw();
+    void operator() (const T lon, const T lat,
+		     T& j, T& i);
+  };
+
+
+  //! Coordinate transformation from longitude/latitude to
+  //! indices of the WRF grid in Lambert conic conformal.
+  template<class T>
+  class LonlatToWRFLccInd
+  {
+  protected:
+    //! Domain grid dimension in East-West direction.
+    const int imx_;
+    //! Domain grid dimension in North-South direction.
+    const int jmx_;
+    //! Domain reference longitude (degree).
+    const double lambdar_;
+    //! Longitude of the bottom-left corner(degree).
+    const double lambda0_;
+    //! Longitude of the bottom-right corner (degree).
+    const double lambda1_;
+    //! Domain reference latitude (degree).
+    const double phir_;
+    //! Max latitude of the bottom boundary (degree).
+    const double max_phi0_;
+    //! Max latitude of the top coundary (degree).
+    const double max_phi1_;
+    //! True latitude #1 (degree).
+    const double phi1_;
+    //! True latitude #2 (degree).
+    const double phi2_;
+    //! Grid distance (meters) of the domain in East-West direction.
+    const double dsi0_;
+    //! Grid distance (meters) of the domain in North-South direction.
+    const double dsj0_;
+    //! Earth radius.
+    const double Earth_radius_;
+    //! pi.
+    const double pi_;
+
+  public:
+    LonlatToWRFLccInd(int imx, int jmx,
+		      double lambdar, double phir,
+		      double lambda0, double lambda1,
+		      double max_phi0, double max_phi1,
+		      double phi1, double phi2,
+		      double dsi0, double dsj0)  throw();
+    void operator() (const T lon, const T lat,
+		     T& i, T& j);
+  };
+
+  
+  //! Coordinate transformation from longitude/latitude to
+  //! indices of the WRF grid in Mercator coordinates.
+  template<class T>
+  class LonlatToWRFMercInd
+  {
+  protected:
+    //! Domain grid dimension in East-West direction.
+    const int imx_;
+    //! Domain grid dimension in North-South direction.
+    const int jmx_;
+    //! Domain center longitude (degree).
+    const double lambdac_;
+    //! Domain center latitude (degree).
+    const double phic_;
+    //! True latitude #1 (degree).
+    const double phi1_;
+    //! Grid distance (meters) of the domain in East-West direction.
+    const double dsi0_;
+    //! Grid distance (meters) of the domain in North-South direction.
+    const double dsj0_;
+    //! Earth radius.
+    const double Earth_radius_;
+    //! pi.
+    const double pi_;
+
+  public:
+    LonlatToWRFMercInd(int imx, int jmx,
+		       double lambdac, double phic,
+		       double phi1,
+		       double dsi0, double dsj0)  throw();
+    void operator() (const T lon, const T lat,
+		     T& i, T& j);
+  };
+
+
+  //! Coordinate transformation from longitude/latitude to
+  //! indices of the WRF grid in polar stereographic coordinates.
+  template<class T>
+  class LonlatToWRFStereInd
+  {
+  protected:
+    //! Domain grid dimension in East-West direction.
+    const int imx_;
+    //! Domain grid dimension in North-South direction.
+    const int jmx_;
+    //! Domain center longitude (degree).
+    const double lambdac_;
+    //! Domain center latitude (degree).
+    const double phic_;
+    //! True latitude #1 (degree).
+    const double phi1_;
+    //! Grid distance (meters) of the domain in East-West direction.
+    const double dsi0_;
+    //! Grid distance (meters) of the domain in North-South direction.
+    const double dsj0_;
+    //! Earth radius.
+    const double Earth_radius_;
+    //! pi.
+    const double pi_;
+
+  public:
+    LonlatToWRFStereInd(int imx, int jmx,
+			double lambdac, double phic,
+			double phi1,
+			double dsi0, double dsj0)  throw();
     void operator() (const T lon, const T lat,
 		     T& j, T& i);
   };

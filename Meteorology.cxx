@@ -647,7 +647,8 @@ namespace AtmoData
   template<class TS, class TP, class T, class TG>
   void ComputeCriticalRelativeHumidity(Data<TS, 3, TG>& SurfacePressure,
 				       Data<TP, 4, TG>& Pressure,
-				       Data<T, 4, TG>& CriticalRelativeHumidity,
+				       Data<T, 4, TG>&
+				       CriticalRelativeHumidity,
 				       T coeff0, T coeff1)
   {
     int h, k, j, i;
@@ -683,9 +684,11 @@ namespace AtmoData
     \param a1 exponent (see the formula). Default: 1.1.
   */
   template<class TS, class TP, class T, class TG>
-  void ComputeCriticalRelativeHumidity_extended(Data<TS, 3, TG>& SurfacePressure,
+  void ComputeCriticalRelativeHumidity_extended(Data<TS, 3, TG>&
+						SurfacePressure,
 						Data<TP, 4, TG>& Pressure,
-						Data<T, 4, TG>& CriticalRelativeHumidity,
+						Data<T, 4, TG>&
+						CriticalRelativeHumidity,
 						T coeff0, T coeff1,
 						T a0, T a1)
   {
@@ -729,7 +732,8 @@ namespace AtmoData
   void ComputeCriticalRelativeHumidity(Data<TB, 3, TG>& BoundaryLayerHeight,
 				       Data<TS, 3, TG>& SurfacePressure,
 				       Data<TP, 4, TG>& Pressure,
-				       Data<T, 4, TG>& CriticalRelativeHumidity,
+				       Data<T, 4, TG>&
+				       CriticalRelativeHumidity,
 				       T coeff0, T coeff1, T BL_CRH)
   {
     int h, k, j, i;
@@ -770,7 +774,8 @@ namespace AtmoData
   */
   template<class TP, class T, class TG>
   void ComputeCriticalRelativeHumidity(Data<TP, 4, TG>& Pressure,
-				       Data<T, 4, TG>& CriticalRelativeHumidity,
+				       Data<T, 4, TG>&
+				       CriticalRelativeHumidity,
 				       T CRH_0, T CRH_1, T CRH_2,
 				       T P_0, T P_1)
   {
@@ -1301,7 +1306,8 @@ namespace AtmoData
 		rhc = CriticalRelativeHumidity(h, k, j, i);
 
 		if (rh1 >= rhc)  // Above a cloud.
-		  CloudHeight(h, j, i) = RelativeHumidity[1].Value(h, k, j, i);
+		  CloudHeight(h, j, i) =
+		    RelativeHumidity[1].Value(h, k, j, i);
 
 		// For the next level.
 		rh0 = rh1;

@@ -112,13 +112,16 @@ namespace AtmoData
   template<class TS, class TP, class T, class TG>
   void ComputeCriticalRelativeHumidity(Data<TS, 3, TG>& SurfacePressure,
 				       Data<TP, 4, TG>& Pressure,
-				       Data<T, 4, TG>& CriticalRelativeHumidity,
+				       Data<T, 4, TG>&
+				       CriticalRelativeHumidity,
 				       T coeff0 = 2., T coeff1 = sqrt(3.));
 
   template<class TS, class TP, class T, class TG>
-  void ComputeCriticalRelativeHumidity_extended(Data<TS, 3, TG>& SurfacePressure,
+  void ComputeCriticalRelativeHumidity_extended(Data<TS, 3, TG>&
+						SurfacePressure,
 						Data<TP, 4, TG>& Pressure,
-						Data<T, 4, TG>& CriticalRelativeHumidity,
+						Data<T, 4, TG>&
+						CriticalRelativeHumidity,
 						T coeff0 = 1.1,
 						T coeff1 = sqrt(1.3),
 						T a0 = 0., T a1 = 1.1);
@@ -127,13 +130,15 @@ namespace AtmoData
   void ComputeCriticalRelativeHumidity(Data<TB, 3, TG>& BoundaryLayerHeight,
 				       Data<TS, 3, TG>& SurfacePressure,
 				       Data<TP, 4, TG>& Pressure,
-				       Data<T, 4, TG>& CriticalRelativeHumidity,
+				       Data<T, 4, TG>&
+				       CriticalRelativeHumidity,
 				       T coeff0 = 2., T coeff1 = sqrt(3.),
 				       T BL_CRH = 0.98);
 
   template<class TP, class T, class TG>
   void ComputeCriticalRelativeHumidity(Data<TP, 4, TG>& Pressure,
-				       Data<T, 4, TG>& CriticalRelativeHumidity,
+				       Data<T, 4, TG>&
+				       CriticalRelativeHumidity,
 				       T CRH_0 = 0.75, T CRH_1 = 0.95,
 				       T CRH_2 = 0.95,
 				       T P_0 = 70000., T P_1 = 40000.);

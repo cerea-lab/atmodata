@@ -523,8 +523,8 @@ namespace AtmoData
 					  double max_phi0, double max_phi1,
 					  double phi1, double phi2,
 					  double dsi0, double dsj0)  throw():
-    imx_(imx), jmx_(jmx), lambdar_(lambdar), phir_(phir),
-    lambda0_(lambda0), lambda1_(lambda1),
+    imx_(imx), jmx_(jmx), lambdar_(lambdar),
+    lambda0_(lambda0), lambda1_(lambda1), phir_(phir),
     max_phi0_(max_phi0), max_phi1_(max_phi1),
     phi1_(phi1), phi2_(phi2), dsi0_(dsi0), dsj0_(dsj0),
     Earth_radius_(6370997.), pi_(3.14159265358979323846264)

@@ -1,4 +1,4 @@
 AtmoData 1.4
 
 Depends on:
- - SeldonData 1.6
+ - SeldonData 1.6.3

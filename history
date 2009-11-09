@@ -2,6 +2,23 @@ o------------------o
 | ATMODATA HISTORY |
 o------------------o
 
+Version 1.4 (2009-11-09)
+-----------
+
+** Improvements:
+
+- Added coordinates transformations:
+   + LonlatToWRFLccInd
+   + LonlatToWRFMercInd
+   + LonlatToWRFStereInd
+- Added two overloaded meteorological functions 'ComputeTemperature'.
+
+** Bug fix:
+
+- The operators () of the classes defined for MM5 in "CoordTransform.cxx" were
+  shifted with an offset of 0.5 cell.
+
+
 Version 1.3.2 (2008-05-08)
 -------------
 

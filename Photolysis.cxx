@@ -383,7 +383,7 @@ namespace AtmoData
 		  dist = 2. * Attenuation[1].Value(h, upper - 1, j, i)
 		    - Attenuation[1].Value(h, upper - 2, j, i) - href;
 		  up_att = 1.;
-		  low_att = Attenuation[1].Value(h, lower - 1, j, i);
+		  low_att = Attenuation(h, lower - 1, j, i);
 		}
 	      else if (upper == Nz && lower == 0)
 		{

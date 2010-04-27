@@ -2,6 +2,16 @@ o------------------o
 | ATMODATA HISTORY |
 o------------------o
 
+
+Version 1.4.1 (2010-04-27)
+-------------
+
+** Bug fix:
+
+- The function 'ComputeAttenuation_LWC' miscalculated the attenuation when
+  clouds reached the upper model level.
+
+
 Version 1.4 (2009-11-09)
 -----------
 

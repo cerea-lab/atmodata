@@ -579,8 +579,7 @@ namespace AtmoData
 
     i = imx_ * (lambdar_ - lambda0_) / (lambda1_ - lambda0_)
       + auxsig * Rs * sin(auxij) / dsi0_;
-    j = jmx_ * (phir_ - max_phi0_) / (max_phi1_ - max_phi0_)
-      - yr / dsj0_ - Rs * cos(auxij) / dsi0_;
+    j = jmx_ * 0.5 - yr / dsj0_ - Rs * cos(auxij) / dsi0_;
 
   }
 

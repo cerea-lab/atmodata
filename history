@@ -3,6 +3,15 @@ o------------------o
 o------------------o
 
 
+Version 1.4.2 (2010-05-07)
+-------------
+
+** Bug fix:
+
+- In the function 'LonLatToWRFLccInd', the index along the north-south
+  direction was erroneous.
+
+
 Version 1.4.1 (2010-04-27)
 -------------
 

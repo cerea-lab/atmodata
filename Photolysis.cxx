@@ -496,6 +496,54 @@ namespace AtmoData
           }
   }
 
+  // Computes the extinction for optical depth.
+  // (OD is the integration of the extinction over the vertical).
+  // The formula is based on  Pozzoli et al., 08 (JGR),
+  // himself based on based on Rockel et al., 1991.
+  /*!
+    \param LiquidWaterContent liquid water content (kg/m^3).
+    \param IceWaterContent Ice water content (kg/m^3).
+    \param LiquidWaterExtinction (output) liquid cloud extinction .
+    \param IceOpticalDepth (output) ice cloud extinction .
+  */
+  template <class TL, class T, class TG>
+  void ComputeExtinction(const Data<TL, 4, TG>& LiquidWaterContent,
+                         const Data<TL, 4, TG>& IceWaterContent,
+                         Data<T, 4, TG>& LiquidWaterExtinction,
+                         Data<T, 4, TG>& IceWaterExtinction)
+  {
+    double cf;
+
+    int Nt(IceWaterContent.GetLength(0));
+    int Nz(IceWaterContent.GetLength(1));
+    int Ny(IceWaterContent.GetLength(2));
+    int Nx(IceWaterContent.GetLength(3));
+
+    LiquidWaterExtinction.Fill(0.);
+    IceWaterExtinction.Fill(0.);
+
+    T al = 1.488;
+    T bl = -0.9374;
+    T rleff = 12;
+    T ai = 1.911;
+    T bi = -1.0631;
+    T rieff = 50;
+
+    for (int h = 0; h < Nt; h++)
+      for (int j = 0; j < Ny; j++)
+        for (int i = 0; i < Nx; i++)
+          // Starting from the top.
+          for (int k = 0; k < Nz; k++)
+            {
+              // kg/m^3 to g/m^3.
+              T tau = al * 1000. * LiquidWaterContent(h, k, j, i) * pow(rleff, bl);
+              T icetau = ai * 1000. * IceWaterContent(h, k, j, i) * pow(rieff, bi);
+
+              LiquidWaterExtinction(h, k, j, i) = tau;
+              IceWaterExtinction(h, k, j, i) = icetau;
+            }
+  }
+
 }  // namespace AtmoData.
 
 #define ATMODATA_FILE_PHOTOLYSIS_CXX

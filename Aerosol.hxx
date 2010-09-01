@@ -23,6 +23,26 @@
 
 #ifndef ATMODATA_FILE_AEROSOL_HXX
 
+namespace AtmoData
+{
+  template<class T>
+  T wpower(T a, T b);
+
+  template<class T>
+  T compute_Hanel_diameter(T dry_radius, T relative_humidity);
+
+  template<class T>
+  T compute_Gerber_diameter(T dry_diameter, T relative_humidity,
+                            T temperature);
+
+  template<class T>
+  T compute_wet_diameter_from_water_content(T dry_diameter,
+                                            T dry_aerosol_concentration,
+                                            T water_concentration);
+} // namespace AtmoData.
+
+
+// Fortran functions.
 #ifdef POLYPHEMUS_SINGLE_UNDERSCORE
 #undef POLYPHEMUS_DOUBLE_UNDERSCORE
 #elif defined(__GNUG__) && __GNUG__ < 4 && !defined(__INTEL_COMPILER)

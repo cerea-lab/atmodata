@@ -47,7 +47,8 @@ namespace AtmoData
 #include "CoordTransform.cxx"
 #include "Transform.cxx"
 #include "Polair.cxx"
-#include "Aerosol.hxx"
+#include "Aerosol.cxx"
+#include "Optics.cxx"
 
 #include "Format.cxx"
 

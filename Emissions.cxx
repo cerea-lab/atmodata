@@ -615,10 +615,14 @@ namespace AtmoData
 	
 	  lon = x_min_luc + i*delta_x_luc; // deg
 	  lat = y_min_luc + j*delta_y_luc; // deg
-	
-	  int i_polair = int((lon - x_min) / Delta_x);
-	  int j_polair = int((lat - y_min) / Delta_y);
-	
+			  
+          int i_polair = -999;
+          int j_polair = -999;
+          if (lon >= x_min)
+              i_polair = int((lon - x_min) / Delta_x);
+         if (lat >= y_min)
+	     j_polair = int((lat - y_min) / Delta_y);
+
 	  if (i_polair >= 0 && i_polair < Nx && j_polair >= 0
 	      && j_polair < Ny)
 	    Ntot_polair(j_polair, i_polair) += 1;

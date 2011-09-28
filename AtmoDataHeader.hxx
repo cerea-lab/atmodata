@@ -1,4 +1,4 @@
-// Copyright (C) 2003-2007, ENPC - INRIA - EDF R&D
+// Copyright (C) 2003-2011, ENPC - INRIA - EDF R&D
 // Author(s): Vivien Mallet
 //
 // This file is part of AtmoData library, a tool for data processing in
@@ -21,11 +21,9 @@
 //      http://cerea.enpc.fr/polyphemus/atmodata.html
 
 
-#ifndef ATMODATA_FILE_ATMODATA_HXX
+#ifndef ATMODATA_FILE_ATMODATAHEADER_HXX
 
-#include "AtmoDataHeader.hxx"
-
-#include "SeldonData.hxx"
+#include "SeldonDataHeader.hxx"
 using namespace SeldonData;
 
 //! AtmoData namespace.
@@ -33,24 +31,26 @@ namespace AtmoData
 {
   using Talos::to_num;
   using Talos::to_str;
+  using SeldonData::IOError;
+  using SeldonData::WrongDim;
 }
 
 #include "Common.hxx"
 
-#include "Meteorology.cxx"
-#include "Kz.cxx"
-#include "TimeDiagnosis.cxx"
-#include "Photolysis.cxx"
-#include "Emissions.cxx"
-#include "Deposition.cxx"
-#include "CoordTransform.cxx"
-#include "Transform.cxx"
-#include "Polair.cxx"
+#include "Meteorology.hxx"
+#include "Kz.hxx"
+#include "TimeDiagnosis.hxx"
+#include "Photolysis.hxx"
+#include "Emissions.hxx"
+#include "Deposition.hxx"
+#include "CoordTransform.hxx"
+#include "Transform.hxx"
+#include "Polair.hxx"
 #include "Aerosol.hxx"
 
-#include "Format.cxx"
+#include "Format.hxx"
 
-#include "Errors.cxx"
+#include "Errors.hxx"
 
-#define ATMODATA_FILE_ATMODATA_HXX
+#define ATMODATA_FILE_ATMODATAHEADER_HXX
 #endif

@@ -299,16 +299,12 @@ namespace AtmoData
     const int jmx_;
     //! Domain reference longitude (degree).
     const double lambdar_;
-    //! Longitude of the bottom-left corner(degree).
-    const double lambda0_;
-    //! Longitude of the bottom-right corner (degree).
-    const double lambda1_;
     //! Domain reference latitude (degree).
     const double phir_;
-    //! Max latitude of the bottom boundary (degree).
-    const double max_phi0_;
-    //! Max latitude of the top coundary (degree).
-    const double max_phi1_;
+    //! Domain center index along x-direction (i).
+    const double i_cen_;
+    //! Domain center index along y-direction (j).
+    const double j_cen_;
     //! True latitude #1 (degree).
     const double phi1_;
     //! True latitude #2 (degree).
@@ -325,8 +321,7 @@ namespace AtmoData
   public:
     LonlatToWRFLccInd(int imx, int jmx,
                       double lambdar, double phir,
-                      double lambda0, double lambda1,
-                      double max_phi0, double max_phi1,
+                      double i_cen, double j_cen,
                       double phi1, double phi2,
                       double dsi0, double dsj0)  throw();
     void operator()(const T lon, const T lat,

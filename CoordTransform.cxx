@@ -32,7 +32,7 @@ namespace AtmoData
   //! Default constructor.
   template <class T>
   LaeaToLonlat<T>::LaeaToLonlat(T lon_origin, T lat_origin)  throw():
-    Earth_radius_(6370997.),
+    Earth_radius_(6370000.),
     pi_(3.14159265358979323846264),
     limit_(1.e-15),
     lat_origin_(lat_origin / 180. * pi_),
@@ -97,7 +97,7 @@ namespace AtmoData
                                           double ds, int ratio)  throw():
     jmx_(jmx), imx_(imx), jx_(jx), ix_(ix), phic_(phic), lambdac_(lambdac),
     phi1_(phi1), phi2_(phi2), ds_(ds), ratio_(ratio),
-    Earth_radius_(6370997.),
+    Earth_radius_(6370000.),
     pi_(3.14159265358979323846264)
   {
 
@@ -189,7 +189,7 @@ namespace AtmoData
                                           double ds0, int ratio)  throw():
     jmx_(jmx), imx_(imx), jx_(jx), ix_(ix), phic_(phic), lambdac_(lambdac),
     phi1_(phi1), phi2_(phi2), ds0_(ds0), ratio_(ratio),
-    Earth_radius_(6370997.),
+    Earth_radius_(6370000.),
     pi_(3.14159265358979323846264)
   {
 
@@ -258,7 +258,7 @@ namespace AtmoData
                                             double ds, int ratio)  throw():
     jmx_(jmx), imx_(imx), jx_(jx), ix_(ix), phic_(phic), lambdac_(lambdac),
     phi1_(phi1), ds_(ds), ratio_(ratio),
-    Earth_radius_(6370997.),
+    Earth_radius_(6370000.),
     pi_(3.14159265358979323846264)
   {
 
@@ -314,7 +314,7 @@ namespace AtmoData
                                             double ds0, int ratio)  throw():
     jmx_(jmx), imx_(imx), jx_(jx), ix_(ix), phic_(phic), lambdac_(lambdac),
     phi1_(phi1), ds0_(ds0), ratio_(ratio),
-    Earth_radius_(6370997.),
+    Earth_radius_(6370000.),
     pi_(3.14159265358979323846264)
   {
 
@@ -371,7 +371,7 @@ namespace AtmoData
                                               int ratio)  throw():
     jmx_(jmx), imx_(imx), jx_(jx), ix_(ix), phic_(phic), lambdac_(lambdac),
     phi1_(phi1), ds_(ds), ratio_(ratio),
-    Earth_radius_(6370997.),
+    Earth_radius_(6370000.),
     pi_(3.14159265358979323846264)
   {
 
@@ -458,7 +458,7 @@ namespace AtmoData
                                               int ratio)  throw():
     jmx_(jmx), imx_(imx), jx_(jx), ix_(ix), phic_(phic), lambdac_(lambdac),
     phi1_(phi1), ds0_(ds0), ratio_(ratio),
-    Earth_radius_(6370997.),
+    Earth_radius_(6370000.),
     pi_(3.14159265358979323846264)
   {
 
@@ -519,15 +519,13 @@ namespace AtmoData
   template <class T>
   LonlatToWRFLccInd<T>::LonlatToWRFLccInd(int imx, int jmx,
                                           double lambdar, double phir,
-                                          double lambda0, double lambda1,
-                                          double max_phi0, double max_phi1,
+                                          double i_cen, double j_cen,
                                           double phi1, double phi2,
                                           double dsi0, double dsj0)  throw():
-    imx_(imx), jmx_(jmx), lambdar_(lambdar),
-    lambda0_(lambda0), lambda1_(lambda1), phir_(phir),
-    max_phi0_(max_phi0), max_phi1_(max_phi1),
-    phi1_(phi1), phi2_(phi2), dsi0_(dsi0), dsj0_(dsj0),
-    Earth_radius_(6370997.), pi_(3.14159265358979323846264)
+    imx_(imx), jmx_(jmx), lambdar_(lambdar), phir_(phir),
+    i_cen_(i_cen), j_cen_(j_cen), phi1_(phi1), phi2_(phi2),
+    dsi0_(dsi0), dsj0_(dsj0),
+    Earth_radius_(6370000.), pi_(3.14159265358979323846264)
   {
 
   }
@@ -549,37 +547,26 @@ namespace AtmoData
   {
 
     double conv;
-    double aux1, aux2, kappa;
-    double auxsig;
-    double psi1;
-    double auxr, yr;
-    double aux, Rs;
-    double auxij;
-
     conv = 360.0 / (2.0 * pi_);
 
-    aux1 = (45.0 - abs(phi1_) / 2.0) / conv;
-    aux2 = (45.0 - abs(phi2_) / 2.0) / conv;
-    kappa = (log10(cos(phi1_ / conv)) - log10(cos(phi2_ / conv)))
-      / (log10(tan(aux1)) - log10(tan(aux2)));
+    double cone, Rho, Rho0, theta, offset_i, offset_j;
 
-    auxsig = phir_ > 0 ? 1.0 : -1.0;
+    cone = (log10(cos(phi1_ / conv)) - log10(cos(phi2_ / conv)))
+      / (log10(tan(pi_ / 4 - phi1_ / 2 / conv)) - log10(tan(pi_ / 4 - phi2_ / 2 / conv)));
 
-    psi1 = auxsig * (pi_ / 2.0 - abs(phi1_) / conv);
+    Rho = Earth_radius_ * cos(phi1_ / conv) / cone
+      * pow(tan(pi_ / 4 - lat / 2 / conv) / tan(pi_ / 4 - phi1_ / 2 / conv), cone);
 
-    auxr = (auxsig * 90.0 - phir_) / conv / 2.0;
-    yr = - (Earth_radius_ / kappa) * sin(psi1)
-      * pow(tan(auxr) / tan(psi1 / 2.0), kappa);
+    theta = cone * (lon - lambdar_);
 
-    aux = (auxsig * 90.0 - lat) / (2.0 * conv);
-    Rs = (Earth_radius_ / kappa) * sin(psi1)
-      * pow(tan(aux) / tan(psi1 / 2.0), kappa);
+    Rho0 = Earth_radius_ * cos(phi1_ / conv) / cone
+      * pow(tan(pi_ / 4 - phir_ / 2 / conv) / tan(pi_ / 4 - phi1_ / 2 / conv), cone);
 
-    auxij = kappa * (lon - lambdar_) / conv;
+    offset_i = imx_ * 0.5 - i_cen_;
+    offset_j = jmx_ * 0.5 - j_cen_ + Rho0 / dsj0_;
 
-    i = imx_ * (lambdar_ - lambda0_) / (lambda1_ - lambda0_)
-      + auxsig * Rs * sin(auxij) / dsi0_;
-    j = jmx_ * 0.5 - yr / dsj0_ - Rs * cos(auxij) / dsi0_;
+    i = offset_i + Rho * sin(theta / conv) / dsi0_;
+    j = offset_j - Rho * cos(theta / conv) / dsj0_;
 
   }
 
@@ -595,7 +582,7 @@ namespace AtmoData
                                             double dsj0) throw():
     imx_(imx), jmx_(jmx), lambdac_(lambdac), phic_(phic),
     phi1_(phi1), dsi0_(dsi0), dsj0_(dsj0),
-    Earth_radius_(6370997.),
+    Earth_radius_(6370000.),
     pi_(3.14159265358979323846264)
   {
 
@@ -633,8 +620,8 @@ namespace AtmoData
     aux = lat / conv;
     y = c2 * log((1.0 + sin(aux)) / cos(aux));
 
-    i = imx_ / 2.0 + x / dsi0_ - 1.;
-    j = jmx_ / 2.0 + (y - yc) / dsj0_ - 1.;
+    i = imx_ / 2.0 + x / dsi0_;
+    j = jmx_ / 2.0 + (y - yc) / dsj0_;
 
   }
 
@@ -650,7 +637,7 @@ namespace AtmoData
                                               double dsj0) throw():
     imx_(imx), jmx_(jmx), lambdac_(lambdac), phic_(phic),
     phi1_(phi1), dsi0_(dsi0), dsj0_(dsj0),
-    Earth_radius_(6370997.),
+    Earth_radius_(6370000.),
     pi_(3.14159265358979323846264)
   {
 

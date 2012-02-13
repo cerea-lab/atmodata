@@ -21,7 +21,7 @@
 //      http://cerea.enpc.fr/polyphemus/atmodata.html
 
 
-#ifndef ATMODATA_FILE_FORMAT_HXX
+#ifndef ATMODATA_FILE_FORMAT_CXX
 
 #include "Format.hxx"
 
@@ -1222,5 +1222,5 @@ namespace AtmoData
 }  // namespace AtmoData.
 
 
-#define ATMODATA_FILE_FORMAT_HXX
+#define ATMODATA_FILE_FORMAT_CXX
 #endif

@@ -1,5 +1,5 @@
-// Copyright (C) 2003-2007, ENPC - INRIA - EDF R&D
-// Author(s): Vivien Mallet
+// Copyright (C) 2003-2013, ENPC - INRIA - EDF R&D
+// Author(s): Vivien Mallet, Sylvain Doré
 //
 // This file is part of AtmoData library, a tool for data processing in
 // atmospheric sciences.
@@ -42,6 +42,7 @@ namespace AtmoData
 #include "TimeDiagnosis.cxx"
 #include "Photolysis.cxx"
 #include "Emissions.cxx"
+#include "Megan.cxx"
 #include "Deposition.cxx"
 #include "CoordTransform.cxx"
 #include "Transform.cxx"

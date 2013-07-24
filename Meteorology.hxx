@@ -197,6 +197,13 @@ namespace AtmoData
                               Grid<TG>& GridZ_interf,
                               Data<T, 3, TG>& CloudBaseHeight);
 
+  template <class T, class TG>
+  void ComputeCloudTopHeight(Data<int, 4>& LowIndices,
+                             Data<int, 4>& MediumIndices,
+                             Data<int, 4>& HighIndices,
+                             Grid<TG>& GridZ_interf,
+                             Data<T, 3, TG>& CloudTopHeight);
+
   template<class T, class TLC, class TC>
   void ComputeTotalCloudiness(Data<TLC, 3, T>& LowCloudiness,
                               Data<TLC, 3, T>& MediumCloudiness,

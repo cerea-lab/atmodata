@@ -1368,6 +1368,64 @@ namespace AtmoData
   }
 
 
+  //! Computes the height of cloud top (only for in-cloud scavenging purposes)
+  /*!
+    \param LowIndices vertical indices of base and top of low clouds.
+    \param MediumIndices vertical indices of base and top of medium clouds.
+    \param HighIndices vertical indices of base and top of high clouds.
+    \param GridZ_interf altitudes of interfaces (m).
+    \param CloudTopHeight (output) altitudes of cloud tops.
+    \note Dimensions of LowIndices, MediumIndices and HighIndices are
+    Nt x Ny x Nx x 2. Along the last dimension, those arrays store the index
+    of the cloud base and the index of the cloud top (in this order). Those
+    indices are indices of interfaces. E.g., if LowIndices(t, y, x, 0) equals
+    2 and  LowIndices(t, y, x, 1) equals 4, then a cloud lies in layers 2
+    and 3.
+  */
+  template <class T, class TG>
+  void ComputeCloudTopHeight(Data<int, 4>& LowIndices,
+                             Data<int, 4>& MediumIndices,
+                             Data<int, 4>& HighIndices,
+                             Grid<TG>& GridZ_interf,
+                             Data<T, 3, TG>& CloudTopHeight)
+  {
+    int h, j, i;
+    int Nt(CloudTopHeight.GetLength(0));
+    int Ny(CloudTopHeight.GetLength(1));
+    int Nx(CloudTopHeight.GetLength(2));
+
+    CloudTopHeight.SetZero();
+
+    for (h = 0; h < Nt; h++)
+      for (j = 0; j < Ny; j++)
+        for (i = 0; i < Nx; i++)
+          if (LowIndices(h, j, i, 1) != 0)
+            {
+              if (LowIndices(h, j, i, 1) != MediumIndices(h, j, i, 0))
+                CloudTopHeight(h, j, i) =
+                  GridZ_interf.Value(h, LowIndices(h, j, i, 1), j, i);
+              else if (MediumIndices(h, j, i, 1) != HighIndices(h, j, i, 0))
+                CloudTopHeight(h, j, i) =
+                  GridZ_interf.Value(h, MediumIndices(h, j, i, 1), j, i);
+              else
+                CloudTopHeight(h, j, i) =
+                  GridZ_interf.Value(h, HighIndices(h, j, i, 1), j, i);
+            }
+          else if (MediumIndices(h, j, i, 1) != 0)
+            {
+              if (MediumIndices(h, j, i, 1) != HighIndices(h, j, i, 0))
+                CloudTopHeight(h, j, i) =
+                  GridZ_interf.Value(h, MediumIndices(h, j, i, 1), j, i);
+              else
+                CloudTopHeight(h, j, i) =
+                  GridZ_interf.Value(h, HighIndices(h, j, i, 1), j, i);
+            }
+          else if (HighIndices(h, j, i, 1) != 0)
+            CloudTopHeight(h, j, i) =
+              GridZ_interf.Value(h, HighIndices(h, j, i, 1), j, i);
+  }
+
+
   //! Computes the total cloudiness.
   /*!
     \param LowCloudiness low cloudiness in [0, 1].

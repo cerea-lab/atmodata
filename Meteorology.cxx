@@ -1215,28 +1215,28 @@ namespace AtmoData
     \param CriticalRelativeHumidity function that returns the critical
     relative humidity as function of the altitude, the pressure
     and reference pressure.
-    \param CloudHeight (output) altitudes of cloud basis.
+    \param CloudBaseHeight (output) altitudes of cloud basis.
   */
   template < class TP, class TH,
-             class T, class TG >
-  void ComputeCloudHeight(Data<TP, 4, TG>& Pressure,
-                          Data<TH, 4, TG>& RelativeHumidity,
-                          T(CriticalRelativeHumidity)(const T&, const T&,
-                                                      const T&),
-                          Data<T, 3, TG>& CloudHeight)
+           class T, class TG >
+  void ComputeCloudBaseHeight(Data<TP, 4, TG>& Pressure,
+                              Data<TH, 4, TG>& RelativeHumidity,
+                              T(CriticalRelativeHumidity)(const T&, const T&,
+                                                          const T&),
+                              Data<T, 3, TG>& CloudBaseHeight)
   {
 
     int h, k, j, i;
-    int Nt(CloudHeight.GetLength(0));
+    int Nt(CloudBaseHeight.GetLength(0));
     int Nz(Pressure.GetLength(1));
-    int Ny(CloudHeight.GetLength(1));
-    int Nx(CloudHeight.GetLength(2));
+    int Ny(CloudBaseHeight.GetLength(1));
+    int Nx(CloudBaseHeight.GetLength(2));
 
     // Index "0" and "1" refer to two contiguous levels.
     T rh0, rh1, rhc;
 
     T max_height = 2. * Pressure[1].Value(0, Nz - 1, 0, 0);
-    CloudHeight.Fill(max_height);
+    CloudBaseHeight.Fill(max_height);
 
     for (h = 0; h < Nt; h++)
       for (j = 0; j < Ny; j++)
@@ -1246,7 +1246,7 @@ namespace AtmoData
             rh0 = RelativeHumidity(h, Nz - 1, j, i);
 
             k = 0;
-            while ((k < Nz) && (CloudHeight(h, j, i) == max_height))
+            while ((k < Nz) && (CloudBaseHeight(h, j, i) == max_height))
               {
 
                 rh1 = RelativeHumidity(h, k, j, i);
@@ -1257,7 +1257,7 @@ namespace AtmoData
                                                Pressure(h, 0, j, i));
 
                 if (rh1 >= rhc)  // Above a cloud.
-                  CloudHeight(h, j, i) = Pressure[1].Value(h, k, j, i);
+                  CloudBaseHeight(h, j, i) = Pressure[1].Value(h, k, j, i);
 
                 // For the next level.
                 rh0 = rh1;
@@ -1274,25 +1274,25 @@ namespace AtmoData
   /*!
     \param RelativeHumidity relative humidity (kg/kg).
     \param CriticalRelativeHumidity critical relative humidity.
-    \param CloudHeight (output) altitudes of cloud basis.
+    \param CloudBaseHeight (output) altitudes of cloud basis.
   */
   template <class TH, class TCRH, class T, class TG>
-  void ComputeCloudHeight(Data<TH, 4, TG>& RelativeHumidity,
-                          Data<TCRH, 4, TG>& CriticalRelativeHumidity,
-                          Data<T, 3, TG>& CloudHeight)
+  void ComputeCloudBaseHeight(Data<TH, 4, TG>& RelativeHumidity,
+                              Data<TCRH, 4, TG>& CriticalRelativeHumidity,
+                              Data<T, 3, TG>& CloudBaseHeight)
   {
 
     int h, k, j, i;
-    int Nt(CloudHeight.GetLength(0));
+    int Nt(CloudBaseHeight.GetLength(0));
     int Nz(RelativeHumidity.GetLength(1));
-    int Ny(CloudHeight.GetLength(1));
-    int Nx(CloudHeight.GetLength(2));
+    int Ny(CloudBaseHeight.GetLength(1));
+    int Nx(CloudBaseHeight.GetLength(2));
 
     // Index "0" and "1" refer to two contiguous levels.
     T rh0, rh1, rhc;
 
     T max_height = 2. * RelativeHumidity[1].Value(0, Nz - 1, 0, 0);
-    CloudHeight.Fill(max_height);
+    CloudBaseHeight.Fill(max_height);
 
     for (h = 0; h < Nt; h++)
       for (j = 0; j < Ny; j++)
@@ -1302,7 +1302,7 @@ namespace AtmoData
             rh0 = RelativeHumidity(h, Nz - 1, j, i);
 
             k = 0;
-            while ((k < Nz) && (CloudHeight(h, j, i) == max_height))
+            while ((k < Nz) && (CloudBaseHeight(h, j, i) == max_height))
               {
 
                 rh1 = RelativeHumidity(h, k, j, i);
@@ -1311,7 +1311,7 @@ namespace AtmoData
                 rhc = CriticalRelativeHumidity(h, k, j, i);
 
                 if (rh1 >= rhc)  // Above a cloud.
-                  CloudHeight(h, j, i) =
+                  CloudBaseHeight(h, j, i) =
                     RelativeHumidity[1].Value(h, k, j, i);
 
                 // For the next level.
@@ -1331,7 +1331,7 @@ namespace AtmoData
     \param MediumIndices vertical indices of base and top of medium clouds.
     \param HighIndices vertical indices of base and top of high clouds.
     \param GridZ_interf altitudes of interfaces (m).
-    \param CloudHeight (output) altitudes of cloud basis.
+    \param CloudBaseHeight (output) altitudes of cloud basis.
     \note Dimensions of LowIndices, MediumIndices and HighIndices are
     Nt x Ny x Nx x 2. Along the last dimension, those arrays store the index
     of the cloud base and the index of the cloud top (in this order). Those
@@ -1340,30 +1340,30 @@ namespace AtmoData
     and 3.
   */
   template <class T, class TG>
-  void ComputeCloudHeight(Data<int, 4>& LowIndices,
-                          Data<int, 4>& MediumIndices,
-                          Data<int, 4>& HighIndices,
-                          Grid<TG>& GridZ_interf,
-                          Data<T, 3, TG>& CloudHeight)
+  void ComputeCloudBaseHeight(Data<int, 4>& LowIndices,
+                              Data<int, 4>& MediumIndices,
+                              Data<int, 4>& HighIndices,
+                              Grid<TG>& GridZ_interf,
+                              Data<T, 3, TG>& CloudBaseHeight)
   {
     int h, j, i;
-    int Nt(CloudHeight.GetLength(0));
-    int Ny(CloudHeight.GetLength(1));
-    int Nx(CloudHeight.GetLength(2));
+    int Nt(CloudBaseHeight.GetLength(0));
+    int Ny(CloudBaseHeight.GetLength(1));
+    int Nx(CloudBaseHeight.GetLength(2));
 
-    CloudHeight.SetZero();
+    CloudBaseHeight.SetZero();
 
     for (h = 0; h < Nt; h++)
       for (j = 0; j < Ny; j++)
         for (i = 0; i < Nx; i++)
           if (LowIndices(h, j, i, 0) != 0)
-            CloudHeight(h, j, i) =
+            CloudBaseHeight(h, j, i) =
               GridZ_interf.Value(h, LowIndices(h, j, i, 0), j, i);
           else if (MediumIndices(h, j, i, 0) != 0)
-            CloudHeight(h, j, i) =
+            CloudBaseHeight(h, j, i) =
               GridZ_interf.Value(h, MediumIndices(h, j, i, 0), j, i);
           else if (HighIndices(h, j, i, 0) != 0)
-            CloudHeight(h, j, i) =
+            CloudBaseHeight(h, j, i) =
               GridZ_interf.Value(h, HighIndices(h, j, i, 0), j, i);
   }
 
@@ -1408,7 +1408,7 @@ namespace AtmoData
                                    TLC high_cloudiness)
   {
     return 1. - (1. - low_cloudiness) * (1. - medium_cloudiness)
-      * (1. - high_cloudiness);
+           * (1. - high_cloudiness);
   }
 
 

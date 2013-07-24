@@ -179,23 +179,23 @@ namespace AtmoData
                          T P_0 = 80000., T P_1 = 45000.);
 
   template <class TP, class TH, class T, class TG>
-  void ComputeCloudHeight(Data<TP, 4, TG>& Pressure,
-                          Data<TH, 4, TG>& RelativeHumidity,
-                          T(CriticalRelativeHumidity)(const T&, const T&,
-                                                      const T&),
-                          Data<T, 3, TG>& CloudHeight);
+  void ComputeCloudBaseHeight(Data<TP, 4, TG>& Pressure,
+                              Data<TH, 4, TG>& RelativeHumidity,
+                              T(CriticalRelativeHumidity)(const T&, const T&,
+                                                          const T&),
+                              Data<T, 3, TG>& CloudBaseHeight);
 
   template <class TP, class TH, class TCRH, class T, class TG>
-  void ComputeCloudHeight(Data<TH, 4, TG>& RelativeHumidity,
-                          Data<TCRH, 4, TG>& CriticalRelativeHumidity,
-                          Data<T, 3, TG>& CloudHeight);
+  void ComputeCloudBaseHeight(Data<TH, 4, TG>& RelativeHumidity,
+                              Data<TCRH, 4, TG>& CriticalRelativeHumidity,
+                              Data<T, 3, TG>& CloudBaseHeight);
 
   template <class T, class TG>
-  void ComputeCloudHeight(Data<int, 4>& LowIndices,
-                          Data<int, 4>& MediumIndices,
-                          Data<int, 4>& HighIndices,
-                          Grid<TG>& GridZ_interf,
-                          Data<T, 3, TG>& CloudHeight);
+  void ComputeCloudBaseHeight(Data<int, 4>& LowIndices,
+                              Data<int, 4>& MediumIndices,
+                              Data<int, 4>& HighIndices,
+                              Grid<TG>& GridZ_interf,
+                              Data<T, 3, TG>& CloudBaseHeight);
 
   template<class T, class TLC, class TC>
   void ComputeTotalCloudiness(Data<TLC, 3, T>& LowCloudiness,
@@ -213,7 +213,7 @@ namespace AtmoData
 
 
   template < class Ta, class Tb, class TSP,
-             class T, class TG >
+           class T, class TG >
   void ComputePressure(Data<Ta, 1, TG>& alpha, Data<Tb, 1, TG>& beta,
                        Data<TSP, 3, TG>& SurfacePressure,
                        Data<T, 4, TG>& Pressure, T P0 = 101325.);

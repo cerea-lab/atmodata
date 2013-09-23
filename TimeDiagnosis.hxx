@@ -34,7 +34,7 @@ namespace AtmoData
 
   template<class T>
   void ComputeSunHour(T lon, T lat, int idate,
-		      T& sunrise_hour, T& sunset_hour);
+                      T& sunrise_hour, T& sunset_hour);
 
   template<class T>
   T ComputeSunriseHour(T lon, T lat, int idate);

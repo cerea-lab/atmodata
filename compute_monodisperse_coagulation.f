@@ -1,23 +1,23 @@
 C-----------------------------------------------------------------------
 C     Copyright (C) 2006-2007, ENPC - INRIA - EDF R&D
 C     Author(s): Vivien Mallet, Edouard Debry
-C     
+C
 C     This file is part of AtmoData library, a tool for data processing
 C     in atmospheric sciences.
-C    
+C
 C     AtmoData is developed in the INRIA - ENPC joint project-team CLIME
 C     and in the ENPC - EDF R&D joint laboratory CEREA.
-C    
+C
 C     AtmoData is free software; you can redistribute it and/or modify
 C     it under the terms of the GNU General Public License as published
 C     by the Free Software Foundation; either version 2 of the License,
 C     or (at your option) any later version.
-C     
+C
 C     AtmoData is distributed in the hope that it will be useful, but
 C     WITHOUT ANY WARRANTY; without even the implied warranty of
 C     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 C     General Public License for more details.
-C     
+C
 C     For more information, visit the AtmoData home page:
 C          http://cerea.enpc.fr/polyphemus/atmodata.html
 C-----------------------------------------------------------------------
@@ -57,15 +57,15 @@ c     kercg - coagulation kernel (m^3/s).
      &     * cdifp              ! m2.s - 1
      &     / vmp                ! m.s - 1
      &     / dpp )              ! m
-      
+
       kercg = 8.d0 * pi         ! adim
      &     * cdifp              ! m2.s - 1
      &     * dpp                ! m
      &     * beta               ! adim
-      
+
       end
-      
-      
+
+
 c     Function: compute_coagulation_free_molecular
 c
 c     Computes coagulation kernels for monodispersed
@@ -90,7 +90,7 @@ c     kercg - coagulation kernel (m^3/s).
       double precision dpp
 
       dpp = dp * 1.d-06         ! convert µm to m
-      
+
       kercg = pi                ! adim
      &     * dpp * dpp          ! m2
      &     * vmp                ! m.s - 1
@@ -121,7 +121,7 @@ c     kercg - coagulation kernel (m^3/s).
       double precision dpp
 
       dpp = dp * 1.d-06         ! convert µm to m
-      
+
       kercg = 8.d0 * pi         ! adim
      &     * cdifp              ! m2.s - 1
      &     * dpp                ! m

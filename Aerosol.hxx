@@ -35,7 +35,7 @@
 #define _compute_gas_diffusivity compute_gas_diffusivity__
 #define _gerber_wet_diameter gerber_wet_diameter__
 #define _compute_collision_integral compute_collision_integral__
-#define _compute_condensation_transfer_rate	\
+#define _compute_condensation_transfer_rate        \
   compute_condensation_transfer_rate__
 #define _compute_quadratic_mean_velocity compute_quadratic_mean_velocity__
 #define _compute_saturation_concentration compute_saturation_concentration__
@@ -46,7 +46,7 @@
 #define _compute_gas_diffusivity compute_gas_diffusivity_
 #define _gerber_wet_diameter gerber_wet_diameter_
 #define _compute_collision_integral compute_collision_integral_
-#define _compute_condensation_transfer_rate	\
+#define _compute_condensation_transfer_rate        \
   compute_condensation_transfer_rate_
 #define _compute_quadratic_mean_velocity compute_quadratic_mean_velocity_
 #define _compute_saturation_concentration compute_saturation_concentration_
@@ -57,21 +57,21 @@
 extern "C"
 {
   void _compute_gas_diffusivity(const double*, const double*, const double*,
-				const double*, const double*, double*);
+                                const double*, const double*, double*);
   void _gerber_wet_diameter(const double*, const double*, const double*,
-			    const double*);
+                            const double*);
   void _compute_collision_integral(const double*, const double*);
   void _compute_condensation_transfer_rate(const double*, const double*,
-					   const double*, const double*,
-					   double*);
+                                           const double*, const double*,
+                                           double*);
   void _compute_quadratic_mean_velocity(const double*, const double*,
-					double*);
+                                        double*);
   void _compute_saturation_concentration(const double*, const double*,
-					 const double*, const double*,
-					 double*);
+                                         const double*, const double*,
+                                         double*);
   void _compute_kelvin_coefficient(const double*, const double*,
-				   const double*, const double*,
-				   const double*, double*);
+                                   const double*, const double*,
+                                   const double*, double*);
 }
 
 #define ATMODATA_FILE_AEROSOL_HXX

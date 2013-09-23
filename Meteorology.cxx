@@ -43,9 +43,9 @@ namespace AtmoData
   */
   template<class TU, class TV, class TTp, class T, class TG>
   void ComputeRichardson(Data<TU, 4, TG>& ZonalWind,
-			 Data<TV, 4, TG>& MeridionalWind,
-			 Data<TTp, 4, TG>& PotentialTemperature,
-			 Data<T, 4, TG>& Richardson, T wind_threshold)
+                         Data<TV, 4, TG>& MeridionalWind,
+                         Data<TTp, 4, TG>& PotentialTemperature,
+                         Data<T, 4, TG>& Richardson, T wind_threshold)
   {
 
     int h, i, j, k;
@@ -64,70 +64,70 @@ namespace AtmoData
     int level;
 
     if (ZonalWind.GetLength(3) == Nx + 1
-	&& MeridionalWind.GetLength(2) == Ny + 1)
-      for (h=0; h<Nt; h++)
-	for (k=0; k<Nz; k++)
-	  for (j=0; j<Ny; j++)
-	    for (i=0; i<Nx; i++)
-	      {
-		
-		level = k==0 ? 1 : k;
-		
-		dudz = 0.5
-		  * ( (ZonalWind(h, level, j, i+1)
-		       - ZonalWind(h, level-1, j, i+1))
-		      / (ZonalWindLevels.Value(h, level, j, i+1)
-			 - ZonalWindLevels.Value(h, level-1, j, i+1))
-		      + (ZonalWind(h, level, j, i)
-			 - ZonalWind(h, level-1, j, i))
-		      / (ZonalWindLevels.Value(h, level, j, i)
-			 - ZonalWindLevels.Value(h, level-1, j, i)) );
-		dvdz = 0.5
-		  * ( (MeridionalWind(h, level, j+1, i)
-		       - MeridionalWind(h, level-1, j+1, i))
-		      / (MeridionalWindLevels.Value(h, level, j+1, i)
-			 - MeridionalWindLevels.Value(h, level-1, j+1, i))
-		      + (MeridionalWind(h, level, j, i)
-			 - MeridionalWind(h, level-1, j, i))
-		      / (MeridionalWindLevels.Value(h, level, j, i)
-			 - MeridionalWindLevels.Value(h, level-1, j, i)) );
-		dwinddz = max(sqrt(dudz*dudz + dvdz*dvdz), wind_threshold);
-		Richardson(h, k, j, i) =
-		  g * (PotentialTemperature(h, level, j, i)
-		       - PotentialTemperature(h, level - 1, j, i))
-		  / (dwinddz * dwinddz
-		     * PotentialTemperature(h, level - 1, j, i)
-		     * (Levels.Value(h, level, j, i)
-			- Levels.Value(h, level - 1, j, i)));
+        && MeridionalWind.GetLength(2) == Ny + 1)
+      for (h = 0; h < Nt; h++)
+        for (k = 0; k < Nz; k++)
+          for (j = 0; j < Ny; j++)
+            for (i = 0; i < Nx; i++)
+              {
 
-	      }
+                level = k == 0 ? 1 : k;
+
+                dudz = 0.5
+                  * ((ZonalWind(h, level, j, i + 1)
+                      - ZonalWind(h, level - 1, j, i + 1))
+                     / (ZonalWindLevels.Value(h, level, j, i + 1)
+                        - ZonalWindLevels.Value(h, level - 1, j, i + 1))
+                     + (ZonalWind(h, level, j, i)
+                        - ZonalWind(h, level - 1, j, i))
+                     / (ZonalWindLevels.Value(h, level, j, i)
+                        - ZonalWindLevels.Value(h, level - 1, j, i)));
+                dvdz = 0.5
+                  * ((MeridionalWind(h, level, j + 1, i)
+                      - MeridionalWind(h, level - 1, j + 1, i))
+                     / (MeridionalWindLevels.Value(h, level, j + 1, i)
+                        - MeridionalWindLevels.Value(h, level - 1, j + 1, i))
+                     + (MeridionalWind(h, level, j, i)
+                        - MeridionalWind(h, level - 1, j, i))
+                     / (MeridionalWindLevels.Value(h, level, j, i)
+                        - MeridionalWindLevels.Value(h, level - 1, j, i)));
+                dwinddz = max(sqrt(dudz * dudz + dvdz * dvdz), wind_threshold);
+                Richardson(h, k, j, i) =
+                  g * (PotentialTemperature(h, level, j, i)
+                       - PotentialTemperature(h, level - 1, j, i))
+                  / (dwinddz * dwinddz
+                     * PotentialTemperature(h, level - 1, j, i)
+                     * (Levels.Value(h, level, j, i)
+                        - Levels.Value(h, level - 1, j, i)));
+
+              }
     else
-      for (h=0; h<Nt; h++)
-	for (k=0; k<Nz; k++)
-	  for (j=0; j<Ny; j++)
-	    for (i=0; i<Nx; i++)
-	      {
-		
-		level = k==0 ? 1 : k;
-		
-		dudz = (ZonalWind(h, level, j, i)
-			- ZonalWind(h, level-1, j, i))
-		  / (ZonalWindLevels.Value(h, level, j, i)
-		     - ZonalWindLevels.Value(h, level-1, j, i));
-		dvdz = (MeridionalWind(h, level, j, i)
-			- MeridionalWind(h, level-1, j, i))
-		  / (MeridionalWindLevels.Value(h, level, j, i)
-		     - MeridionalWindLevels.Value(h, level-1, j, i));
-		dwinddz = max(sqrt(dudz*dudz + dvdz*dvdz), wind_threshold);
-		Richardson(h, k, j, i) =
-		  g * (PotentialTemperature(h, level, j, i)
-		       - PotentialTemperature(h, level - 1, j, i))
-		  / (dwinddz * dwinddz
-		     * PotentialTemperature(h, level - 1, j, i)
-		     * (Levels.Value(h, level, j, i)
-			- Levels.Value(h, level - 1, j, i)));
+      for (h = 0; h < Nt; h++)
+        for (k = 0; k < Nz; k++)
+          for (j = 0; j < Ny; j++)
+            for (i = 0; i < Nx; i++)
+              {
 
-	      }
+                level = k == 0 ? 1 : k;
+
+                dudz = (ZonalWind(h, level, j, i)
+                        - ZonalWind(h, level - 1, j, i))
+                  / (ZonalWindLevels.Value(h, level, j, i)
+                     - ZonalWindLevels.Value(h, level - 1, j, i));
+                dvdz = (MeridionalWind(h, level, j, i)
+                        - MeridionalWind(h, level - 1, j, i))
+                  / (MeridionalWindLevels.Value(h, level, j, i)
+                     - MeridionalWindLevels.Value(h, level - 1, j, i));
+                dwinddz = max(sqrt(dudz * dudz + dvdz * dvdz), wind_threshold);
+                Richardson(h, k, j, i) =
+                  g * (PotentialTemperature(h, level, j, i)
+                       - PotentialTemperature(h, level - 1, j, i))
+                  / (dwinddz * dwinddz
+                     * PotentialTemperature(h, level - 1, j, i)
+                     * (Levels.Value(h, level, j, i)
+                        - Levels.Value(h, level - 1, j, i)));
+
+              }
 
   }
 
@@ -146,9 +146,9 @@ namespace AtmoData
   */
   template<class TU, class TV, class TTp, class T, class TG>
   void ComputeRichardson(Data<TU, 4, TG>& ZonalWind,
-			 Data<TV, 4, TG>& MeridionalWind,
-			 Data<TTp, 4, TG>& PotentialTemperature,
-			 Data<T, 3, TG>& Richardson, T wind_threshold)
+                         Data<TV, 4, TG>& MeridionalWind,
+                         Data<TTp, 4, TG>& PotentialTemperature,
+                         Data<T, 3, TG>& Richardson, T wind_threshold)
   {
 
     int h, i, j;
@@ -165,48 +165,48 @@ namespace AtmoData
     T dudz, dvdz, dwinddz;
 
     if (ZonalWind.GetLength(3) == Nx + 1
-	&& MeridionalWind.GetLength(2) == Ny + 1)
-      for (h=0; h<Nt; h++)
-	for (j=0; j<Ny; j++)
-	  for (i=0; i<Nx; i++)
-	    {
-		
-	      dudz = 0.5
-		* (ZonalWind(h, 0, j, i+1)
-		   / ZonalWindLevels.Value(h, 0, j, i+1)
-		   + ZonalWind(h, 0, j, i)
-		   / ZonalWindLevels.Value(h, 0, j, i));
-	      dvdz = 0.5 *
-		(MeridionalWind(h, 0, j+1, i)
-		 / MeridionalWindLevels.Value(h, 0, j+1, i)
-		 + MeridionalWind(h, 0, j, i)
-		 / MeridionalWindLevels.Value(h, 0, j, i));
-	      dwinddz = max(sqrt(dudz*dudz + dvdz*dvdz), wind_threshold);
-	      Richardson(h, j, i) =
-		g * (PotentialTemperature(h, 1, j, i)
-		     - PotentialTemperature(h, 0, j, i))
-		/ (dwinddz * dwinddz * PotentialTemperature(h, 0, j, i)
-		   * (Levels.Value(h, 1, j, i) - Levels.Value(h, 0, j, i)));
-	      
-	    }
-    else
-      for (h=0; h<Nt; h++)
-	for (j=0; j<Ny; j++)
-	  for (i=0; i<Nx; i++)
-	    {
-		
-	      dudz = ZonalWind(h, 0, j, i)
-		/ ZonalWindLevels.Value(h, 0, j, i);
-	      dvdz = MeridionalWind(h, 0, j, i)
-		/ MeridionalWindLevels.Value(h, 0, j, i);
-	      dwinddz = max(sqrt(dudz*dudz + dvdz*dvdz), wind_threshold);
-	      Richardson(h, j, i) =
-		g * (PotentialTemperature(h, 1, j, i)
-		     - PotentialTemperature(h, 0, j, i))
-		/ (dwinddz * dwinddz * PotentialTemperature(h, 0, j, i)
-		   * (Levels.Value(h, 1, j, i) - Levels.Value(h, 0, j, i)));
+        && MeridionalWind.GetLength(2) == Ny + 1)
+      for (h = 0; h < Nt; h++)
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            {
 
-	    }
+              dudz = 0.5
+                * (ZonalWind(h, 0, j, i + 1)
+                   / ZonalWindLevels.Value(h, 0, j, i + 1)
+                   + ZonalWind(h, 0, j, i)
+                   / ZonalWindLevels.Value(h, 0, j, i));
+              dvdz = 0.5 *
+                (MeridionalWind(h, 0, j + 1, i)
+                 / MeridionalWindLevels.Value(h, 0, j + 1, i)
+                 + MeridionalWind(h, 0, j, i)
+                 / MeridionalWindLevels.Value(h, 0, j, i));
+              dwinddz = max(sqrt(dudz * dudz + dvdz * dvdz), wind_threshold);
+              Richardson(h, j, i) =
+                g * (PotentialTemperature(h, 1, j, i)
+                     - PotentialTemperature(h, 0, j, i))
+                / (dwinddz * dwinddz * PotentialTemperature(h, 0, j, i)
+                   * (Levels.Value(h, 1, j, i) - Levels.Value(h, 0, j, i)));
+
+            }
+    else
+      for (h = 0; h < Nt; h++)
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            {
+
+              dudz = ZonalWind(h, 0, j, i)
+                / ZonalWindLevels.Value(h, 0, j, i);
+              dvdz = MeridionalWind(h, 0, j, i)
+                / MeridionalWindLevels.Value(h, 0, j, i);
+              dwinddz = max(sqrt(dudz * dudz + dvdz * dvdz), wind_threshold);
+              Richardson(h, j, i) =
+                g * (PotentialTemperature(h, 1, j, i)
+                     - PotentialTemperature(h, 0, j, i))
+                / (dwinddz * dwinddz * PotentialTemperature(h, 0, j, i)
+                   * (Levels.Value(h, 1, j, i) - Levels.Value(h, 0, j, i)));
+
+            }
 
   }
 
@@ -223,9 +223,9 @@ namespace AtmoData
   */
   template<class TU, class TTp, class T, class TG>
   void ComputeRichardson(Data<TU, 3, TG>& WindModule,
-			 Data<TTp, 3, TG>& SurfacePotentialTemperature,
-			 Data<TTp, 4, TG>& PotentialTemperature,
-			 Data<T, 3, TG>& SurfaceRichardson, T wind_threshold)
+                         Data<TTp, 3, TG>& SurfacePotentialTemperature,
+                         Data<TTp, 4, TG>& PotentialTemperature,
+                         Data<T, 3, TG>& SurfaceRichardson, T wind_threshold)
   {
 
     int h, i, j;
@@ -241,16 +241,16 @@ namespace AtmoData
 
     for (h = 0; h < Nt; h++)
       for (j = 0; j < Ny; j++)
-	for (i = 0; i < Nx; i++)
-	  {
-	    wind = max(WindModule(h, j, i), wind_threshold);
-	    SurfaceRichardson(h, j, i) =
-	      2. * g * (PotentialTemperature(h, 0, j, i)
-			- SurfacePotentialTemperature(h, j, i))
-	      * Levels.Value(h, 0, j, i)
-	      / (wind * wind * (PotentialTemperature(h, 0, j, i)
-				+ SurfacePotentialTemperature(h, j, i)));
-	  }
+        for (i = 0; i < Nx; i++)
+          {
+            wind = max(WindModule(h, j, i), wind_threshold);
+            SurfaceRichardson(h, j, i) =
+              2. * g * (PotentialTemperature(h, 0, j, i)
+                        - SurfacePotentialTemperature(h, j, i))
+              * Levels.Value(h, 0, j, i)
+              / (wind * wind * (PotentialTemperature(h, 0, j, i)
+                                + SurfacePotentialTemperature(h, j, i)));
+          }
 
   }
 
@@ -268,10 +268,10 @@ namespace AtmoData
   */
   template<class TR, class TU, class TTp, class T, class TG>
   void ComputeRichardson(Data<TR, 2, TG>& Roughness,
-			 Data<TU, 3, TG>& WindModule,
-			 Data<TTp, 3, TG>& SurfacePotentialTemperature,
-			 Data<TTp, 4, TG>& PotentialTemperature,
-			 Data<T, 3, TG>& SurfaceRichardson, T wind_threshold)
+                         Data<TU, 3, TG>& WindModule,
+                         Data<TTp, 3, TG>& SurfacePotentialTemperature,
+                         Data<TTp, 4, TG>& PotentialTemperature,
+                         Data<T, 3, TG>& SurfaceRichardson, T wind_threshold)
   {
 
     int h, i, j;
@@ -287,17 +287,17 @@ namespace AtmoData
 
     for (h = 0; h < Nt; h++)
       for (j = 0; j < Ny; j++)
-	for (i = 0; i < Nx; i++)
-	  {
-	    wind = max(WindModule(h, j, i), wind_threshold);
-	    SurfaceRichardson(h, j, i) =
-	      2. * g * (PotentialTemperature(h, 0, j, i)
-			- SurfacePotentialTemperature(h, j, i))
-	      * (Levels.Value(h, 0, j, i) - Roughness(j, i))
-	      / (wind * wind * (PotentialTemperature(h, 0, j, i)
-				+ SurfacePotentialTemperature(h, j, i))
-		 * Levels.Value(h, 0, j, i) * Levels.Value(h, 0, j, i));
-	  }
+        for (i = 0; i < Nx; i++)
+          {
+            wind = max(WindModule(h, j, i), wind_threshold);
+            SurfaceRichardson(h, j, i) =
+              2. * g * (PotentialTemperature(h, 0, j, i)
+                        - SurfacePotentialTemperature(h, j, i))
+              * (Levels.Value(h, 0, j, i) - Roughness(j, i))
+              / (wind * wind * (PotentialTemperature(h, 0, j, i)
+                                + SurfacePotentialTemperature(h, j, i))
+                 * Levels.Value(h, 0, j, i) * Levels.Value(h, 0, j, i));
+          }
 
   }
 
@@ -316,9 +316,9 @@ namespace AtmoData
   */
   template<class TT, class TP, class T, class TG>
   void ComputePotentialTemperature(Data<TT, 4, TG>& Temperature,
-				   Data<TP, 4, TG>& Pressure,
-				   Data<T, 4, TG>& PotentialTemperature,
-				   T P0, T cp, T r)
+                                   Data<TP, 4, TG>& Pressure,
+                                   Data<T, 4, TG>& PotentialTemperature,
+                                   T P0, T cp, T r)
   {
 
     int h, i, j, k;
@@ -330,14 +330,14 @@ namespace AtmoData
 
     T ratio = -r / cp;
 
-    for (h=0; h<Nt; h++)
-      for (k=0; k<Nz; k++)
-	for (j=0; j<Ny; j++)
-	  for (i=0; i<Nx; i++)
-	    PotentialTemperature(h, k, j, i) =
-	      Temperature(h, k, j, i)
-	      * pow(Pressure(h, k, j, i) / P0, ratio);
-    
+    for (h = 0; h < Nt; h++)
+      for (k = 0; k < Nz; k++)
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            PotentialTemperature(h, k, j, i) =
+              Temperature(h, k, j, i)
+              * pow(Pressure(h, k, j, i) / P0, ratio);
+
   }
 
 
@@ -355,9 +355,9 @@ namespace AtmoData
   */
   template<class TT, class TP, class T, class TG>
   void ComputePotentialTemperature(Data<TT, 3, TG>& Temperature,
-				   Data<TP, 3, TG>& Pressure,
-				   Data<T, 3, TG>& PotentialTemperature,
-				   T P0, T cp, T r)
+                                   Data<TP, 3, TG>& Pressure,
+                                   Data<T, 3, TG>& PotentialTemperature,
+                                   T P0, T cp, T r)
   {
 
     int h, i, j;
@@ -368,15 +368,15 @@ namespace AtmoData
 
     T ratio = -r / cp;
 
-    for (h=0; h<Nt; h++)
-      for (j=0; j<Ny; j++)
-	for (i=0; i<Nx; i++)
-	  PotentialTemperature(h, j, i) =
-	    Temperature(h, j, i) * pow(Pressure(h, j, i) / P0, ratio);
-    
+    for (h = 0; h < Nt; h++)
+      for (j = 0; j < Ny; j++)
+        for (i = 0; i < Nx; i++)
+          PotentialTemperature(h, j, i) =
+            Temperature(h, j, i) * pow(Pressure(h, j, i) / P0, ratio);
+
   }
 
-  
+
   //! Computes the temperature.
   /*!
     Formula: Temperature = PotentialTemperature * (Pressure / P0)^(r/cp).
@@ -391,9 +391,9 @@ namespace AtmoData
   */
   template<class TT, class TP, class T, class TG>
   void ComputeTemperature(Data<TT, 4, TG>& PotentialTemperature,
-			  Data<TP, 4, TG>& Pressure,
-			  Data<T, 4, TG>& Temperature,
-			  T P0, T cp, T r)
+                          Data<TP, 4, TG>& Pressure,
+                          Data<T, 4, TG>& Temperature,
+                          T P0, T cp, T r)
   {
 
     int h, i, j, k;
@@ -405,14 +405,14 @@ namespace AtmoData
 
     T ratio = r / cp;
 
-    for (h=0; h<Nt; h++)
-      for (k=0; k<Nz; k++)
-	for (j=0; j<Ny; j++)
-	  for (i=0; i<Nx; i++)
-	    Temperature(h, k, j, i) =
-	      PotentialTemperature(h, k, j, i)
-	      * pow(Pressure(h, k, j, i) / P0, ratio);
-    
+    for (h = 0; h < Nt; h++)
+      for (k = 0; k < Nz; k++)
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            Temperature(h, k, j, i) =
+              PotentialTemperature(h, k, j, i)
+              * pow(Pressure(h, k, j, i) / P0, ratio);
+
   }
 
 
@@ -430,9 +430,9 @@ namespace AtmoData
   */
   template<class TT, class TP, class T, class TG>
   void ComputeTemperature(Data<TT, 3, TG>& PotentialTemperature,
-			  Data<TP, 3, TG>& Pressure,
-			  Data<T, 3, TG>& Temperature,
-			  T P0, T cp, T r)
+                          Data<TP, 3, TG>& Pressure,
+                          Data<T, 3, TG>& Temperature,
+                          T P0, T cp, T r)
   {
 
     int h, i, j;
@@ -443,12 +443,12 @@ namespace AtmoData
 
     T ratio = r / cp;
 
-    for (h=0; h<Nt; h++)
-      for (j=0; j<Ny; j++)
-	for (i=0; i<Nx; i++)
-	  Temperature(h, j, i) = PotentialTemperature(h, j, i)
-	    * pow(Pressure(h, j, i) / P0, ratio);
-    
+    for (h = 0; h < Nt; h++)
+      for (j = 0; j < Ny; j++)
+        for (i = 0; i < Nx; i++)
+          Temperature(h, j, i) = PotentialTemperature(h, j, i)
+            * pow(Pressure(h, j, i) / P0, ratio);
+
   }
 
 
@@ -460,8 +460,8 @@ namespace AtmoData
   */
   template<class TT, class TP, class T, class TG>
   void ComputeSaturationHumidity(Data<TT, 3, TG>& Temperature,
-				 Data<TP, 3, TG>& Pressure,
-				 Data<T, 3, TG>& SaturationHumidity)
+                                 Data<TP, 3, TG>& Pressure,
+                                 Data<T, 3, TG>& SaturationHumidity)
   {
     int h, j, i;
 
@@ -472,13 +472,13 @@ namespace AtmoData
     T P_sat;
     for (h = 0; h < Nt; h++)
       for (j = 0; j < Ny; j++)
-	for (i = 0; i < Nx; i++)
-	  {
-	    P_sat = 611.2 * exp(17.67 * (Temperature(h, j, i) - 273.15)
-				/ (Temperature(h, j, i) - 29.65));
-	    SaturationHumidity(h, j, i) = 0.622 * P_sat
-	      / (Pressure(h, j, i) - 0.378 * P_sat);
-	  }
+        for (i = 0; i < Nx; i++)
+          {
+            P_sat = 611.2 * exp(17.67 * (Temperature(h, j, i) - 273.15)
+                                / (Temperature(h, j, i) - 29.65));
+            SaturationHumidity(h, j, i) = 0.622 * P_sat
+              / (Pressure(h, j, i) - 0.378 * P_sat);
+          }
   }
 
 
@@ -490,8 +490,8 @@ namespace AtmoData
   */
   template<class TT, class TP, class T, class TG>
   void ComputeSaturationHumidity(Data<TT, 4, TG>& Temperature,
-				 Data<TP, 4, TG>& Pressure,
-				 Data<T, 4, TG>& SaturationHumidity)
+                                 Data<TP, 4, TG>& Pressure,
+                                 Data<T, 4, TG>& SaturationHumidity)
   {
     int h, k, j, i;
 
@@ -503,14 +503,14 @@ namespace AtmoData
     T P_sat;
     for (h = 0; h < Nt; h++)
       for (k = 0; k < Nz; k++)
-	for (j = 0; j < Ny; j++)
-	  for (i = 0; i < Nx; i++)
-	    {
-	      P_sat = 611.2 * exp(17.67 * (Temperature(h, k, j, i) - 273.15)
-				  / (Temperature(h, k, j, i) - 29.65));
-	      SaturationHumidity(h, k, j, i) = 0.622 * P_sat
-		/ (Pressure(h, k, j, i) - 0.378 * P_sat);
-	    }
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            {
+              P_sat = 611.2 * exp(17.67 * (Temperature(h, k, j, i) - 273.15)
+                                  / (Temperature(h, k, j, i) - 29.65));
+              SaturationHumidity(h, k, j, i) = 0.622 * P_sat
+                / (Pressure(h, k, j, i) - 0.378 * P_sat);
+            }
   }
 
 
@@ -523,9 +523,9 @@ namespace AtmoData
   */
   template<class TS, class TT, class TP, class T, class TG>
   void ComputeRelativeHumidity(Data<TS, 4, TG>& SpecificHumidity,
-			       Data<TT, 4, TG>& Temperature,
-			       Data<TP, 4, TG>& Pressure,
-			       Data<T, 4, TG>& RelativeHumidity)
+                               Data<TT, 4, TG>& Temperature,
+                               Data<TP, 4, TG>& Pressure,
+                               Data<T, 4, TG>& RelativeHumidity)
   {
     int h, k, j, i;
     int Nt(RelativeHumidity.GetLength(0));
@@ -536,18 +536,18 @@ namespace AtmoData
     T P_sat;
     for (h = 0; h < Nt; h++)
       for (k = 0; k < Nz; k++)
-	for (j = 0; j < Ny; j++)
-	  for (i = 0; i < Nx; i++)
-	    {
-	      P_sat = 611.2 * exp(17.67 * (Temperature(h, k, j, i) - 273.15)
-				  / (Temperature(h, k, j, i) - 29.65));
-	      RelativeHumidity(h, k, j, i) = SpecificHumidity(h, k, j, i)
-		* Pressure(h, k, j, i)
-		/ ( (0.62197 * (1.0 - SpecificHumidity(h, k, j, i))
-		     + SpecificHumidity(h, k, j, i) ) * P_sat);
-	    }
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            {
+              P_sat = 611.2 * exp(17.67 * (Temperature(h, k, j, i) - 273.15)
+                                  / (Temperature(h, k, j, i) - 29.65));
+              RelativeHumidity(h, k, j, i) = SpecificHumidity(h, k, j, i)
+                * Pressure(h, k, j, i)
+                / ((0.62197 * (1.0 - SpecificHumidity(h, k, j, i))
+                    + SpecificHumidity(h, k, j, i)) * P_sat);
+            }
   }
-  
+
 
   //! Computes the relative humidity from the specific humidity.
   /*!
@@ -558,9 +558,9 @@ namespace AtmoData
   */
   template<class TS, class TT, class TP, class T, class TG>
   void ComputeRelativeHumidity(Data<TS, 3, TG>& SpecificHumidity,
-			       Data<TT, 3, TG>& Temperature,
-			       Data<TP, 3, TG>& Pressure,
-			       Data<T, 3, TG>& RelativeHumidity)
+                               Data<TT, 3, TG>& Temperature,
+                               Data<TP, 3, TG>& Pressure,
+                               Data<T, 3, TG>& RelativeHumidity)
   {
     int k, j, i;
     int Nz(RelativeHumidity.GetLength(0));
@@ -570,15 +570,15 @@ namespace AtmoData
     T P_sat;
     for (k = 0; k < Nz; k++)
       for (j = 0; j < Ny; j++)
-	for (i = 0; i < Nx; i++)
-	  {
-	    P_sat = 611.2 * exp(17.67 * (Temperature(k, j, i) - 273.15)
-				/ (Temperature(k, j, i) - 29.65));
-	    RelativeHumidity(k, j, i) = SpecificHumidity(k, j, i)
-	      * Pressure(k, j, i)
-	      / ( (0.62197 * (1.0 - SpecificHumidity(k, j, i))
-		   + SpecificHumidity(k, j, i) ) * P_sat);
-	  }
+        for (i = 0; i < Nx; i++)
+          {
+            P_sat = 611.2 * exp(17.67 * (Temperature(k, j, i) - 273.15)
+                                / (Temperature(k, j, i) - 29.65));
+            RelativeHumidity(k, j, i) = SpecificHumidity(k, j, i)
+              * Pressure(k, j, i)
+              / ((0.62197 * (1.0 - SpecificHumidity(k, j, i))
+                  + SpecificHumidity(k, j, i)) * P_sat);
+          }
   }
 
 
@@ -599,11 +599,11 @@ namespace AtmoData
   */
   template<class TH, class TS, class TW, class TL, class T, class TG>
   void ComputeSurfaceHumidity_diag(Data<TH, 4, TG>& SpecificHumidity,
-				   Data<TS, 3, TG>& SaturationHumidity,
-				   Data<TW, 3, TG>& SoilWater,
-				   Data<TL, 3, TG>& LUC, int sea_index,
-				   Data<T, 3, TG>& SurfaceHumidity,
-				   T veg, T theta_cap)
+                                   Data<TS, 3, TG>& SaturationHumidity,
+                                   Data<TW, 3, TG>& SoilWater,
+                                   Data<TL, 3, TG>& LUC, int sea_index,
+                                   Data<T, 3, TG>& SurfaceHumidity,
+                                   T veg, T theta_cap)
   {
     int h, j, i;
 
@@ -614,22 +614,22 @@ namespace AtmoData
     T q_sat, alpha;
     for (h = 0; h < Nt; h++)
       for (j = 0; j < Ny; j++)
-	for (i = 0; i < Nx; i++)
-	  {
-	    q_sat = SaturationHumidity(h, j, i);
-	    
-	    if (SoilWater(h, j, i) < theta_cap)
-	      // 1.963495 = pi / 1.6.
-	      alpha = 0.5 * (1. - cos(1.963495 * SoilWater(h, j, i)
-				      / theta_cap));
-	    else
-	      alpha = 1.0;
+        for (i = 0; i < Nx; i++)
+          {
+            q_sat = SaturationHumidity(h, j, i);
 
-	    SurfaceHumidity(h, j, i) = LUC(sea_index, j, i) * q_sat
-	      + (1.0 - LUC(sea_index, j, i))
-	      * ( alpha * q_sat + veg * (1. - alpha)
-		  * min(q_sat, SpecificHumidity(h, 0, j, i)) );
-	  }
+            if (SoilWater(h, j, i) < theta_cap)
+              // 1.963495 = pi / 1.6.
+              alpha = 0.5 * (1. - cos(1.963495 * SoilWater(h, j, i)
+                                      / theta_cap));
+            else
+              alpha = 1.0;
+
+            SurfaceHumidity(h, j, i) = LUC(sea_index, j, i) * q_sat
+              + (1.0 - LUC(sea_index, j, i))
+              * (alpha * q_sat + veg * (1. - alpha)
+                 * min(q_sat, SpecificHumidity(h, 0, j, i)));
+          }
   }
 
 
@@ -646,10 +646,10 @@ namespace AtmoData
   */
   template<class TS, class TP, class T, class TG>
   void ComputeCriticalRelativeHumidity(Data<TS, 3, TG>& SurfacePressure,
-				       Data<TP, 4, TG>& Pressure,
-				       Data<T, 4, TG>&
-				       CriticalRelativeHumidity,
-				       T coeff0, T coeff1)
+                                       Data<TP, 4, TG>& Pressure,
+                                       Data<T, 4, TG>&
+                                       CriticalRelativeHumidity,
+                                       T coeff0, T coeff1)
   {
     int h, k, j, i;
     int Nt(CriticalRelativeHumidity.GetLength(0));
@@ -660,13 +660,13 @@ namespace AtmoData
     T sig;
     for (h = 0; h < Nt; h++)
       for (k = 0; k < Nz; k++)
-	for (j = 0; j < Ny; j++)
-	  for (i = 0; i < Nx; i++)
-	    {
-	      sig = Pressure(h, k, j, i) / SurfacePressure(h, j, i);
-	      CriticalRelativeHumidity(h, k, j, i) = 1.0 - coeff0 * sig
-		* (1.0 - sig) * (1.0 + (sig - 0.5) * coeff1);
-	    }
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            {
+              sig = Pressure(h, k, j, i) / SurfacePressure(h, j, i);
+              CriticalRelativeHumidity(h, k, j, i) = 1.0 - coeff0 * sig
+                * (1.0 - sig) * (1.0 + (sig - 0.5) * coeff1);
+            }
   }
 
 
@@ -685,12 +685,12 @@ namespace AtmoData
   */
   template<class TS, class TP, class T, class TG>
   void ComputeCriticalRelativeHumidity_extended(Data<TS, 3, TG>&
-						SurfacePressure,
-						Data<TP, 4, TG>& Pressure,
-						Data<T, 4, TG>&
-						CriticalRelativeHumidity,
-						T coeff0, T coeff1,
-						T a0, T a1)
+                                                SurfacePressure,
+                                                Data<TP, 4, TG>& Pressure,
+                                                Data<T, 4, TG>&
+                                                CriticalRelativeHumidity,
+                                                T coeff0, T coeff1,
+                                                T a0, T a1)
   {
     int h, k, j, i;
     int Nt(CriticalRelativeHumidity.GetLength(0));
@@ -701,14 +701,14 @@ namespace AtmoData
     T sig;
     for (h = 0; h < Nt; h++)
       for (k = 0; k < Nz; k++)
-	for (j = 0; j < Ny; j++)
-	  for (i = 0; i < Nx; i++)
-	    {
-	      sig = Pressure(h, k, j, i) / SurfacePressure(h, j, i);
-	      CriticalRelativeHumidity(h, k, j, i) =
-		1.0 - coeff0 * pow(sig, a0)
-		* pow(T(1.) - sig, a1) * (1.0 + (sig - 0.5) * coeff1);
-	    }
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            {
+              sig = Pressure(h, k, j, i) / SurfacePressure(h, j, i);
+              CriticalRelativeHumidity(h, k, j, i) =
+                1.0 - coeff0 * pow(sig, a0)
+                * pow(T(1.) - sig, a1) * (1.0 + (sig - 0.5) * coeff1);
+            }
   }
 
 
@@ -730,11 +730,11 @@ namespace AtmoData
   */
   template<class TB, class TS, class TP, class T, class TG>
   void ComputeCriticalRelativeHumidity(Data<TB, 3, TG>& BoundaryLayerHeight,
-				       Data<TS, 3, TG>& SurfacePressure,
-				       Data<TP, 4, TG>& Pressure,
-				       Data<T, 4, TG>&
-				       CriticalRelativeHumidity,
-				       T coeff0, T coeff1, T BL_CRH)
+                                       Data<TS, 3, TG>& SurfacePressure,
+                                       Data<TP, 4, TG>& Pressure,
+                                       Data<T, 4, TG>&
+                                       CriticalRelativeHumidity,
+                                       T coeff0, T coeff1, T BL_CRH)
   {
     int h, k, j, i;
     int Nt(CriticalRelativeHumidity.GetLength(0));
@@ -745,17 +745,17 @@ namespace AtmoData
     T sig;
     for (h = 0; h < Nt; h++)
       for (k = 0; k < Nz; k++)
-	for (j = 0; j < Ny; j++)
-	  for (i = 0; i < Nx; i++)
-	    if (CriticalRelativeHumidity[1].Value(h, k, j, i)
-		< BoundaryLayerHeight(h, j, i))
-	      CriticalRelativeHumidity(h, k, j, i) = BL_CRH;
-	    else
-	      {
-		sig = Pressure(h, k, j, i) / SurfacePressure(h, j, i);
-		CriticalRelativeHumidity(h, k, j, i) = 1.0 - coeff0 * sig
-		  * (1.0 - sig) * (1.0 + (sig - 0.5) * coeff1);
-	      }
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            if (CriticalRelativeHumidity[1].Value(h, k, j, i)
+                < BoundaryLayerHeight(h, j, i))
+              CriticalRelativeHumidity(h, k, j, i) = BL_CRH;
+            else
+              {
+                sig = Pressure(h, k, j, i) / SurfacePressure(h, j, i);
+                CriticalRelativeHumidity(h, k, j, i) = 1.0 - coeff0 * sig
+                  * (1.0 - sig) * (1.0 + (sig - 0.5) * coeff1);
+              }
   }
 
 
@@ -774,10 +774,10 @@ namespace AtmoData
   */
   template<class TP, class T, class TG>
   void ComputeCriticalRelativeHumidity(Data<TP, 4, TG>& Pressure,
-				       Data<T, 4, TG>&
-				       CriticalRelativeHumidity,
-				       T CRH_0, T CRH_1, T CRH_2,
-				       T P_0, T P_1)
+                                       Data<T, 4, TG>&
+                                       CriticalRelativeHumidity,
+                                       T CRH_0, T CRH_1, T CRH_2,
+                                       T P_0, T P_1)
   {
     int h, k, j, i;
     int Nt(CriticalRelativeHumidity.GetLength(0));
@@ -787,14 +787,14 @@ namespace AtmoData
 
     for (h = 0; h < Nt; h++)
       for (k = 0; k < Nz; k++)
-	for (j = 0; j < Ny; j++)
-	  for (i = 0; i < Nx; i++)
-	    if (Pressure(h, k, j, i) > P_0)
-	      CriticalRelativeHumidity(h, k, j, i) = CRH_0;
-	    else if (Pressure(h, k, j, i) > P_1)
-	      CriticalRelativeHumidity(h, k, j, i) = CRH_1;
-	    else
-	      CriticalRelativeHumidity(h, k, j, i) = CRH_2;
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            if (Pressure(h, k, j, i) > P_0)
+              CriticalRelativeHumidity(h, k, j, i) = CRH_0;
+            else if (Pressure(h, k, j, i) > P_1)
+              CriticalRelativeHumidity(h, k, j, i) = CRH_1;
+            else
+              CriticalRelativeHumidity(h, k, j, i) = CRH_2;
   }
 
 
@@ -808,8 +808,8 @@ namespace AtmoData
   */
   template<class TR, class TC, class T, class TG>
   void ComputeCloudFraction(Data<TR, 4, TG>& RelativeHumidity,
-			    Data<TC, 4, TG>& CriticalRelativeHumidity,
-			    Data<T, 4, TG>& CloudFraction)
+                            Data<TC, 4, TG>& CriticalRelativeHumidity,
+                            Data<T, 4, TG>& CloudFraction)
   {
     int h, k, j, i;
     int Nt(CloudFraction.GetLength(0));
@@ -820,19 +820,19 @@ namespace AtmoData
     T tmp, crh;
     for (h = 0; h < Nt; h++)
       for (k = 0; k < Nz; k++)
-	for (j = 0; j < Ny; j++)
-	  for (i = 0; i < Nx; i++)
-	    {
-	      crh = CriticalRelativeHumidity(h, k, j, i);
-	      tmp = RelativeHumidity(h, k, j, i) - crh;
-	      if (tmp < 0. || crh == 1.)
-		CloudFraction(h, k, j, i) = 0.;
-	      else
-		{
-		  tmp = tmp / (1. - crh);
-		  CloudFraction(h, k, j, i) = tmp * tmp;
-		}
-	    }
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            {
+              crh = CriticalRelativeHumidity(h, k, j, i);
+              tmp = RelativeHumidity(h, k, j, i) - crh;
+              if (tmp < 0. || crh == 1.)
+                CloudFraction(h, k, j, i) = 0.;
+              else
+                {
+                  tmp = tmp / (1. - crh);
+                  CloudFraction(h, k, j, i) = tmp * tmp;
+                }
+            }
   }
 
 
@@ -850,9 +850,9 @@ namespace AtmoData
   */
   template<class TP, class TR, class TC, class T, class TG>
   void ComputeCloudFraction(Data<TP, 3, TG>& BoundaryLayerHeight,
-			    Data<TR, 4, TG>& RelativeHumidity,
-			    Data<TC, 4, TG>& CriticalRelativeHumidity,
-			    Data<T, 4, TG>& CloudFraction)
+                            Data<TR, 4, TG>& RelativeHumidity,
+                            Data<TC, 4, TG>& CriticalRelativeHumidity,
+                            Data<T, 4, TG>& CloudFraction)
   {
     int h, k, j, i;
     int Nt(CloudFraction.GetLength(0));
@@ -863,23 +863,22 @@ namespace AtmoData
     T tmp, crh;
     for (h = 0; h < Nt; h++)
       for (k = 0; k < Nz; k++)
-	for (j = 0; j < Ny; j++)
-	  for (i = 0; i < Nx; i++)
-	    {
-	      crh = CriticalRelativeHumidity(h, k, j, i);
-	      tmp = RelativeHumidity(h, k, j, i) - crh;
-	      if (tmp < 0. || crh == 1.)
-		CloudFraction(h, k, j, i) = 0.;
-	      else
-		if (CloudFraction[1].Value(h, k, j, i)
-		    < BoundaryLayerHeight(h, j, i))
-		  CloudFraction(h, k, j, i) = 0.34 * tmp / (1. - crh);
-		else
-		  {
-		    tmp = tmp / (1. - crh);
-		    CloudFraction(h, k, j, i) = tmp * tmp;
-		  }
-	    }
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            {
+              crh = CriticalRelativeHumidity(h, k, j, i);
+              tmp = RelativeHumidity(h, k, j, i) - crh;
+              if (tmp < 0. || crh == 1.)
+                CloudFraction(h, k, j, i) = 0.;
+              else if (CloudFraction[1].Value(h, k, j, i)
+                       < BoundaryLayerHeight(h, j, i))
+                CloudFraction(h, k, j, i) = 0.34 * tmp / (1. - crh);
+              else
+                {
+                  tmp = tmp / (1. - crh);
+                  CloudFraction(h, k, j, i) = tmp * tmp;
+                }
+            }
   }
 
 
@@ -897,7 +896,7 @@ namespace AtmoData
   */
   template<class TU, class TV, class T, class TG>
   void ComputeModule(Data<TU, 4, TG>& U, Data<TV, 4, TG>& V,
-		     Data<T, 4, TG>& Module)
+                     Data<T, 4, TG>& Module)
   {
 
     int h, i, j, k;
@@ -909,27 +908,27 @@ namespace AtmoData
 
     T u, v;
 
-    if ( (U.GetLength(3) == Nx + 1) && (V.GetLength(2) == Ny + 1) )
-      for (h=0; h<Nt; h++)
-	for (k=0; k<Nz; k++)
-	  for (j=0; j<Ny; j++)
-	    for (i=0; i<Nx; i++)
-	      {
-		u = 0.5 * (U(h, k, j, i+1) + U(h, k, j, i));
-		v = 0.5 * (V(h, k, j+1, i) + V(h, k, j, i));
-		Module(h, k, j, i) = sqrt(u*u + v*v);
-	      }
+    if ((U.GetLength(3) == Nx + 1) && (V.GetLength(2) == Ny + 1))
+      for (h = 0; h < Nt; h++)
+        for (k = 0; k < Nz; k++)
+          for (j = 0; j < Ny; j++)
+            for (i = 0; i < Nx; i++)
+              {
+                u = 0.5 * (U(h, k, j, i + 1) + U(h, k, j, i));
+                v = 0.5 * (V(h, k, j + 1, i) + V(h, k, j, i));
+                Module(h, k, j, i) = sqrt(u * u + v * v);
+              }
     else
-      for (h=0; h<Nt; h++)
-	for (k=0; k<Nz; k++)
-	  for (j=0; j<Ny; j++)
-	    for (i=0; i<Nx; i++)
-	      {
-		u = U(h, k, j, i);
-		v = V(h, k, j, i);
-		Module(h, k, j, i) = sqrt(u*u + v*v);
-	      }
-	
+      for (h = 0; h < Nt; h++)
+        for (k = 0; k < Nz; k++)
+          for (j = 0; j < Ny; j++)
+            for (i = 0; i < Nx; i++)
+              {
+                u = U(h, k, j, i);
+                v = V(h, k, j, i);
+                Module(h, k, j, i) = sqrt(u * u + v * v);
+              }
+
   }
 
 
@@ -947,7 +946,7 @@ namespace AtmoData
   */
   template<class TU, class TV, class T, class TG>
   void ComputeModule(Data<TU, 4, TG>& U, Data<TV, 4, TG>& V,
-		     Data<T, 3, TG>& Module)
+                     Data<T, 3, TG>& Module)
   {
 
     int h, i, j;
@@ -958,24 +957,24 @@ namespace AtmoData
 
     T u, v;
 
-    if ( (U.GetLength(3) == Nx + 1) && (V.GetLength(2) == Ny + 1) )
-      for (h=0; h<Nt; h++)
-	for (j=0; j<Ny; j++)
-	  for (i=0; i<Nx; i++)
-	    {
-	      u = 0.5 * (U(h, 0, j, i+1) + U(h, 0, j, i));
-	      v = 0.5 * (V(h, 0, j+1, i) + V(h, 0, j, i));
-	      Module(h, j, i) = sqrt(u*u + v*v);
-	    }
+    if ((U.GetLength(3) == Nx + 1) && (V.GetLength(2) == Ny + 1))
+      for (h = 0; h < Nt; h++)
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            {
+              u = 0.5 * (U(h, 0, j, i + 1) + U(h, 0, j, i));
+              v = 0.5 * (V(h, 0, j + 1, i) + V(h, 0, j, i));
+              Module(h, j, i) = sqrt(u * u + v * v);
+            }
     else
-      for (h=0; h<Nt; h++)
-	for (j=0; j<Ny; j++)
-	  for (i=0; i<Nx; i++)
-	    {
-	      u = U(h, 0, j, i);
-	      v = V(h, 0, j, i);
-	      Module(h, j, i) = sqrt(u*u + v*v);
-	    }
+      for (h = 0; h < Nt; h++)
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            {
+              u = U(h, 0, j, i);
+              v = V(h, 0, j, i);
+              Module(h, j, i) = sqrt(u * u + v * v);
+            }
 
   }
 
@@ -994,7 +993,7 @@ namespace AtmoData
   */
   template<class TU, class TV, class T, class TG>
   void ComputeModule(Data<TU, 3, TG>& U, Data<TV, 3, TG>& V,
-		     Data<T, 3, TG>& Module)
+                     Data<T, 3, TG>& Module)
   {
 
     int h, i, j;
@@ -1005,24 +1004,24 @@ namespace AtmoData
 
     T u, v;
 
-    if ( (U.GetLength(2) == Nx + 1) && (V.GetLength(1) == Ny + 1) )
-      for (h=0; h<Nt; h++)
-	for (j=0; j<Ny; j++)
-	  for (i=0; i<Nx; i++)
-	    {
-	      u = 0.5 * (U(h, j, i+1) + U(h, j, i));
-	      v = 0.5 * (V(h, j+1, i) + V(h, j, i));
-	      Module(h, j, i) = sqrt(u*u + v*v);
-	    }
+    if ((U.GetLength(2) == Nx + 1) && (V.GetLength(1) == Ny + 1))
+      for (h = 0; h < Nt; h++)
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            {
+              u = 0.5 * (U(h, j, i + 1) + U(h, j, i));
+              v = 0.5 * (V(h, j + 1, i) + V(h, j, i));
+              Module(h, j, i) = sqrt(u * u + v * v);
+            }
     else
-      for (h=0; h<Nt; h++)
-	for (j=0; j<Ny; j++)
-	  for (i=0; i<Nx; i++)
-	    {
-	      u = U(h, j, i);
-	      v = V(h, j, i);
-	      Module(h, j, i) = sqrt(u*u + v*v);
-	    }
+      for (h = 0; h < Nt; h++)
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            {
+              u = U(h, j, i);
+              v = V(h, j, i);
+              Module(h, j, i) = sqrt(u * u + v * v);
+            }
 
   }
 
@@ -1051,15 +1050,15 @@ namespace AtmoData
   */
   template<class TC, class TP, class T, class TG>
   void ComputeCloudiness(Data<TC, 4, TG>& CloudFraction,
-			 Data<TP, 4, TG>& Pressure,
-			 Grid<TG>& GridZ_interf,
-			 Data<int, 4>& LowIndices,
-			 Data<int, 4>& MediumIndices,
-			 Data<int, 4>& HighIndices,
-			 Data<T, 3, TG>& LowCloudiness,
-			 Data<T, 3, TG>& MediumCloudiness,
-			 Data<T, 3, TG>& HighCloudiness,
-			 T P_0, T P_1)
+                         Data<TP, 4, TG>& Pressure,
+                         Grid<TG>& GridZ_interf,
+                         Data<int, 4>& LowIndices,
+                         Data<int, 4>& MediumIndices,
+                         Data<int, 4>& HighIndices,
+                         Data<T, 3, TG>& LowCloudiness,
+                         Data<T, 3, TG>& MediumCloudiness,
+                         Data<T, 3, TG>& HighCloudiness,
+                         T P_0, T P_1)
   {
     int h, k, j, i;
     int Nt(CloudFraction.GetLength(0));
@@ -1076,130 +1075,136 @@ namespace AtmoData
     int k_base, k_top, k_max;
     for (h = 0; h < Nt; h++)
       for (j = 0; j < Ny; j++)
-	for (i = 0; i < Nx; i++)
-	  {
+        for (i = 0; i < Nx; i++)
+          {
 
-	    /*** Low clouds ***/
+            /*** Low clouds ***/
 
-	    cloud_max = 0;
-	    // The first level is excluded.
-	    for (k = 1; k < Nz && Pressure(h, k, j, i) > P_0; k++)
-	      cloud_max = max(cloud_max, CloudFraction(h, k, j, i));
-	    below = true; above = false;
-	    k_base = 0; k_top = 0;
-	    for (k = 1; k < Nz && Pressure(h, k, j, i) > P_0 && !above; k++)
-	      {
-		below = below && ( CloudFraction(h, k, j, i) < 0.5 * cloud_max
-				   || CloudFraction(h, k, j, i) == 0 );
-		above = !below && CloudFraction(h, k, j, i) < 0.5 * cloud_max;
-		if (!below && k_base == 0)
-		  k_base = k;
-		if (above)
-		  k_top = k;
-	      }
-	    if (above)
-	      while (k < Nz && Pressure(h, k, j, i) > P_0)
-		k++;
-	    k_max = k - 1;
-	    // Goes up to P_0.
-	    if (k_base > k_top)
-	      k_top = k_max + 1;
-	    LowIndices(h, j, i, 0) = k_base;
-	    LowIndices(h, j, i, 1) = k_top;
-	    k = k_base;
-	    // k_top == 0 means no cloud.
-	    while (k < k_top && k_top != 0)
-	      {
-		LowCloudiness(h, j, i) += CloudFraction(h, k, j, i)
-		  * (GridZ_interf.Value(h, k + 1, j, i)
-		     - GridZ_interf.Value(h, k, j, i));
-		k++;
-	      }
-	    if (k_top != 0)
-	      LowCloudiness(h, j, i) /=
-		GridZ_interf.Value(h, k_top, j, i)
-		- GridZ_interf.Value(h, k_base, j, i);
+            cloud_max = 0;
+            // The first level is excluded.
+            for (k = 1; k < Nz && Pressure(h, k, j, i) > P_0; k++)
+              cloud_max = max(cloud_max, CloudFraction(h, k, j, i));
+            below = true;
+            above = false;
+            k_base = 0;
+            k_top = 0;
+            for (k = 1; k < Nz && Pressure(h, k, j, i) > P_0 && !above; k++)
+              {
+                below = below && (CloudFraction(h, k, j, i) < 0.5 * cloud_max
+                                  || CloudFraction(h, k, j, i) == 0);
+                above = !below && CloudFraction(h, k, j, i) < 0.5 * cloud_max;
+                if (!below && k_base == 0)
+                  k_base = k;
+                if (above)
+                  k_top = k;
+              }
+            if (above)
+              while (k < Nz && Pressure(h, k, j, i) > P_0)
+                k++;
+            k_max = k - 1;
+            // Goes up to P_0.
+            if (k_base > k_top)
+              k_top = k_max + 1;
+            LowIndices(h, j, i, 0) = k_base;
+            LowIndices(h, j, i, 1) = k_top;
+            k = k_base;
+            // k_top == 0 means no cloud.
+            while (k < k_top && k_top != 0)
+              {
+                LowCloudiness(h, j, i) += CloudFraction(h, k, j, i)
+                  * (GridZ_interf.Value(h, k + 1, j, i)
+                     - GridZ_interf.Value(h, k, j, i));
+                k++;
+              }
+            if (k_top != 0)
+              LowCloudiness(h, j, i) /=
+                GridZ_interf.Value(h, k_top, j, i)
+                - GridZ_interf.Value(h, k_base, j, i);
 
-	    /*** Medium clouds ***/
+            /*** Medium clouds ***/
 
-	    cloud_max = 0;
-	    // Starts above low clouds.
-	    for (k = k_max + 1; k < Nz && Pressure(h, k, j, i) > P_1; k++)
-	      cloud_max = max(cloud_max, CloudFraction(h, k, j, i));
-	    below = true; above = false;
-	    k_base = 0; k_top = 0;
-	    for (k = k_max + 1; k < Nz && Pressure(h, k, j, i) > P_1
-		   && !above; k++)
-	      {
-		below = below && ( CloudFraction(h, k, j, i) < 0.5 * cloud_max
-				   || CloudFraction(h, k, j, i) == 0 );
-		above = !below && CloudFraction(h, k, j, i) < 0.5 * cloud_max;
-		if (!below && k_base == 0)
-		  k_base = k;
-		if (above)
-		  k_top = k;
-	      }
-	    if (above)
-	      while (k < Nz && Pressure(h, k, j, i) > P_1)
-		k++;
-	    k_max = k - 1;
-	    // Goes up to P_1.
-	    if (k_base > k_top)
-	      k_top = k_max + 1;
-	    MediumIndices(h, j, i, 0) = k_base;
-	    MediumIndices(h, j, i, 1) = k_top;
-	    k = k_base;
-	    // k_top == 0 means no cloud.
-	    while (k < k_top && k_top != 0)
-	      {
-		MediumCloudiness(h, j, i) += CloudFraction(h, k, j, i)
-		  * (GridZ_interf.Value(h, k + 1, j, i)
-		     - GridZ_interf.Value(h, k, j, i));
-		k++;
-	      }
-	    if (k_top != 0)
-	      MediumCloudiness(h, j, i) /=
-		GridZ_interf.Value(h, k_top, j, i)
-		- GridZ_interf.Value(h, k_base, j, i);
+            cloud_max = 0;
+            // Starts above low clouds.
+            for (k = k_max + 1; k < Nz && Pressure(h, k, j, i) > P_1; k++)
+              cloud_max = max(cloud_max, CloudFraction(h, k, j, i));
+            below = true;
+            above = false;
+            k_base = 0;
+            k_top = 0;
+            for (k = k_max + 1; k < Nz && Pressure(h, k, j, i) > P_1
+                   && !above; k++)
+              {
+                below = below && (CloudFraction(h, k, j, i) < 0.5 * cloud_max
+                                  || CloudFraction(h, k, j, i) == 0);
+                above = !below && CloudFraction(h, k, j, i) < 0.5 * cloud_max;
+                if (!below && k_base == 0)
+                  k_base = k;
+                if (above)
+                  k_top = k;
+              }
+            if (above)
+              while (k < Nz && Pressure(h, k, j, i) > P_1)
+                k++;
+            k_max = k - 1;
+            // Goes up to P_1.
+            if (k_base > k_top)
+              k_top = k_max + 1;
+            MediumIndices(h, j, i, 0) = k_base;
+            MediumIndices(h, j, i, 1) = k_top;
+            k = k_base;
+            // k_top == 0 means no cloud.
+            while (k < k_top && k_top != 0)
+              {
+                MediumCloudiness(h, j, i) += CloudFraction(h, k, j, i)
+                  * (GridZ_interf.Value(h, k + 1, j, i)
+                     - GridZ_interf.Value(h, k, j, i));
+                k++;
+              }
+            if (k_top != 0)
+              MediumCloudiness(h, j, i) /=
+                GridZ_interf.Value(h, k_top, j, i)
+                - GridZ_interf.Value(h, k_base, j, i);
 
-	    /*** High clouds ***/
+            /*** High clouds ***/
 
-	    cloud_max = 0;
-	    // Starts above low clouds.
-	    for (k = k_max + 1; k < Nz; k++)
-	      cloud_max = max(cloud_max, CloudFraction(h, k, j, i));
-	    below = true; above = false;
-	    k_base = 0; k_top = 0;
-	    for (k = k_max + 1; k < Nz && !above; k++)
-	      {
-		below = below && ( CloudFraction(h, k, j, i) < 0.5 * cloud_max
-				   || CloudFraction(h, k, j, i) == 0 );
-		above = !below && CloudFraction(h, k, j, i) < 0.5 * cloud_max;
-		if (!below && k_base == 0)
-		  k_base = k;
-		if (above)
-		  k_top = k;
-	      }
-	    k_max = k - 1;
-	    // Goes up to the top.
-	    if (k_base > k_top)
-	      k_top = k_max + 1;
-	    HighIndices(h, j, i, 0) = k_base;
-	    HighIndices(h, j, i, 1) = k_top;
-	    k = k_base;
-	    // k_top == 0 means no cloud.
-	    while (k < k_top && k_top != 0)
-	      {
-		HighCloudiness(h, j, i) += CloudFraction(h, k, j, i)
-		  * (GridZ_interf.Value(h, k + 1, j, i)
-		     - GridZ_interf.Value(h, k, j, i));
-		k++;
-	      }
-	    if (k_top != 0)
-	      HighCloudiness(h, j, i) /=
-		GridZ_interf.Value(h, k_top, j, i)
-		- GridZ_interf.Value(h, k_base, j, i);
-	  }
+            cloud_max = 0;
+            // Starts above low clouds.
+            for (k = k_max + 1; k < Nz; k++)
+              cloud_max = max(cloud_max, CloudFraction(h, k, j, i));
+            below = true;
+            above = false;
+            k_base = 0;
+            k_top = 0;
+            for (k = k_max + 1; k < Nz && !above; k++)
+              {
+                below = below && (CloudFraction(h, k, j, i) < 0.5 * cloud_max
+                                  || CloudFraction(h, k, j, i) == 0);
+                above = !below && CloudFraction(h, k, j, i) < 0.5 * cloud_max;
+                if (!below && k_base == 0)
+                  k_base = k;
+                if (above)
+                  k_top = k;
+              }
+            k_max = k - 1;
+            // Goes up to the top.
+            if (k_base > k_top)
+              k_top = k_max + 1;
+            HighIndices(h, j, i, 0) = k_base;
+            HighIndices(h, j, i, 1) = k_top;
+            k = k_base;
+            // k_top == 0 means no cloud.
+            while (k < k_top && k_top != 0)
+              {
+                HighCloudiness(h, j, i) += CloudFraction(h, k, j, i)
+                  * (GridZ_interf.Value(h, k + 1, j, i)
+                     - GridZ_interf.Value(h, k, j, i));
+                k++;
+              }
+            if (k_top != 0)
+              HighCloudiness(h, j, i) /=
+                GridZ_interf.Value(h, k_top, j, i)
+                - GridZ_interf.Value(h, k_base, j, i);
+          }
   }
 
 
@@ -1212,13 +1217,13 @@ namespace AtmoData
     and reference pressure.
     \param CloudHeight (output) altitudes of cloud basis.
   */
-  template <class TP, class TH,
-	    class T, class TG>
+  template < class TP, class TH,
+             class T, class TG >
   void ComputeCloudHeight(Data<TP, 4, TG>& Pressure,
-			  Data<TH, 4, TG>& RelativeHumidity,
-			  T (CriticalRelativeHumidity)(const T&, const T&,
-						       const T&),
-			  Data<T, 3, TG>& CloudHeight)
+                          Data<TH, 4, TG>& RelativeHumidity,
+                          T(CriticalRelativeHumidity)(const T&, const T&,
+                                                      const T&),
+                          Data<T, 3, TG>& CloudHeight)
   {
 
     int h, k, j, i;
@@ -1230,38 +1235,38 @@ namespace AtmoData
     // Index "0" and "1" refer to two contiguous levels.
     T rh0, rh1, rhc;
 
-    T max_height = 2. * Pressure[1].Value(0, Nz-1, 0, 0);
+    T max_height = 2. * Pressure[1].Value(0, Nz - 1, 0, 0);
     CloudHeight.Fill(max_height);
 
-    for (h=0; h<Nt; h++)
-      for (j=0; j<Ny; j++)
-	for (i=0; i<Nx; i++)
-	  {
+    for (h = 0; h < Nt; h++)
+      for (j = 0; j < Ny; j++)
+        for (i = 0; i < Nx; i++)
+          {
 
-	    rh0 = RelativeHumidity(h, Nz-1, j, i);
-	    
-	    k = 0;
-	    while ( (k<Nz) && (CloudHeight(h, j, i) == max_height) )
-	      {
+            rh0 = RelativeHumidity(h, Nz - 1, j, i);
 
-		rh1 = RelativeHumidity(h, k, j, i);
+            k = 0;
+            while ((k < Nz) && (CloudHeight(h, j, i) == max_height))
+              {
 
-		// Critical relative humidity.
-		rhc = CriticalRelativeHumidity(Pressure[1].Value(h, k, j, i),
-					       Pressure(h, k, j, i),
-					       Pressure(h, 0, j, i));
+                rh1 = RelativeHumidity(h, k, j, i);
 
-		if (rh1 >= rhc)  // Above a cloud.
-		  CloudHeight(h, j, i) = Pressure[1].Value(h, k, j, i);
+                // Critical relative humidity.
+                rhc = CriticalRelativeHumidity(Pressure[1].Value(h, k, j, i),
+                                               Pressure(h, k, j, i),
+                                               Pressure(h, 0, j, i));
 
-		// For the next level.
-		rh0 = rh1;
+                if (rh1 >= rhc)  // Above a cloud.
+                  CloudHeight(h, j, i) = Pressure[1].Value(h, k, j, i);
 
-		k++;
+                // For the next level.
+                rh0 = rh1;
 
-	      }
+                k++;
 
-	  }
+              }
+
+          }
   }
 
 
@@ -1273,8 +1278,8 @@ namespace AtmoData
   */
   template <class TH, class TCRH, class T, class TG>
   void ComputeCloudHeight(Data<TH, 4, TG>& RelativeHumidity,
-			  Data<TCRH, 4, TG>& CriticalRelativeHumidity,
-			  Data<T, 3, TG>& CloudHeight)
+                          Data<TCRH, 4, TG>& CriticalRelativeHumidity,
+                          Data<T, 3, TG>& CloudHeight)
   {
 
     int h, k, j, i;
@@ -1286,37 +1291,37 @@ namespace AtmoData
     // Index "0" and "1" refer to two contiguous levels.
     T rh0, rh1, rhc;
 
-    T max_height = 2. * RelativeHumidity[1].Value(0, Nz-1, 0, 0);
+    T max_height = 2. * RelativeHumidity[1].Value(0, Nz - 1, 0, 0);
     CloudHeight.Fill(max_height);
 
-    for (h=0; h<Nt; h++)
-      for (j=0; j<Ny; j++)
-	for (i=0; i<Nx; i++)
-	  {
+    for (h = 0; h < Nt; h++)
+      for (j = 0; j < Ny; j++)
+        for (i = 0; i < Nx; i++)
+          {
 
-	    rh0 = RelativeHumidity(h, Nz-1, j, i);
-	    
-	    k = 0;
-	    while ( (k<Nz) && (CloudHeight(h, j, i) == max_height) )
-	      {
+            rh0 = RelativeHumidity(h, Nz - 1, j, i);
 
-		rh1 = RelativeHumidity(h, k, j, i);
+            k = 0;
+            while ((k < Nz) && (CloudHeight(h, j, i) == max_height))
+              {
 
-		// Critical relative humidity.
-		rhc = CriticalRelativeHumidity(h, k, j, i);
+                rh1 = RelativeHumidity(h, k, j, i);
 
-		if (rh1 >= rhc)  // Above a cloud.
-		  CloudHeight(h, j, i) =
-		    RelativeHumidity[1].Value(h, k, j, i);
+                // Critical relative humidity.
+                rhc = CriticalRelativeHumidity(h, k, j, i);
 
-		// For the next level.
-		rh0 = rh1;
+                if (rh1 >= rhc)  // Above a cloud.
+                  CloudHeight(h, j, i) =
+                    RelativeHumidity[1].Value(h, k, j, i);
 
-		k++;
+                // For the next level.
+                rh0 = rh1;
 
-	      }
+                k++;
 
-	  }
+              }
+
+          }
   }
 
 
@@ -1336,10 +1341,10 @@ namespace AtmoData
   */
   template <class T, class TG>
   void ComputeCloudHeight(Data<int, 4>& LowIndices,
-			  Data<int, 4>& MediumIndices,
-			  Data<int, 4>& HighIndices,
-			  Grid<TG>& GridZ_interf,
-			  Data<T, 3, TG>& CloudHeight)
+                          Data<int, 4>& MediumIndices,
+                          Data<int, 4>& HighIndices,
+                          Grid<TG>& GridZ_interf,
+                          Data<T, 3, TG>& CloudHeight)
   {
     int h, j, i;
     int Nt(CloudHeight.GetLength(0));
@@ -1350,16 +1355,16 @@ namespace AtmoData
 
     for (h = 0; h < Nt; h++)
       for (j = 0; j < Ny; j++)
-	for (i = 0; i < Nx; i++)
-	  if (LowIndices(h, j, i, 0) != 0)
-	    CloudHeight(h, j, i) =
-	      GridZ_interf.Value(h, LowIndices(h, j, i, 0), j, i);
-	  else if (MediumIndices(h, j, i, 0) != 0)
-	    CloudHeight(h, j, i) =
-	      GridZ_interf.Value(h, MediumIndices(h, j, i, 0), j, i);
-	  else if (HighIndices(h, j, i, 0) != 0)
-	    CloudHeight(h, j, i) =
-	      GridZ_interf.Value(h, HighIndices(h, j, i, 0), j, i);
+        for (i = 0; i < Nx; i++)
+          if (LowIndices(h, j, i, 0) != 0)
+            CloudHeight(h, j, i) =
+              GridZ_interf.Value(h, LowIndices(h, j, i, 0), j, i);
+          else if (MediumIndices(h, j, i, 0) != 0)
+            CloudHeight(h, j, i) =
+              GridZ_interf.Value(h, MediumIndices(h, j, i, 0), j, i);
+          else if (HighIndices(h, j, i, 0) != 0)
+            CloudHeight(h, j, i) =
+              GridZ_interf.Value(h, HighIndices(h, j, i, 0), j, i);
   }
 
 
@@ -1373,9 +1378,9 @@ namespace AtmoData
   */
   template<class T, class TLC, class TC>
   void ComputeTotalCloudiness(Data<TLC, 3, T>& LowCloudiness,
-			      Data<TLC, 3, T>& MediumCloudiness,
-			      Data<TLC, 3, T>& HighCloudiness,
-			      Data<TC, 3, T>& Cloudiness)
+                              Data<TLC, 3, T>& MediumCloudiness,
+                              Data<TLC, 3, T>& HighCloudiness,
+                              Data<TC, 3, T>& Cloudiness)
   {
     int h, j, i;
     int Nt(Cloudiness.GetLength(0));
@@ -1384,10 +1389,10 @@ namespace AtmoData
 
     for (h = 0; h < Nt; h++)
       for (j = 0; j < Ny; j++)
-	for (i = 0; i < Nx; i++)
-	  Cloudiness(h, j, i) = 1. - (1. - LowCloudiness(h, j, i))
-	    * (1. - MediumCloudiness(h, j, i))
-	    * (1. - HighCloudiness(h, j, i));
+        for (i = 0; i < Nx; i++)
+          Cloudiness(h, j, i) = 1. - (1. - LowCloudiness(h, j, i))
+            * (1. - MediumCloudiness(h, j, i))
+            * (1. - HighCloudiness(h, j, i));
   }
 
 
@@ -1400,7 +1405,7 @@ namespace AtmoData
   */
   template<class TLC, class TC>
   inline TC ComputeTotalCloudiness(TLC low_cloudiness, TLC medium_cloudiness,
-				   TLC high_cloudiness)
+                                   TLC high_cloudiness)
   {
     return 1. - (1. - low_cloudiness) * (1. - medium_cloudiness)
       * (1. - high_cloudiness);
@@ -1419,46 +1424,45 @@ namespace AtmoData
   */
   template<class T>
   string ComputePasquillStabilityClass(T surface_wind, T solar_radiation,
-				       T cloudiness, bool isday)
+                                       T cloudiness, bool isday)
   {
     if (isday)
       if (surface_wind < 2.)
-	if (solar_radiation > 700.)
-	  return "A";
-	else
-	  return "B";
+        if (solar_radiation > 700.)
+          return "A";
+        else
+          return "B";
       else if (surface_wind < 3.)
-	if (solar_radiation >= 350.)
-	  return "B";
-	else
-	  return "C";
+        if (solar_radiation >= 350.)
+          return "B";
+        else
+          return "C";
       else if (surface_wind < 5.)
-	if (solar_radiation > 700.)
-	  return "B";
-	else
-	  return "C";
+        if (solar_radiation > 700.)
+          return "B";
+        else
+          return "C";
       else if (surface_wind < 6.)
-	if (solar_radiation > 700.)
-	  return "C";
-	else
-	  return "D";
+        if (solar_radiation > 700.)
+          return "C";
+        else
+          return "D";
       else
-	return "D";
+        return "D";
+    else if (surface_wind < 2.)
+      return "F";
+    else if (surface_wind < 3.)
+      if (cloudiness > 0.5)
+        return "E";
+      else
+        return "F";
+    else if (surface_wind < 5.)
+      if (cloudiness > 0.5)
+        return "D";
+      else
+        return "E";
     else
-      if (surface_wind < 2.)
-	return "F";
-      else if (surface_wind < 3.)
-	if (cloudiness > 0.5)
-	  return "E";
-	else
-	  return "F";
-      else if (surface_wind < 5.)
-	if (cloudiness > 0.5)
-	  return "D";
-	else
-	  return "E";
-      else
-	return "D";
+      return "D";
   }
 
 
@@ -1472,11 +1476,11 @@ namespace AtmoData
     \param Pressure (output) pressure.
     \param P0 (optional) standard pressure. Default: 101325 Pa.
   */
-  template <class Ta, class Tb, class TSP,
-	    class T, class TG>
+  template < class Ta, class Tb, class TSP,
+             class T, class TG >
   void ComputePressure(Data<Ta, 1, TG>& alpha, Data<Tb, 1, TG>& beta,
-		       Data<TSP, 3, TG>& SurfacePressure,
-		       Data<T, 4, TG>& Pressure, T P0)
+                       Data<TSP, 3, TG>& SurfacePressure,
+                       Data<T, 4, TG>& Pressure, T P0)
   {
 
     int h, i, j, k;
@@ -1486,12 +1490,12 @@ namespace AtmoData
     int Nz = Pressure.GetLength(1);
     int Nt = Pressure.GetLength(0);
 
-    for (h=0; h<Nt; h++)
-      for (k=0; k<Nz; k++)
-	for (j=0; j<Ny; j++)
-	  for (i=0; i<Nx; i++)
-	    Pressure(h, k, j, i) = alpha(k) * P0
-	      + beta(k) * SurfacePressure(h, j, i);
+    for (h = 0; h < Nt; h++)
+      for (k = 0; k < Nz; k++)
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            Pressure(h, k, j, i) = alpha(k) * P0
+              + beta(k) * SurfacePressure(h, j, i);
 
   }
 
@@ -1515,9 +1519,9 @@ namespace AtmoData
   */
   template<class TPS, class TP, class TT, class T, class TG>
   void ComputeHeight(Data<TPS, 3, TG>& SurfacePressure,
-		     Data<TP, 4, TG>& Pressure,
-		     Data<TT, 4, TG>& Temperature,
-		     Grid<T>& Height, T g, T r)
+                     Data<TP, 4, TG>& Pressure,
+                     Data<TT, 4, TG>& Temperature,
+                     Grid<T>& Height, T g, T r)
   {
 
     int h, i, j, k;
@@ -1527,17 +1531,17 @@ namespace AtmoData
     int Nz = Height.GetLength(1);
     int Nt = Height.GetLength(0);
 
-    for (h=0; h<Nt; h++)
-      for (k=0; k<Nz; k++)
-	for (j=0; j<Ny; j++)
-	  for (i=0; i<Nx; i++)
-	    if (k==0)
-	      Height.Value(h, k, j, i) = r / g * Temperature(h, k, j, i)
-		* log(SurfacePressure(h, j, i) / Pressure(h, k, j, i));
-	    else
-	      Height.Value(h, k, j, i) = Height.Value(h, k-1, j, i)
-		- r / g * Temperature(h, k, j, i)
-		* log(Pressure(h, k, j, i) / Pressure(h, k-1, j, i));
+    for (h = 0; h < Nt; h++)
+      for (k = 0; k < Nz; k++)
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            if (k == 0)
+              Height.Value(h, k, j, i) = r / g * Temperature(h, k, j, i)
+                * log(SurfacePressure(h, j, i) / Pressure(h, k, j, i));
+            else
+              Height.Value(h, k, j, i) = Height.Value(h, k - 1, j, i)
+                - r / g * Temperature(h, k, j, i)
+                * log(Pressure(h, k, j, i) / Pressure(h, k - 1, j, i));
 
   }
 
@@ -1563,8 +1567,8 @@ namespace AtmoData
   */
   template<class TP, class TT, class T, class TG>
   void ComputeInterfHeight(Data<TP, 4, TG>& Pressure,
-			   Data<TT, 4, TG>& Temperature,
-			   Grid<T>& Height, bool ground_set, T g, T r)
+                           Data<TT, 4, TG>& Temperature,
+                           Grid<T>& Height, bool ground_set, T g, T r)
   {
 
     int h, i, j, k;
@@ -1575,19 +1579,19 @@ namespace AtmoData
     int Nt = Height.GetLength(0);
 
     if (!ground_set)
-      for (h=0; h<Nt; h++)
-	for (j=0; j<Ny; j++)
-	  for (i=0; i<Nx; i++)
-	    Height.Value(h, 0, j, i) = T(0);
-	
-    for (h=0; h<Nt; h++)
-      for (k=0; k<Nz; k++)
-	for (j=0; j<Ny; j++)
-	  for (i=0; i<Nx; i++)
-	    Height.Value(h, k+1, j, i) = Height.Value(h, k, j, i)
-	      - r / g * Temperature(h, k, j, i)
-	      * log(Pressure(h, k+1, j, i) / Pressure(h, k, j, i));
-	
+      for (h = 0; h < Nt; h++)
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            Height.Value(h, 0, j, i) = T(0);
+
+    for (h = 0; h < Nt; h++)
+      for (k = 0; k < Nz; k++)
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            Height.Value(h, k + 1, j, i) = Height.Value(h, k, j, i)
+              - r / g * Temperature(h, k, j, i)
+              * log(Pressure(h, k + 1, j, i) / Pressure(h, k, j, i));
+
   }
 
 
@@ -1610,9 +1614,9 @@ namespace AtmoData
   */
   template<class TP, class TT, class T, class TG>
   void ComputeMiddleHeight(Data<TP, 4, TG>& Pressure,
-			   Data<TT, 4, TG>& Temperature,
-			   Grid<T>& InterfHeight, Grid<T>& MiddleHeight,
-			   T g, T r)
+                           Data<TT, 4, TG>& Temperature,
+                           Grid<T>& InterfHeight, Grid<T>& MiddleHeight,
+                           T g, T r)
   {
 
     int h, i, j, k;
@@ -1622,15 +1626,15 @@ namespace AtmoData
     int Nz = MiddleHeight.GetLength(1);
     int Nt = MiddleHeight.GetLength(0);
 
-    for (h=0; h<Nt; h++)
-      for (k=0; k<Nz; k++)
-	for (j=0; j<Ny; j++)
-	  for (i=0; i<Nx; i++)
-	    MiddleHeight.Value(h, k, j, i) = InterfHeight.Value(h, k, j, i)
-	      + r / g * Temperature(h, k, j, i)
-	      * (1. - Pressure(h, k+1, j, i)
-		 / (Pressure(h, k, j, i) - Pressure(h, k+1, j, i))
-		 * log(Pressure(h, k, j, i) / Pressure(h, k+1, j, i)));
+    for (h = 0; h < Nt; h++)
+      for (k = 0; k < Nz; k++)
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            MiddleHeight.Value(h, k, j, i) = InterfHeight.Value(h, k, j, i)
+              + r / g * Temperature(h, k, j, i)
+              * (1. - Pressure(h, k + 1, j, i)
+                 / (Pressure(h, k, j, i) - Pressure(h, k + 1, j, i))
+                 * log(Pressure(h, k, j, i) / Pressure(h, k + 1, j, i)));
 
   }
 
@@ -1648,8 +1652,8 @@ namespace AtmoData
   */
   template <class TT, class TH, class T, class TG>
   void ComputeVirtualTemperature(Data<TT, 4, TG>& Temperature,
-				 Data<TH, 4, TG>& SpecificHumidity,
-				 Data<T, 4, TG>& VirtualTemperature, T c)
+                                 Data<TH, 4, TG>& SpecificHumidity,
+                                 Data<T, 4, TG>& VirtualTemperature, T c)
   {
 
     int h, i, j, k;
@@ -1659,13 +1663,13 @@ namespace AtmoData
     int Nz = VirtualTemperature.GetLength(1);
     int Nt = VirtualTemperature.GetLength(0);
 
-    for (h=0; h<Nt; h++)
-      for (k=0; k<Nz; k++)
-	for (j=0; j<Ny; j++)
-	  for (i=0; i<Nx; i++)
-	    VirtualTemperature(h, k, j, i) = Temperature(h, k, j, i)
-	      * (1 + c * SpecificHumidity(h, k, j, i)
-		 / (1. - SpecificHumidity(h, k, j, i)));
+    for (h = 0; h < Nt; h++)
+      for (k = 0; k < Nz; k++)
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            VirtualTemperature(h, k, j, i) = Temperature(h, k, j, i)
+              * (1 + c * SpecificHumidity(h, k, j, i)
+                 / (1. - SpecificHumidity(h, k, j, i)));
 
   }
 

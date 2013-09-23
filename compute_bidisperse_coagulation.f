@@ -1,23 +1,23 @@
 C-----------------------------------------------------------------------
 C     Copyright (C) 2006-2007, ENPC - INRIA - EDF R&D
 C     Author(s): Vivien Mallet, Edouard Debry
-C     
+C
 C     This file is part of AtmoData library, a tool for data processing
 C     in atmospheric sciences.
-C    
+C
 C     AtmoData is developed in the INRIA - ENPC joint project-team CLIME
 C     and in the ENPC - EDF R&D joint laboratory CEREA.
-C    
+C
 C     AtmoData is free software; you can redistribute it and/or modify
 C     it under the terms of the GNU General Public License as published
 C     by the Free Software Foundation; either version 2 of the License,
 C     or (at your option) any later version.
-C     
+C
 C     AtmoData is distributed in the hope that it will be useful, but
 C     WITHOUT ANY WARRANTY; without even the implied warranty of
 C     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 C     General Public License for more details.
-C     
+C
 C     For more information, visit the AtmoData home page:
 C          http://cerea.enpc.fr/polyphemus/atmodata.html
 C-----------------------------------------------------------------------
@@ -73,11 +73,11 @@ c     eventually correct inputs
       d2c = dmax1(d2, dmin)
       m1c = dmax1(m1, mmin)
       m2c = dmax1(m2, mmin)
-      
+
 c     knudsen number for particles in air
       kn1 = 2.d0 * airfmp / d1c ! adim
       kn2 = 2.d0 * airfmp / d2c ! adim
-      
+
 c     diffusion coefficient
       cdif1 = Kb                ! J.K-1
      $     * temp               ! k
@@ -85,7 +85,7 @@ c     diffusion coefficient
      $     / muair              ! air viscosity kg.m - 1.s - 1
      $     / d1c                ! µm
      $     * 1.d06              ! convert µm - > m
-      
+
       cor1 = ( 5.D0+( kn1*( 4.D0
      $     + 6.d0 * kn1 * ( 1.d0 + 3.d0 * kn1))) )
      $     / ( 5.d0 + kn1 * ((8.d0 + pi) * kn1 - 1.d0) )
@@ -98,12 +98,12 @@ c     diffusion coefficient
      $     / muair              ! air viscosity kg.m - 1.s - 1
      $     / d2c                ! µm
      $     * 1.d06              ! convert µm - > m
-      
+
 
       cor2 = ( 5.D0+( kn2*( 4.D0
      $     + 6.d0 * kn2 * ( 1.d0 + 3.d0 * kn2))) )
      $     / ( 5.d0 + kn2 * ((8.d0 + pi) * kn2 - 1.d0) )
-      
+
       cdif2 = cdif2 * cor2      ! m2.s-1
 
 c     mean quadratic aerosol velocity  ! m.s-1
@@ -112,7 +112,7 @@ c     mean quadratic aerosol velocity  ! m.s-1
      $     * temp               ! k
      $     / m1c                ! µg
      $     * 1.d09 )            ! convert µg - > kg
-      
+
       vm2 = dsqrt( 8.d0 / pi    ! adim
      $     * kb                 ! j.k - 1
      $     * temp               ! k
@@ -123,22 +123,22 @@ c     average values
       cdifp=(cdif1+cdif2)*5.D-01 ! m2.s-1
       vmp = dsqrt(vm1 * vm1 + vm2 * vm2) ! m.s - 1
       dp = (d1c + d2c) * 5.d-01 ! µm
-      
+
       lambdap = 8.d0 / pi
      $     * cdifp              ! m2.s - 1
      $     / vmp                ! m.s - 1
      $     * 1.d06              ! convert m to µm
-      
+
       knp = 2.d0
      $     * lambdap            ! µm
      $     / dp                 ! µm
 
       if (knp.le.knmin) then
-         
+
          call compute_coagulation_continuous(dp, cdifp, kercg)
-         
+
       elseif(knp.ge.knmax) then
-         
+
          call compute_coagulation_free_molecular(dp, vmp, stick, kercg)
 
       else
@@ -161,7 +161,7 @@ c     average values
      $        * (((1.d0 + kn1) ** 3.d0
      $        - (1.d0 + kn1 * kn1) ** 1.5d0 )
      $        * frac3 / kn1 - 1.d0)
-         
+
          delta2 = d2c           ! µm
      $        * (((1.d0 + kn2) ** 3.d0
      $        - (1.d0 + kn2 * kn2) ** 1.5d0 )
@@ -175,7 +175,7 @@ c     average values
 
          deltap = dsqrt( delta1 * delta1
      $        + delta2 * delta2 )
-         
+
          call compute_coagulation_free_transition(dp, cdifp, deltap,
      $        vmp, stick, kercg)
 

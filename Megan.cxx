@@ -113,7 +113,7 @@ namespace AtmoData
     T Topt = 313. + 0.6 * (daily_temperature - 297.);
     T x = ((1 / Topt) - (1 / temperature)) / 0.00831;
     return Eopt * CT2 * exp(CT1 * x)
-         / CT2 - CT1 * (1. - exp(CT2 * x));
+      / CT2 - CT1 * (1. - exp(CT2 * x));
   }
 
 
@@ -143,7 +143,7 @@ namespace AtmoData
     if (sinangle >= 0.0)
       {
         T top_PAR = 3000.0
-            + 99.0 * cos(2.0 * 3.14 - float((iday - 10)) / 365.0);
+          + 99.0 * cos(2.0 * 3.14 - float((iday - 10)) / 365.0);
         T phi = PAR / (sinangle * top_PAR);
         T B = 1.0 + 0.0005 * (daily_PAR - 400.0);
         T A = 2.46 * B * phi - 0.9 * pow(phi, 2);
@@ -157,7 +157,7 @@ namespace AtmoData
 
   template <class T>
   T GammaAGE(const string& species, T LAIp, T LAIc,
-                T daily_temperature, T t)
+             T daily_temperature, T t)
   {
     T Fnew, Fgro, Fmat, Fold;
     T ti, tm;
@@ -309,7 +309,7 @@ namespace AtmoData
                             for (y = 0; y < Ny; y++)
                               for (t = 0; t < Nt; t++)
                                 emissions(i, t, y, x) += coefficient
-                                    * emis_out(k, y, x, t);
+                                  * emis_out(k, y, x, t);
                   }
           }
       }

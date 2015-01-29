@@ -3,6 +3,26 @@ o------------------o
 o------------------o
 
 
+Version 1.5 (2015-04-20)
+-----------
+
+** Improvements:
+
+- Added MEGAN biogenic emission model.
+- Added new functions for optical and aerosol calculations.
+- Renamed 'ComputeCloudHeight' to 'ComputeCloudBaseHeight', and added
+  'ComputeCloudTopHeight'.
+- Updated formula for the Lambert conformal conic projection.
+- Better split header files and source files.
+
+** Bug fix:
+
+- The include guard of "Format.cxx" was the same as the include guard of
+  "Format.hxx".
+- There was a dimension overflow in a Blitz array (It was harmless because the
+  array is not used in this version of AtmoData).
+
+
 Version 1.4.3 (2010-11-03)
 -------------
 

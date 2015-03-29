@@ -605,7 +605,7 @@ namespace AtmoData
 
     BHI.resize(20, 50);
     BHR.resize(20, 20);
-    BHIC.resize(50, 20);
+    BHIC.resize(20, 50);
     BHRC.resize(20, 20);
 
     FileStream.read(reinterpret_cast<char*>(BHI.data()), 1000 * sizeof(int));

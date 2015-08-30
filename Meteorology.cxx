@@ -1218,7 +1218,7 @@ namespace AtmoData
     \param CloudBaseHeight (output) altitudes of cloud basis.
   */
   template < class TP, class TH,
-           class T, class TG >
+             class T, class TG >
   void ComputeCloudBaseHeight(Data<TP, 4, TG>& Pressure,
                               Data<TH, 4, TG>& RelativeHumidity,
                               T(CriticalRelativeHumidity)(const T&, const T&,
@@ -1466,7 +1466,7 @@ namespace AtmoData
                                    TLC high_cloudiness)
   {
     return 1. - (1. - low_cloudiness) * (1. - medium_cloudiness)
-           * (1. - high_cloudiness);
+      * (1. - high_cloudiness);
   }
 
 
@@ -1526,6 +1526,43 @@ namespace AtmoData
 
   //! Computes the pressure from the surface pressure.
   /*!
+
+    For MACC files, computes with 4D surface pressure !
+
+    Formula: Pressure_k = alpha_k * P0 + beta_k * SurfacePressure,
+    where k is the level index.
+    \param alpha coefficients.
+    \param beta coefficients.
+    \param SurfacePressure surface pressure.
+    \param Pressure (output) pressure.
+    \param P0 (optional) standard pressure. Default: 101325 Pa.
+  */
+  template < class Ta, class Tb, class TSP,
+             class T, class TG >
+  void Compute4DPressure(Data<Ta, 1, TG>& alpha, Data<Tb, 1, TG>& beta,
+                         Data<TSP, 4, TG>& SurfacePressure,
+                         Data<T, 4, TG>& Pressure, T P0)
+  {
+
+    int h, i, j, k;
+
+    int Nx = Pressure.GetLength(3);
+    int Ny = Pressure.GetLength(2);
+    int Nz = Pressure.GetLength(1);
+    int Nt = Pressure.GetLength(0);
+
+    for (h = 0; h < Nt; h++)
+      for (k = 0; k < Nz; k++)
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            Pressure(h, k, j, i) = alpha(k)
+              + beta(k) * SurfacePressure(h, 0, j, i);
+
+  }
+
+
+  //! Computes the pressure from the surface pressure.
+  /*!
     Formula: Pressure_k = alpha_k * P0 + beta_k * SurfacePressure,
     where k is the level index.
     \param alpha coefficients.
@@ -1554,6 +1591,48 @@ namespace AtmoData
           for (i = 0; i < Nx; i++)
             Pressure(h, k, j, i) = alpha(k) * P0
               + beta(k) * SurfacePressure(h, j, i);
+
+  }
+
+
+  //! Computes the altitudes from pressure fields.
+  /*!
+    Level heights are computed according to:
+    Z_k = (-r/a)*[-1 + (P_k/P0)^(1/5.255)]
+    where Z is the altitude, P the pressure,
+    k the level index, r the normalized temperature,
+    and a the vertical temperature gradient.
+    \param Pressure pressure (Pa).
+    \param Height (output) altitudes (m).
+    \param a (optional) Vertical temperature gradient. Default: 0.65K for 100m.
+    \param r (optional) Normalized temperature. Default: 288.15.
+    \note Pressure and Height must be defined on the same grid.
+  */
+  template<class TPS, class TP, class TT, class T, class TG>
+  void Compute4DHeight(Data<TPS, 4, TG>& SurfacePressure,
+                       Data<TP, 4, TG>& Pressure,
+                       Data<TT, 4, TG>& Temperature,
+                       Grid<T>& Height, T g, T r)
+  {
+
+    int h, i, j, k;
+
+    int Nx = Height.GetLength(3);
+    int Ny = Height.GetLength(2);
+    int Nz = Height.GetLength(1);
+    int Nt = Height.GetLength(0);
+
+    for (h = 0; h < Nt; h++)
+      for (k = 0; k < Nz; k++)
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            if (k == 0)
+              Height.Value(h, k, j, i) = r / g * Temperature(h, k, j, i)
+                * log(SurfacePressure(h, 0, j, i) / Pressure(h, k, j, i));
+            else
+              Height.Value(h, k, j, i) = Height.Value(h, k - 1, j, i)
+                - r / g * Temperature(h, k, j, i)
+                * log(Pressure(h, k, j, i) / Pressure(h, k - 1, j, i));
 
   }
 

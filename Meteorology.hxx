@@ -220,16 +220,28 @@ namespace AtmoData
 
 
   template < class Ta, class Tb, class TSP,
-           class T, class TG >
+             class T, class TG >
   void ComputePressure(Data<Ta, 1, TG>& alpha, Data<Tb, 1, TG>& beta,
                        Data<TSP, 3, TG>& SurfacePressure,
                        Data<T, 4, TG>& Pressure, T P0 = 101325.);
+
+  template < class Ta, class Tb, class TSP,
+             class T, class TG >
+  void Compute4DPressure(Data<Ta, 1, TG>& alpha, Data<Tb, 1, TG>& beta,
+                         Data<TSP, 4, TG>& SurfacePressure,
+                         Data<T, 4, TG>& Pressure, T P0 = 101325.);
 
   template<class TPS, class TP, class TT, class T, class TG>
   void ComputeHeight(Data<TPS, 3, TG>& SurfacePressure,
                      Data<TP, 4, TG>& Pressure,
                      Data<TT, 4, TG>& Temperature,
                      Grid<T>& Height, T g = 9.80665, T r = 287.0);
+
+  template<class TPS, class TP, class TT, class T, class TG>
+  void Compute4DHeight(Data<TPS, 4, TG>& SurfacePressure,
+                       Data<TP, 4, TG>& Pressure,
+                       Data<TT, 4, TG>& Temperature,
+                       Grid<T>& Height, T g = 9.80665, T r = 287.0);
 
   template<class TP, class TT, class T, class TG>
   void ComputeInterfHeight(Data<TP, 4, TG>& Pressure,

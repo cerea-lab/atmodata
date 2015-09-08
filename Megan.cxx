@@ -113,7 +113,7 @@ namespace AtmoData
     T Topt = 313. + 0.6 * (daily_temperature - 297.);
     T x = ((1 / Topt) - (1 / temperature)) / 0.00831;
     return Eopt * CT2 * exp(CT1 * x)
-      / CT2 - CT1 * (1. - exp(CT2 * x));
+      / (CT2 - CT1 * (1. - exp(CT2 * x)));
   }
 
 

@@ -128,9 +128,9 @@ namespace AtmoData
       {
         T frac = species_concentration(i) / global_concentration;
         global_refractive_index_real +=
-                   frac * species_refractive_index_real(i);
+          frac * species_refractive_index_real(i);
         global_refractive_index_imaginary +=
-                   frac * species_refractive_index_imaginary(i);
+          frac * species_refractive_index_imaginary(i);
       }
   }
 

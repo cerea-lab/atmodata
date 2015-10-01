@@ -55,7 +55,7 @@ namespace AtmoData
 #define _compute_gas_diffusivity compute_gas_diffusivity__
 #define _gerber_wet_diameter gerber_wet_diameter__
 #define _compute_collision_integral compute_collision_integral__
-#define _compute_condensation_transfer_rate        \
+#define _compute_condensation_transfer_rate	\
   compute_condensation_transfer_rate__
 #define _compute_quadratic_mean_velocity compute_quadratic_mean_velocity__
 #define _compute_saturation_concentration compute_saturation_concentration__
@@ -66,7 +66,7 @@ namespace AtmoData
 #define _compute_gas_diffusivity compute_gas_diffusivity_
 #define _gerber_wet_diameter gerber_wet_diameter_
 #define _compute_collision_integral compute_collision_integral_
-#define _compute_condensation_transfer_rate        \
+#define _compute_condensation_transfer_rate	\
   compute_condensation_transfer_rate_
 #define _compute_quadratic_mean_velocity compute_quadratic_mean_velocity_
 #define _compute_saturation_concentration compute_saturation_concentration_

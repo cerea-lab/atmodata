@@ -67,10 +67,10 @@ namespace AtmoData
   {
     // 'dry_diameter' and 'wet_diameter' unit is \mu m.
     const T C1(0.4989352162271429),
-             C2(0.3026183900844475e1),
-             C3(0.5372215625062934e-12),
-             C4(-0.1371059101078550e1),
-             C5(0.3942463621284677e-02);
+      C2(0.3026183900844475e1),
+      C3(0.5372215625062934e-12),
+      C4(-0.1371059101078550e1),
+      C5(0.3942463621284677e-02);
     const T temperature_ref(298.0);
 
     T dry_radius = (dry_diameter / 2.) * 1.e-4;
@@ -78,7 +78,7 @@ namespace AtmoData
     T wet_radius = wpower(C1 * wpower(dry_radius, C2) /
                           abs(aa * wpower(dry_radius, C4)
                               - log(relative_humidity))
-                         + wpower<double>(T(dry_radius), T(3.)), T(1.) / 3.);
+                          + wpower<double>(T(dry_radius), T(3.)), T(1.) / 3.);
     return 2. * wet_radius * 1.e4;
   }
 
@@ -101,17 +101,17 @@ namespace AtmoData
     const T pi = 3.14159265358979323846264;
 
     T global_aerosol_concentration =
-        dry_aerosol_concentration + water_concentration;
+      dry_aerosol_concentration + water_concentration;
 
     T aerosol_number = 6. * dry_aerosol_concentration /
-        (pi * wpower(dry_diameter, T(3.)) * dry_aerosol_density);
+      (pi * wpower(dry_diameter, T(3.)) * dry_aerosol_density);
 
     T global_aerosol_density = (dry_aerosol_density * dry_aerosol_concentration
                                 + water_density * water_concentration)
-        / global_aerosol_concentration;
+      / global_aerosol_concentration;
 
     return wpower(6. * global_aerosol_concentration
-            / (pi * global_aerosol_density * aerosol_number), T(1.) / 3.);
+                  / (pi * global_aerosol_density * aerosol_number), T(1.) / 3.);
   }
 
 }  // namespace AtmoData.

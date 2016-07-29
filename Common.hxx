@@ -52,7 +52,7 @@ namespace AtmoData
   template <class T, int N>
   inline void swap(Array<T, N>& A)
   {
-    for (int i = 0; i < A.size(); i++)
+    for (int i = 0; i < (int) A.size(); i++)
       swap(A.data()[i]);
   }
 

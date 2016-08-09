@@ -68,7 +68,7 @@ LogNormal::LogNormal(float Ntot0, float Dmean0, float Sigma0)
 }
 
 
-// Computes the number concentration at a given diameter (µm) for a lognormal
+// Computes the number concentration at a given diameter (Âµm) for a lognormal
 // distribution.
 float LogNormal::NumLogNormal(float diameter)
 {
@@ -82,7 +82,7 @@ float LogNormal::NumLogNormal(float diameter)
 }
 
 
-// Computes the volume concentration at a given diameter (µm) for a lognormal
+// Computes the volume concentration at a given diameter (Âµm) for a lognormal
 // distribution.
 float LogNormal::VolLogNormal(float diameter)
 {
@@ -180,7 +180,7 @@ ModalAerosol::ModalAerosol(float Dmin0, float Dmax0, float Ntot0, float Dmean0, 
 }
 
 // Computes the aerosol number concentration for a modal aerosol distribution
-// at a given diameter (µm).
+// at a given diameter (Âµm).
 float ModalAerosol::NumDensity(float diameter)
 {
   float num = 0.0;
@@ -191,7 +191,7 @@ float ModalAerosol::NumDensity(float diameter)
 }
 
 // Computes the aerosol number concentration for a modal aerosol distribution
-// at a given diameter (µm) for 7 modes.
+// at a given diameter (Âµm) for 7 modes.
 float ModalAerosol::NumDensity7(float diameter)
 {
   float num = 0.0;
@@ -207,7 +207,7 @@ float ModalAerosol::NumDensity7(float diameter)
 }
 
 // Computes the aerosol volume concentration for a modal aerosol distribution
-// at a given diameter (µm).
+// at a given diameter (Âµm).
 float ModalAerosol::VolDensity(float diameter)
 {
   float vol = 0.0;
@@ -218,7 +218,7 @@ float ModalAerosol::VolDensity(float diameter)
 }
 
 // Computes the aerosol volume concentration for a modal aerosol distribution
-// at a given diameter (µm) for 1 mode.
+// at a given diameter (Âµm) for 1 mode.
 float ModalAerosol::VolDensity1(float diameter)
 {
   float vol = 0.0;
@@ -229,7 +229,7 @@ float ModalAerosol::VolDensity1(float diameter)
 }
 
 // Computes the aerosol volume concentration for a modal aerosol distribution
-// at a given diameter (µm) for 7 modes.
+// at a given diameter (Âµm) for 7 modes.
 float ModalAerosol::VolDensity7(float diameter)
 {
   float vol = 0.0;

@@ -1,5 +1,5 @@
 // Copyright (C) 2006-2007, ENPC - INRIA - EDF R&D
-// Author(s): Irène Korsakissok
+// Author(s): IrÃ¨ne Korsakissok
 //
 // This file is part of AtmoData library, a tool for data processing in
 // atmospheric sciences.

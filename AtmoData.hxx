@@ -49,6 +49,7 @@ namespace AtmoData
 #include "Polair.cxx"
 #include "Aerosol.cxx"
 #include "Optics.cxx"
+#include "InterpolationChimere.cxx"
 
 #include "Format.cxx"
 

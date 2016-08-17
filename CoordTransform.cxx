@@ -28,6 +28,26 @@
 namespace AtmoData
 {
 
+  //!@{
+  //! Internal helpers.
+  const double pi = 3.14159265358979323846264;
+  const double conv = 360.0 / (2.0 * pi);
+
+  template <class T>
+  T kappa_from_phi(T phi1, T phi2)
+  {
+    if (phi1 == phi2)
+      return 1;
+    else
+      {
+        double aux1, aux2;
+        aux1 = (45.0 - abs(phi1) / 2.0) / conv;
+        aux2 = (45.0 - abs(phi2) / 2.0) / conv;
+        return (log10(cos(phi1 / conv)) - log10(cos(phi2 / conv)))
+          / (log10(tan(aux1)) - log10(tan(aux2)));
+      }
+  }
+  //!@}
 
   //! Default constructor.
   template <class T>
@@ -119,8 +139,7 @@ namespace AtmoData
 
     double ic0, jc0;
     double ic, jc;
-    double conv;
-    double aux1, aux2, kappa;
+    double kappa;
     double auxsig;
     double psi1;
     double auxc, yc;
@@ -138,12 +157,7 @@ namespace AtmoData
     ic = (ic0 - ix_) * ratio_;
     jc = (jc0 - jx_) * ratio_;
 
-    conv = 360.0 / (2.0 * pi_);
-
-    aux1 = (45.0 - abs(phi1_) / 2.0) / conv;
-    aux2 = (45.0 - abs(phi2_) / 2.0) / conv;
-    kappa = (log10(cos(phi1_ / conv)) - log10(cos(phi2_ / conv)))
-      / (log10(tan(aux1)) - log10(tan(aux2)));
+    kappa = kappa_from_phi(phi1_, phi2_);
 
     auxsig = phic_ > 0 ? 1.0 : -1.0;
 
@@ -212,7 +226,6 @@ namespace AtmoData
 
     double ic0, jc0;
     double ic, jc;
-    double conv;
     double aux1, aux2, kappa;
     double auxsig;
     double psi1;
@@ -223,12 +236,7 @@ namespace AtmoData
     ic0 = (imx_ + 1.0) / 2.0;
     jc0 = (jmx_ + 1.0) / 2.0;
 
-    conv = 360.0 / (2.0 * pi_);
-
-    aux1 = (45.0 - abs(phi1_) / 2.0) / conv;
-    aux2 = (45.0 - abs(phi2_) / 2.0) / conv;
-    kappa = (log10(cos(phi1_ / conv)) - log10(cos(phi2_ / conv)))
-      / (log10(tan(aux1)) - log10(tan(aux2)));
+    kappa = kappa_from_phi(phi1_, phi2_);
 
     auxsig = phic_ > 0 ? 1.0 : -1.0;
 
@@ -282,7 +290,6 @@ namespace AtmoData
     double ic, jc;
     double c2;
     double yc;
-    double conv;
     double aux;
     double x, y;
 
@@ -291,8 +298,6 @@ namespace AtmoData
 
     ic = (ic0 - ix_) * ratio_;
     jc = (jc0 - jx_) * ratio_;
-
-    conv = 180. / pi_;
 
     c2 = Earth_radius_ * cos(phi1_ / conv);
     aux = phic_ / conv;
@@ -339,14 +344,11 @@ namespace AtmoData
     double ic, jc;
     double c2;
     double yc;
-    double conv;
     double aux;
     double x, y;
 
     ic0 = (imx_ + 1.0) / 2.0;
     jc0 = (jmx_ + 1.0) / 2.0;
-
-    conv = 180. / pi_;
 
     c2 = Earth_radius_ * cos(phi1_ / conv);
     aux = phic_ / conv;
@@ -393,7 +395,6 @@ namespace AtmoData
 
     double ic0, jc0;
     double ic, jc;
-    double conv;
     double kappa;
     double auxsig;
     double psi1;
@@ -411,8 +412,6 @@ namespace AtmoData
 
     ic = (ic0 - ix_) * ratio_;
     jc = (jc0 - jx_) * ratio_;
-
-    conv = 180. / pi_;
 
     kappa = 1.0;
 
@@ -481,7 +480,6 @@ namespace AtmoData
 
     double ic0, jc0;
     double ic, jc;
-    double conv;
     double kappa;
     double auxsig;
     double psi1;
@@ -492,8 +490,6 @@ namespace AtmoData
 
     ic0 = (imx_ + 1.0) / 2.0;
     jc0 = (jmx_ + 1.0) / 2.0;
-
-    conv = 180. / pi_;
 
     kappa = 1.0;
 
@@ -545,10 +541,6 @@ namespace AtmoData
   void LonlatToWRFLccInd<T>::operator()(const T lon, const T lat,
                                         T& i, T& j)
   {
-
-    double conv;
-    conv = 360.0 / (2.0 * pi_);
-
     double cone, Rho, Rho0, theta, offset_i, offset_j;
 
     cone = (log10(cos(phi1_ / conv)) - log10(cos(phi2_ / conv)))
@@ -606,11 +598,8 @@ namespace AtmoData
 
     double c2;
     double yc;
-    double conv;
     double aux;
     double x, y;
-
-    conv = 180. / pi_;
 
     c2 = Earth_radius_ * cos(phi1_ / conv);
     aux = phic_ / conv;
@@ -658,16 +647,12 @@ namespace AtmoData
   void LonlatToWRFStereInd<T>::operator()(const T lon, const T lat,
                                           T& i, T& j)
   {
-
-    double conv;
     double kappa;
     double auxsig;
     double psi1;
     double auxc, yc;
     double aux, Rs;
     double auxij;
-
-    conv = 180. / pi_;
 
     kappa = 1.0;
 

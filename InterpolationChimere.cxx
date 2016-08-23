@@ -414,8 +414,7 @@ namespace AtmoData
                                     const Array<T, 2>& Weight_x,
                                     const Array<T, 2>& Weight_y,
                                     Array<T, 3>& GridZ_out,
-                                    Array<T, 4>& Field_out, T ground_threshold =
-                                        0.)
+                                    Array<T, 4>& Field_out, T ground_threshold)
     {
       int h, j, i;
 

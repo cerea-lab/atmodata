@@ -543,8 +543,11 @@ namespace AtmoData
   {
     double cone, Rho, Rho0, theta, offset_i, offset_j;
 
-    cone = (log10(cos(phi1_ / conv)) - log10(cos(phi2_ / conv)))
-      / (log10(tan(pi_ / 4 - phi1_ / 2 / conv)) - log10(tan(pi_ / 4 - phi2_ / 2 / conv)));
+    if (abs(phi1_) == abs(phi2_))
+      cone = sin(phi1_/conv);
+    else
+      cone = (log10(cos(phi1_ / conv)) - log10(cos(phi2_ / conv)))
+	/ (log10(tan(pi_ / 4 - phi1_ / 2 / conv)) - log10(tan(pi_ / 4 - phi2_ / 2 / conv)));
 
     Rho = Earth_radius_ * cos(phi1_ / conv) / cone
       * pow(tan(pi_ / 4 - lat / 2 / conv) / tan(pi_ / 4 - phi1_ / 2 / conv), cone);

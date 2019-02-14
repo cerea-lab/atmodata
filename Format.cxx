@@ -804,7 +804,7 @@ namespace AtmoData
     int time_step = 0;
 
     // Searches for specified field.
-    while (!is_empty(FileStream))
+    while (!is_emptystream(FileStream))
       {
         flag = this->ReadFlag(FileStream);
 

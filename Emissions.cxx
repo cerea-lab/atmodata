@@ -542,6 +542,7 @@ namespace AtmoData
   */
   template <class real>
   void GridCorrespondences(const Data<int, 2, real>& LUC,
+                           const string LUC_type,
                            Data<int, 2, real>& Nurb_emep,
                            Data<int, 2, real>& Nwat_emep,
                            Data<int, 2, real>& Nfor_emep,
@@ -600,18 +601,38 @@ namespace AtmoData
           int j_emep = int(ypol - M * tan(pi / 4. - lat / 2.)
                            * cos(lon + 32. * pi / 180.) - 0.5);
 
-          if (i_emep >= 0 && i_emep < Nx_emep && j_emep >= 0
-              && j_emep < Ny_emep)
-            if (LUC(j, i) == 13)
-              Nurb_emep(j_emep, i_emep) += 1;
-            else if (LUC(j, i) == 0)
-              Nwat_emep(j_emep, i_emep) += 1;
-            else if (LUC(j, i) >= 1 && LUC(j, i) <= 6)
-              Nfor_emep(j_emep, i_emep) += 1;
-            else if (LUC(j, i) >= 7 && LUC(j, i) <= 12)
-              Noth_emep(j_emep, i_emep) += 1;
-            else
-              throw "Error in GridCorrespondences: LUC index out of range.";
+          if (LUC_type == "glcf")
+            {
+              if (i_emep >= 0 && i_emep < Nx_emep && j_emep >= 0
+                  && j_emep < Ny_emep)
+                if (LUC(j, i) == 13) // urban
+                  Nurb_emep(j_emep, i_emep) += 1;
+                else if (LUC(j, i) == 0) // water
+                  Nwat_emep(j_emep, i_emep) += 1;
+                else if (LUC(j, i) >= 1 && LUC(j, i) <= 6) // forest
+                  Nfor_emep(j_emep, i_emep) += 1;
+                else if (LUC(j, i) >= 7 && LUC(j, i) <= 12) // others
+                  Noth_emep(j_emep, i_emep) += 1;
+                else
+                  throw "Error in GridCorrespondences: LUC index out of range.";
+            }
+          else if (LUC_type == "glc2000")
+            {
+              if (i_emep >= 0 && i_emep < Nx_emep && j_emep >= 0
+                  && j_emep < Ny_emep)
+                if (LUC(j, i) == 22) // urban
+                  Nurb_emep(j_emep, i_emep) += 1;
+                else if (LUC(j, i) == 20) // water
+                  Nwat_emep(j_emep, i_emep) += 1;
+                else if (LUC(j, i) >= 1 && LUC(j, i) <= 10) // forest
+                  Nfor_emep(j_emep, i_emep) += 1;
+                else if ((LUC(j, i) >= 11 && LUC(j, i) <= 19) or (LUC(j, i) == 21) or (LUC(j, i) == 23)) // others
+                  Noth_emep(j_emep, i_emep) += 1;
+                else
+                  throw "Error in GridCorrespondences: LUC index out of range.";
+            }
+          else
+            throw "Error in GridCorrespondences: wrong LUC type.";
 
           lon = x_min_luc + i * delta_x_luc; // deg
           lat = y_min_luc + j * delta_y_luc; // deg
@@ -864,6 +885,7 @@ namespace AtmoData
   */
   template <class real>
   void EmepToLatLon(const Data<int, 2, real>& LUC,
+                    const string LUC_type,
                     const real Ratio_urb,
                     const real Ratio_for,
                     const real Ratio_oth,
@@ -935,59 +957,120 @@ namespace AtmoData
           if (i_emep >= 0 && i_emep < Nx_emep && j_emep >= 0 && j_emep < Ny_emep
               && i_polair >= 0 && i_polair < Nx && j_polair >= 0 && j_polair < Ny)
             {
-              if (LUC(j, i) == 0)
+              if (LUC_type == "glcf")
                 {
-                  Ratio = 1. / real(Nwat_emep(j_emep, i_emep));
-                  for (l = 0; l < Nsp_emis; l++)
-                    for (s = 0; s < Nsectors; s++)
-                      for (iter = Emis_water(l, j_emep, i_emep, s).begin();
-                           iter != Emis_water(l, j_emep, i_emep, s).end(); ++iter)
-                        {
-                          iter_out = Emis_out(l, s, j_polair, i_polair).begin();
-                          while (iter_out != Emis_out(l, s, j_polair, i_polair).end()
-                                 && iter_out->country_ != iter->country_)
-                            ++iter_out;
-                          if (iter_out != Emis_out(l, s, j_polair, i_polair).end())
-                            iter_out->emission_ += iter->emission_ * Ratio;
-                          else
-                            Emis_out(l, s, j_polair, i_polair).push_back(EmepCountryEmission<real>(iter->emission_ * Ratio, iter->country_));
-                        }
-                }
+                  if (LUC(j, i) == 0) // water
+                    {
+                      Ratio = 1. / real(Nwat_emep(j_emep, i_emep));
+                      for (l = 0; l < Nsp_emis; l++)
+                        for (s = 0; s < Nsectors; s++)
+                          for (iter = Emis_water(l, j_emep, i_emep, s).begin();
+                               iter != Emis_water(l, j_emep, i_emep, s).end(); ++iter)
+                            {
+                              iter_out = Emis_out(l, s, j_polair, i_polair).begin();
+                              while (iter_out != Emis_out(l, s, j_polair, i_polair).end()
+                                     && iter_out->country_ != iter->country_)
+                                ++iter_out;
+                              if (iter_out != Emis_out(l, s, j_polair, i_polair).end())
+                                iter_out->emission_ += iter->emission_ * Ratio;
+                              else
+                                Emis_out(l, s, j_polair, i_polair).push_back(EmepCountryEmission<real>(iter->emission_ * Ratio, iter->country_));
+                            }
+                    }
+                  else
+                    {
+                      if (LUC(j, i) == 13) 
+                        Ratio = Ratio_urb
+                          / real(Ratio_urb * Nurb_emep(j_emep, i_emep)
+                                 + Ratio_for * Nfor_emep(j_emep, i_emep)
+                                 + Ratio_oth * Noth_emep(j_emep, i_emep));
+
+                      if (LUC(j, i) >= 1 && LUC(j, i) <= 6)
+                        Ratio = Ratio_for
+                          / real(Ratio_urb * Nurb_emep(j_emep, i_emep)
+                                 + Ratio_for * Nfor_emep(j_emep, i_emep)
+                             + Ratio_oth * Noth_emep(j_emep, i_emep));
+
+                      if (LUC(j, i) >= 7 && LUC(j, i) <= 12)
+                        Ratio = Ratio_oth
+                          / real(Ratio_urb * Nurb_emep(j_emep, i_emep)
+                                 + Ratio_for * Nfor_emep(j_emep, i_emep)
+                                 + Ratio_oth * Noth_emep(j_emep, i_emep));
+
+                      for (l = 0; l < Nsp_emis; l++)
+                        for (s = 0; s < Nsectors; s++)
+                          for (iter = Emis_land(l, j_emep, i_emep, s).begin();
+                               iter != Emis_land(l, j_emep, i_emep, s).end(); ++iter)
+                            {
+                              iter_out = Emis_out(l, s, j_polair, i_polair).begin();
+                              while (iter_out != Emis_out(l, s, j_polair, i_polair).end()
+                                     && iter_out->country_ != iter->country_)
+                                ++iter_out;
+                              if (iter_out != Emis_out(l, s, j_polair, i_polair).end())
+                                iter_out->emission_ += iter->emission_ * Ratio;
+                              else
+                                Emis_out(l, s, j_polair, i_polair).push_back(EmepCountryEmission<real>(iter->emission_ * Ratio, iter->country_));
+                            }
+                    } // other than water
+                } // "glcf"
+              else if (LUC_type == "glc2000")
+                {
+                  if (LUC(j, i) == 20) // water
+                    {
+                      Ratio = 1. / real(Nwat_emep(j_emep, i_emep));
+                      for (l = 0; l < Nsp_emis; l++)
+                        for (s = 0; s < Nsectors; s++)
+                          for (iter = Emis_water(l, j_emep, i_emep, s).begin();
+                               iter != Emis_water(l, j_emep, i_emep, s).end(); ++iter)
+                            {
+                              iter_out = Emis_out(l, s, j_polair, i_polair).begin();
+                              while (iter_out != Emis_out(l, s, j_polair, i_polair).end()
+                                     && iter_out->country_ != iter->country_)
+                                ++iter_out;
+                              if (iter_out != Emis_out(l, s, j_polair, i_polair).end())
+                                iter_out->emission_ += iter->emission_ * Ratio;
+                              else
+                                Emis_out(l, s, j_polair, i_polair).push_back(EmepCountryEmission<real>(iter->emission_ * Ratio, iter->country_));
+                            }
+                    }
+                  else
+                    {
+                      if (LUC(j, i) == 22) // urban
+                        Ratio = Ratio_urb
+                          / real(Ratio_urb * Nurb_emep(j_emep, i_emep)
+                                 + Ratio_for * Nfor_emep(j_emep, i_emep)
+                                 + Ratio_oth * Noth_emep(j_emep, i_emep));
+
+                      if (LUC(j, i) >= 1 && LUC(j, i) <= 10) // forest
+                        Ratio = Ratio_for
+                          / real(Ratio_urb * Nurb_emep(j_emep, i_emep)
+                                 + Ratio_for * Nfor_emep(j_emep, i_emep)
+                             + Ratio_oth * Noth_emep(j_emep, i_emep));
+
+                      if ((LUC(j, i) >= 11 && LUC(j, i) <= 19) or (LUC(j, i) == 21) or (LUC(j, i) == 23)) // others
+                        Ratio = Ratio_oth
+                          / real(Ratio_urb * Nurb_emep(j_emep, i_emep)
+                                 + Ratio_for * Nfor_emep(j_emep, i_emep)
+                                 + Ratio_oth * Noth_emep(j_emep, i_emep));
+
+                      for (l = 0; l < Nsp_emis; l++)
+                        for (s = 0; s < Nsectors; s++)
+                          for (iter = Emis_land(l, j_emep, i_emep, s).begin();
+                               iter != Emis_land(l, j_emep, i_emep, s).end(); ++iter)
+                            {
+                              iter_out = Emis_out(l, s, j_polair, i_polair).begin();
+                              while (iter_out != Emis_out(l, s, j_polair, i_polair).end()
+                                     && iter_out->country_ != iter->country_)
+                                ++iter_out;
+                              if (iter_out != Emis_out(l, s, j_polair, i_polair).end())
+                                iter_out->emission_ += iter->emission_ * Ratio;
+                              else
+                                Emis_out(l, s, j_polair, i_polair).push_back(EmepCountryEmission<real>(iter->emission_ * Ratio, iter->country_));
+                            }
+                    } // other than water
+                } // "glc2000"
               else
-                {
-                  if (LUC(j, i) == 13)
-                    Ratio = Ratio_urb
-                      / real(Ratio_urb * Nurb_emep(j_emep, i_emep)
-                             + Ratio_for * Nfor_emep(j_emep, i_emep)
-                             + Ratio_oth * Noth_emep(j_emep, i_emep));
-
-                  if (LUC(j, i) >= 1 && LUC(j, i) <= 6)
-                    Ratio = Ratio_for
-                      / real(Ratio_urb * Nurb_emep(j_emep, i_emep)
-                             + Ratio_for * Nfor_emep(j_emep, i_emep)
-                             + Ratio_oth * Noth_emep(j_emep, i_emep));
-
-                  if (LUC(j, i) >= 7 && LUC(j, i) <= 12)
-                    Ratio = Ratio_oth
-                      / real(Ratio_urb * Nurb_emep(j_emep, i_emep)
-                             + Ratio_for * Nfor_emep(j_emep, i_emep)
-                             + Ratio_oth * Noth_emep(j_emep, i_emep));
-
-                  for (l = 0; l < Nsp_emis; l++)
-                    for (s = 0; s < Nsectors; s++)
-                      for (iter = Emis_land(l, j_emep, i_emep, s).begin();
-                           iter != Emis_land(l, j_emep, i_emep, s).end(); ++iter)
-                        {
-                          iter_out = Emis_out(l, s, j_polair, i_polair).begin();
-                          while (iter_out != Emis_out(l, s, j_polair, i_polair).end()
-                                 && iter_out->country_ != iter->country_)
-                            ++iter_out;
-                          if (iter_out != Emis_out(l, s, j_polair, i_polair).end())
-                            iter_out->emission_ += iter->emission_ * Ratio;
-                          else
-                            Emis_out(l, s, j_polair, i_polair).push_back(EmepCountryEmission<real>(iter->emission_ * Ratio, iter->country_));
-                        }
-                }
+                throw "Error in EmepToLatLon: wrong LUC type.";
             }
         }
 

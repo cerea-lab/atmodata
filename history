@@ -2,6 +2,13 @@ o------------------o
 | ATMODATA HISTORY |
 o------------------o
 
+Version 1.5.3 (2019-08-02)
+-------------
+
+** Improvements:
+- Corrections for compatibility to C+11
+- Added Merikanto ternary nucleation function
+
 Version 1.5.2 (2018-04-10)
 -------------
 

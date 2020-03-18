@@ -138,9 +138,16 @@ c     test if parameterization is valid.
 
          jnucl = dexp(lnj)
 
-         if(jnucl.lt.1.d-5) jnucl = 0.d0
-         if(jnucl.gt.1.d6) jnucl = 1.d6
-
+         if(jnucl.lt.1.d-5) then
+             jnucl = 0.d0
+             ntoth2so4 = 0.d0
+             ntotnh3 = 0.d0
+             dpnucl = 1.d0
+         else 
+           if(jnucl.gt.1.d6) then
+              jnucl = 1.d6
+              lnj = dlog(jnucl)
+            endif
 c     compute total number of molecules in the critical cluster: this is
 c     ntot.
 
@@ -160,6 +167,7 @@ c     compute cluster diameter in nm.
      s        - 0.00003076d0 * temp * lnj
      s        + 0.0000108375d0 * temp ** 2)
 
+        endif
       endif
 
       end

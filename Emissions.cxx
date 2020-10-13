@@ -915,7 +915,9 @@ namespace AtmoData
   */
   template <class real>
   void ReadEmep01(Date date, const vector<string>& Sp_emis_names,
-		  string input_directory, string input_file,
+		  string input_directory,
+                  string Filename_suffix,
+                  string input_file,
 		  string file_snap_correspondance,
 		  const Data<real, 3>& MonthlyFactors,
 		  const Data<real, 3>& DailyFactors,
@@ -979,14 +981,14 @@ namespace AtmoData
     
     // Finds the day of the week.
     int day = date.GetWeekDay();
-
+    int year = date.GetYear();
     for (int l = 0; l < Nsp_emis; l++)
       {        
 	for (int s_in = 0; s_in < N_sector_in; s_in++)
 	  {
 	    string emis_file;
             emis_file = input_directory + Sp_emis_names[l] + "_" + input_snap[s_in]
-              + "_2019_GRID_2017.txt";
+              + "_" + Filename_suffix + ".txt";
 
 	    ExtStream EmepEmisStream(emis_file);
 	    if (!EmepEmisStream.is_open())

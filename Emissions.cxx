@@ -1379,6 +1379,12 @@ namespace AtmoData
         {
           surface = Ntot_polair(j, i) * factor
             * cos(Ntot_polair[0](j) * ratio_pi);
+         if (surface == 0)
+           throw string("\nSurface is zero in Emissions.cxx ") +
+             to_str(Ntot_polair(j, i)) + " " +
+             to_str(factor) + " " +
+             to_str(cos(Ntot_polair[0](j)));
+                   
           for (l = 0; l < Nsp_emis; l++)
             for (s = 0 ; s < Nsectors; s++)
               for (iter_out = Emis_out(l, s, j, i).begin();

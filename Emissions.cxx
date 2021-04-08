@@ -640,9 +640,9 @@ namespace AtmoData
           int i_polair = -999;
           int j_polair = -999;
           if (lon >= x_min)
-            i_polair = int(round((lon - x_min) / Delta_x));
+            i_polair = int(trunc((lon - x_min) / Delta_x));
           if (lat >= y_min)
-            j_polair = int(round((lat - y_min) / Delta_y));
+            j_polair = int(trunc((lat - y_min) / Delta_y));
 
           if (i_polair >= 0 && i_polair < Nx && j_polair >= 0
               && j_polair < Ny)
@@ -724,8 +724,8 @@ namespace AtmoData
           // x_min_emep and y_min_emep correspond to the edge of left-bottom grid cell.
           if ((lon >= x_min_emep) and (lat >= y_min_emep))
             {
-              i_emep = int(round((lon - x_min_emep) / delta_x_emep));
-              j_emep = int(round((lat - y_min_emep) / delta_y_emep));
+              i_emep = int(trunc((lon - x_min_emep) / delta_x_emep));
+              j_emep = int(trunc((lat - y_min_emep) / delta_y_emep));
             }
 
           if (i_emep >= 0 && i_emep < Nx_emep && j_emep >= 0
@@ -746,9 +746,9 @@ namespace AtmoData
           int i_polair = -999;
           int j_polair = -999;
           if (lon >= x_min)
-            i_polair = int(round((lon - x_min) / Delta_x));
+            i_polair = int(trunc((lon - x_min) / Delta_x));
           if (lat >= y_min)
-            j_polair = int(round((lat - y_min) / Delta_y));
+            j_polair = int(trunc((lat - y_min) / Delta_y));
 
           if (i_polair >= 0 && i_polair < Nx && j_polair >= 0
               && j_polair < Ny)
@@ -1012,8 +1012,8 @@ namespace AtmoData
 		lon = to_num<real>(v[4]); 
 		lat = to_num<real>(v[5]);
 
-                i = int(round((lon - x_min_center_emep) / delta_x_emep));
-                j = int(round((lat - y_min_center_emep) / delta_y_emep));
+                i = int(trunc((lon - x_min_center_emep) / delta_x_emep));
+                j = int(trunc((lat - y_min_center_emep) / delta_y_emep));
                 
 		quantity = to_num<real>(v[7]);
 		
@@ -1245,8 +1245,8 @@ namespace AtmoData
           lon = x_min_luc + i * delta_x_luc; // deg
           lat = y_min_luc + j * delta_y_luc; // deg
 
-          int i_polair = int (round((lon - x_min) / Delta_x));
-          int j_polair = int (round((lat - y_min) / Delta_y));
+          int i_polair = int (trunc((lon - x_min) / Delta_x));
+          int j_polair = int (trunc((lat - y_min) / Delta_y));
 
           if (i_emep >= 0 && i_emep < Nx_emep && j_emep >= 0 && j_emep < Ny_emep
               && i_polair >= 0 && i_polair < Nx && j_polair >= 0 && j_polair < Ny)
@@ -1481,16 +1481,16 @@ namespace AtmoData
           int j_emep = -999;
           if ((lon_center >= x_min_emep) and (lat_center >= y_min_emep))
             {
-              i_emep = int(round((lon_center - x_min_emep) / delta_x_emep));
-              j_emep = int(round((lat_center - y_min_emep) / delta_y_emep));
+              i_emep = int(trunc((lon_center - x_min_emep) / delta_x_emep));
+              j_emep = int(trunc((lat_center - y_min_emep) / delta_y_emep));
             }
           
           int i_polair = -999;
           int j_polair = -999;
           if ((lon_center >= x_min) and (lat_center >= y_min))
             {
-              i_polair = int (round((lon_center - x_min) / Delta_x));
-              j_polair = int (round((lat_center - y_min) / Delta_y));
+              i_polair = int (trunc((lon_center - x_min) / Delta_x));
+              j_polair = int (trunc((lat_center - y_min) / Delta_y));
             }
           
           if (i_emep >= 0 && i_emep < Nx_emep && j_emep >= 0 && j_emep < Ny_emep

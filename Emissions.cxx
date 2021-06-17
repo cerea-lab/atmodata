@@ -1012,8 +1012,8 @@ namespace AtmoData
 		lon = to_num<real>(v[4]); 
 		lat = to_num<real>(v[5]);
 
-                i = int(trunc((lon - x_min_center_emep) / delta_x_emep));
-                j = int(trunc((lat - y_min_center_emep) / delta_y_emep));
+                i = int(trunc((lon - x_min_emep) / delta_x_emep));
+                j = int(trunc((lat - y_min_emep) / delta_y_emep));
                 
 		quantity = to_num<real>(v[7]);
 		

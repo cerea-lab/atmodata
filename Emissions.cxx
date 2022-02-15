@@ -350,16 +350,16 @@ namespace AtmoData
               speciation_stream >> Speciation_coeff(k);
 
             // NOX is given in NO2 equivalent units.
-            if (Sp_emis_names[l] == "NOX")
+            if (lower_case(Sp_emis_names[l]) == "nox")
               for (int k = 0; k < Nsectors; k++)
                 Speciation_coeff(k) *= molecular_weights_real / M_NO2;
 
             // SOX is given in SO2 equivalent units.
-            if (Sp_emis_names[l] == "SOX")
+	    if (lower_case(Sp_emis_names[l]) == "sox")
               for (int k = 0; k < Nsectors; k++)
                 Speciation_coeff(k) *= molecular_weights_real / M_SO2;
 
-            if (Sp_emis_names[l] != "NMVOC")
+	    if (lower_case(Sp_emis_names[l]) != "nmvoc" && lower_case(Sp_emis_names[l]) != "covnm")
               {
                 Sp_model_names[mm] = Sp_real_names;
                 for (int k = 0; k < Nsectors; k++)

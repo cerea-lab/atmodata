@@ -317,7 +317,7 @@ namespace AtmoData
 
     ExtStream aggregation_stream(aggregation_matrix);
     if (!aggregation_stream.is_open())
-      throw string(" File ") + input_file + " doesn't exist.";
+      throw string(" File ") + aggregation_matrix + " doesn't exist.";
 
     /*** Reads speciation ***/
 

@@ -38,6 +38,7 @@ namespace AtmoData
 #include "Common.hxx"
 
 #include "Meteorology.hxx"
+#include "MeteorologyStreet.hxx"
 #include "Kz.hxx"
 #include "TimeDiagnosis.hxx"
 #include "Photolysis.hxx"

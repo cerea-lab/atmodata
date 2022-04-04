@@ -403,14 +403,30 @@ namespace AtmoData
     Compute sH factor representing the effect of the canopy on the mixing length in the street (Wang 2012, 2014)
     \param H building height (m)
     \param W building width (m)
+    //! Arguments for trees:
+    \param hmax tree height (m)
+    \param LAI tree Leaf Area Index (-)
+    \param Cdt tree drag coefficient (-)
     \return sH factor (-)
   */
   template<class T>
-  T ComputeWangsH(T H, T W) 
+  T ComputeWangsH(T H, T W, T hmax, T LAI, T Cdt)
   {
     const T karman = 0.41; // Von Karman constant (-)
+    T sH;
     T lcb = 0.5 * W;
-    T sH = lcb / (karman * H + lcb);
+    if (LAI == 0.0 or hmax == 0.0)
+      sH = lcb / (karman * H + lcb);
+    else
+      {
+        const T Et = 0.5;
+        const T a0 = 3.26;
+        const T a1 = 0.0256;
+        const T a2 = 6.70;
+        T lct = Et * H / (Cdt * 0.5 * LAI);
+        T fbt = (a0 + a1 * exp(a2 * H / W))/(pow(hmax / H, 2.));
+        sH = (lcb * lct * fbt) / ((karman * H * (lcb + lct * fbt)) + (lcb * lct * fbt));
+      }
     return sH;
   }
 
@@ -424,10 +440,13 @@ namespace AtmoData
     \param sH factor representing the effect of the canopy on the mixing length in the street (-)
     \param nz number of points used to integrate the vertical wind profile (-)
     \param UH wind speed at roof level (z = H) (m/s)
+    //! Arguments for trees:
+    \param LAI tree Leaf Area Index (-)
+    \param Cdt tree drag coefficient (-)
     \return Ustreet average wind speed in the street (m/s)
   */
   template<class T>
-  T ComputeWangUstreet(T H, T W, T phi, T z0s, T sH, int nz, T UH) 
+  T ComputeWangUstreet(T H, T W, T phi, T z0s, T sH, int nz, T UH, T LAI, T Cdt)
   {
     const T pi = acos(-1);
     const T karman = 0.41; // Von Karman constant (-)
@@ -439,7 +458,14 @@ namespace AtmoData
     else
       throw string("wind angle is out of range ");
     T Cb = 0.31 * (1. - exp(-1.6 * (H / W))) * f_phi;
-    T alpha = Cb * (H / W)/(karman * sH);
+    T alpha;
+    if (LAI == 0.0)
+      alpha = Cb * (H / W)/(karman * sH);
+    else
+      {
+        const T Cu = 6.7;
+        alpha = (Cb * (H / W) + Cdt * Cu * 0.5 * LAI)/(karman * sH);
+      }
     T g_z0 = 2. * sqrt(alpha * z0s / H);
     T g_H = 2. * sqrt(alpha * H / H);
     T C1 = 1. / (BESSI0(g_H) - BESSI0(g_z0) * BESSK0(g_H) / BESSK0(g_z0));
@@ -469,15 +495,26 @@ namespace AtmoData
     \param z0s surface (street ground or walls) roughness height (m)
     \param sH factor representing the effect of the canopy on the mixing length in the street (-)
     \param ustar_H friction velocity above the street (m/s)
+    // Optional arguments for trees:
+    \param LAI tree Leaf Area Index (-)
+    \param Cdt tree drag coefficient (-)
+ 
     \return ustar friction velocity at the altitude z in the street (m/s)
   */
   template<class T>
-  T ComputeWangUstarProfile(T z, T H, T W, T z0s, T sH, T ustar_H)
+  T ComputeWangUstarProfile(T z, T H, T W, T z0s, T sH, T ustar_H, T LAI, T Cdt)
   {
     const T karman = 0.41; // Von Karman constant (-)
     T f_phi = 1.; // wind angle has no effect on ustar
     T Cb = 0.31 * (1. - exp(-1.6 * (H / W))) * f_phi;
-    T alpha = Cb * (H / W)/(karman * sH);
+    T alpha;
+    if (LAI == 0.0)
+      alpha = Cb * (H / W)/(karman * sH);
+    else
+      {
+        const T Cu = 6.7;
+        alpha = (Cb * (H / W) + Cdt * Cu * 0.5 * LAI)/(karman * sH);
+      }
     T g_z0 = 2. * sqrt(alpha * z0s / H);
     T g_H = 2. * sqrt(alpha * H / H);
     T C1 = (2. * ustar_H / (karman * sH * g_H)) / (BESSI1(g_H) + BESSI0(g_z0) * BESSK1(g_H) / BESSK0(g_z0)); // Wang (2014) profile version
@@ -487,7 +524,7 @@ namespace AtmoData
     T Kz = ustar_H * karman * z * sH;
     T ustar = sqrt(Kz * dU_dz);
     return ustar;
-  } 
+  }
 
   //! Compute the mixing length used in vertical transfer velocity calculation according to Schulte et al. (2015)
   /*!

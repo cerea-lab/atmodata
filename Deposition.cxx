@@ -150,6 +150,86 @@ namespace AtmoData
     return Rg;
   }
 
+  //! Gas deposition on tree leaves
+  //! Compute mesophyll resistance for gaseous species
+  /*!
+    \param Henry Henry constant for the species (mol/(L*atm))
+    \param f0 reactivity factor for the species (-)
+    \return Rmes mesophyll resistance for gaseous species (s/m)
+  */
+  template<class T>
+  T ComputeMesophyllResistance(T Henry, T f0)
+  {
+    T Rmes = pow(Henry / 3000. + 100. * f0, -1.);
+    return Rmes;
+  }
+
+  //! Compute cuticular resistance for gaseous species
+  //! on a dry leaf surface (Zhang et al., 2003)
+  /*!
+    \param RcutSO2 cuticular resistance for SO2 (s/m)
+    \param RcutO3 cuticular resistance for O3 (s/m)
+    \alpha species-dependent scaling factor (-)
+    \beta species-dependent scaling factor (-)
+    \param Tair air temperature (°C)
+    \param RH relative humidity (-)
+    \param LAI tree Leaf Area Index (-)
+    \return Rcut cuticular resistance for gaseous species (s/m)
+  */
+  template<class T>
+  T ComputeZhangCuticularResistance(T RcutSO2_d0, T RcutO3_d0, T alpha, T beta, T Tair, T RH, T ustar, T LAI)
+  {
+    T RcutSO2 = RcutSO2_d0 / (exp(0.03 * RH) * pow(LAI, 1/4) * ustar);
+    T RcutO3 = RcutO3_d0 / (exp(0.03 * RH) * pow(LAI, 1/4) * ustar);
+    T Rcut;
+    if (alpha == 0. && beta == 0.)
+      Rcut = 1e30;
+    else
+      Rcut = 1. / ((alpha / RcutSO2) + (beta / RcutO3));
+    if (Tair < -1.)
+      Rcut =  Rcut * exp(-0.2 * (1. + Tair));
+    return Rcut;
+  }
+
+  //! Compute cuticular resistance for gaseous species
+  //! on a dry leaf surface (Wesely, 1989; Walmsley and Wesely, 1996)
+  /*!
+    \param H Henry constant for the species (mol/(L*atm))
+    \param f0 reactivity factor for the species (-)
+    \param Tair air temperature (°C)
+    \param LAI tree Leaf Area Index (-)
+    \return Rcut cuticular resistance for gaseous species (s/m)
+  */
+  template<class T>
+  T ComputeWeselyCuticularResistance(T H, T f0, T Tair, T LAI)
+  {
+    T Rcut_ = 6000. - 4000. * tanh(1.6 * (LAI - 1.6)); // formula used in SURFEX to replace Wesely table
+    T Rcut = Rcut_ * pow(H * 1e-5 + f0, -1.);
+    if (Tair < -2.)
+      Rcut = Rcut * 1000. * exp(-(Tair + 4.));
+    return Rcut;
+  }
+
+  //! Compute stomatal resistance for gaseous species
+  //! on a dry leaf surface (Wesely, 1989; Walmsley and Wesely, 1996)
+  /*!
+    \param Dm molecular diffusivity for the species (cm2/s)
+    \param DmH2O molecular diffusivity for water vapor (cm2/s)
+    \param Rsmin minimum stomatal resistance for water vapor (s/m)
+    \param G incoming solar radiation (W/m2)
+    \param Ts leaf surface temperature (°C)
+    \return Rsto stomatal resistance for gaseous species (s/m)
+  */
+  template<class T>
+  T ComputeWeselyStomatalResistance(T Dm, T DmH2O, T Rsmin, T G, T Ts)
+  {
+    T RstoH2O = Rsmin * (1 + pow(200. / (G + 0.1), 2.)) * (400. / (Ts * (40. - Ts)));
+    T Rsto = RstoH2O * DmH2O / Dm;
+    if (Ts < 0. or Ts > 40.)
+      Rsto = 1e30;
+    return Rsto;
+  }
+
   //! Particles deposition
   //! Compute mean free path of air molecules
   /*!

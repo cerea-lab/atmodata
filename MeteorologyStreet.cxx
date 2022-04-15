@@ -466,8 +466,8 @@ namespace AtmoData
         const T Cu = 6.7;
         alpha = (Cb * (H / W) + Cdt * Cu * 0.5 * LAI)/(karman * sH);
       }
-    T g_z0 = 2. * sqrt(alpha * z0s / H);
-    T g_H = 2. * sqrt(alpha * H / H);
+    T g_z0 = 2. * sqrt(alpha * z0s / H); // g(z0s)
+    T g_H = 2. * sqrt(alpha * H / H); // g(H)
     T C1 = 1. / (BESSI0(g_H) - BESSI0(g_z0) * BESSK0(g_H) / BESSK0(g_z0));
     T C2 = -C1 * BESSI0(g_z0) / BESSK0(g_z0);
     T Ustreet = 0.;
@@ -508,9 +508,9 @@ namespace AtmoData
     T f_phi = 1.; // wind angle has no effect on ustar
     T Cb = 0.31 * (1. - exp(-1.6 * (H / W))) * f_phi;
     T alpha;
-    if (LAI == 0.0)
+    if (LAI == 0.0)   // Tree option is deactivated
       alpha = Cb * (H / W)/(karman * sH);
-    else
+    else             // Tree option is activated
       {
         const T Cu = 6.7;
         alpha = (Cb * (H / W) + Cdt * Cu * 0.5 * LAI)/(karman * sH);

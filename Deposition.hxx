@@ -40,6 +40,18 @@ namespace AtmoData
   T ComputeGroundResistance(T RgSO2, T RgO3, T alpha, T beta, T Tair);
 
   template<class T>
+  T ComputeMesophyllResistance(T H, T f0);
+
+  template<class T>
+  T ComputeZhangCuticularResistance(T RcutSO2_d0, T RcutO3_d0, T alpha, T beta, T Tair, T RH, T ustar, T LAI);
+
+  template<class T>
+  T ComputeWeselyCuticularResistance(T H, T f0, T Tair, T LAI);
+
+  template<class T>
+  T ComputeWeselyStomatalResistance(T Dm, T DmH2O, T Rsmin, T G, T Ts);
+
+  template<class T>
   T ComputeMeanFreePath(T Tair, T Pair, T dyn_vis);
 
   template<class T>

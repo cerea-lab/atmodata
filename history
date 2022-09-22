@@ -2,6 +2,14 @@ o------------------o
 | ATMODATA HISTORY |
 o------------------o
 
+
+# Version 1.6 (2022-09-22)
+-------------
+
+- Added new functions to compute transport and deposition in the street.
+- Added new functions to read 0.1 EMEP emission inventory.
+
+
 Version 1.5.3 (2019-08-02)
 -------------
 

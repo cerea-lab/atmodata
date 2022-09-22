@@ -117,12 +117,16 @@ namespace AtmoData
     const T pi = acos(-1);
     T gamma = 0.577; // Euler constant
     int nc = 100;
-    T maxC = 2.;
+    T maxC = 1.;    
     T step = maxC / nc;
     Array<T, 1> temp(nc);
     Array<T, 1> listC(nc);
     T tempC = 0.0;
     T solutionC;
+
+    if ((z0s / delta) > 0.01)
+      throw string("Please reduce the surface roughness length, z0_surface (current value: ") + to_str(z0s) + ").";
+    
     for (int i = 0; i < nc; ++i)
       {
         tempC += step;

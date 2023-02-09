@@ -1594,6 +1594,36 @@ namespace AtmoData
 
   }
 
+  template <class real>
+  void ComputeCAMSPressure(vector<real> alpha,
+  			   vector<real> beta,
+			   Array<int, 1> list_model_levels,
+  			   Data<real, 3> SurfacePressure,
+  			   Data<real, 4>& Pressure)
+  {
+    int h, i, j, k;
+    int mlevel;
+    real a, b;
+
+    int Nx = Pressure.GetLength(3);
+    int Ny = Pressure.GetLength(2);
+    int Nz = Pressure.GetLength(1);
+    int Nt = Pressure.GetLength(0);
+
+    for (h = 0; h < Nt; h++)
+      for (k = 0; k < Nz; k++)
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+	    {
+	      mlevel = list_model_levels(k);
+	      a = alpha[mlevel];
+	      b = beta[mlevel];
+	      
+	      Pressure(h, k, j, i) = a + b * SurfacePressure(h, j, i);
+	    }
+  }
+
+  
 
   //! Computes the altitudes from pressure fields.
   /*!
@@ -1680,6 +1710,57 @@ namespace AtmoData
                 - r / g * Temperature(h, k, j, i)
                 * log(Pressure(h, k, j, i) / Pressure(h, k - 1, j, i));
 
+  }
+
+  //! Computes the altitudes from pressure and temperature fields.
+  /*!
+    Level heights are computed according to:
+    Z_{k+1} = Z_k + (r * T_k / g) * log(P_k/P_{k+1})
+    where Z is the altitude, T the temperature, P the pressure,
+    k the level index, r the molar gas constant for dry air
+    and g the standard gravity.
+    \par For the first level, Z_0 = r * T_0 / g * log(PS / P_0)
+    where PS is the surface pressure.
+    \param SurfacePressure surface pressure (Pa).
+    \param Pressure pressure (Pa).
+    \param Density (kg/m3).
+    \param Height (output) altitudes (m).
+    \param g (optional) standard gravity. Default: 9.80665.
+    \note Temperature, Pressure and Height must be defined on the same grid.
+  */
+  template<class TPS, class TP, class TD, class T, class TG>
+  void ComputeDensityHeight(Data<TPS, 3, TG>& SurfacePressure,
+			    Array<TP, 1>& Pressure,
+			    Data<TD, 4, TG>& Density,
+			    Grid<T>& Height)
+  {
+
+    int h, i, j, k;
+    T g = 9.80665;
+    int Nx = Height.GetLength(3);
+    int Ny = Height.GetLength(2);
+    int Nz = Height.GetLength(1);
+    int Nt = Height.GetLength(0);
+
+    for (h = 0; h < Nt; h++)
+      for (k = 0; k < Nz; k++)
+        for (j = 0; j < Ny; j++)
+          for (i = 0; i < Nx; i++)
+            if (k == 0)
+	      {
+		if (Pressure(k) > SurfacePressure(h, j, i))
+		  Height.Value(h, k, j, i) = (Pressure(k) / (Density(h, k, j, i) * g))
+		    * log(SurfacePressure(h, j, i) / Pressure(k));
+		else
+		  Height.Value(h, k, j, i) = (Pressure(k) / (Density(h, k, j, i) * g))
+		    * log(SurfacePressure(h, j, i) / Pressure(k));	
+	      }
+            else
+	      {
+		Height.Value(h, k, j, i) = Height.Value(h, k - 1, j, i)
+		  - (Pressure(k) / (Density(h, k, j, i) * g))
+		  * log(Pressure(k) / Pressure(k - 1));
+	      }
   }
 
 

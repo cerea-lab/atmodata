@@ -76,13 +76,13 @@ namespace AtmoData
   T BESSK1(T X);
 
   template<class T>
-  T ComputeWangsH(T H, T W, T L, T hmax, T htrunk, T LAI, int nbtree, T Cdt);
+  T ComputeWangsH(T H, T W, T hmax, T htrunk, T LAIstreet, T Cdt);
 
   template<class T>
-  T ComputeWangUstreet(T H, T W, T L, T phi, T z0s, T sH, int nz, T UH, T hmax, T htrunk, T LAI, int nbtree, T Cdt);
+  T ComputeWangUstreet(T H, T W, T phi, T z0s, T sH, int nz, T UH, T hmax, T htrunk, T LAIstreet, T Cdt);
 
   template<class T>
-  T ComputeWangUstarProfile(T z, T H, T W, T L, T z0s, T sH, T ustar_H, T hmax, T htrunk, T LAI, int nbtree, T Cdt);
+  T ComputeWangUstarProfile(T z, T H, T W, T z0s, T sH, T ustar_H, T hmax, T htrunk, T LAIstreet, T Cdt);
 
   template<class T>
   T ComputeSchulteLm(T H, T W);

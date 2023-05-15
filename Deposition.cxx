@@ -173,7 +173,7 @@ namespace AtmoData
     \beta species-dependent scaling factor (-)
     \param Tair air temperature (°C)
     \param RH relative humidity (-)
-    \param LAI tree Leaf Area Index (-)
+    \param LAI tree Leaf Area Index on street surface (-)
     \return Rcut cuticular resistance for gaseous species (s/m)
   */
   template<class T>
@@ -197,7 +197,7 @@ namespace AtmoData
     \param H Henry constant for the species (mol/(L*atm))
     \param f0 reactivity factor for the species (-)
     \param Tair air temperature (°C)
-    \param LAI tree Leaf Area Index (-)
+    \param LAI tree Leaf Area Index on street surface (-)
     \return Rcut cuticular resistance for gaseous species (s/m)
   */
   template<class T>

@@ -2,6 +2,12 @@ o------------------o
 | ATMODATA HISTORY |
 o------------------o
 
+# Version 1.7 (2023-01-03)
+----------------
+
+- Added new functions to use data from the CAMS model.
+- Revised the computation of the mixing length in the street.
+
 
 # Version 1.6 (2022-09-22)
 -------------
